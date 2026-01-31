@@ -1,0 +1,262 @@
+/* ============================================
+   LEZZET YOLCULUĞU - PRINT STYLES
+   ============================================ */
+
+@media print {
+    /* Hide non-essential elements */
+    .nav,
+    .nav-transparent,
+    .mobile-menu,
+    .action-bar,
+    .footer,
+    .recipe-card-actions,
+    .modal,
+    .toast,
+    .theme-toggle,
+    .nav-actions,
+    .nav-mobile-toggle,
+    .ingredients-servings,
+    .ingredient-checkbox,
+    .list-card-actions,
+    .list-recipe-item-remove {
+        display: none !important;
+    }
+    
+    /* Reset body styles */
+    body {
+        background: white !important;
+        color: black !important;
+        font-size: 12pt;
+        line-height: 1.5;
+    }
+    
+    /* Remove margins and padding */
+    * {
+        box-shadow: none !important;
+        text-shadow: none !important;
+    }
+    
+    /* Recipe Hero */
+    .recipe-hero {
+        height: auto !important;
+        min-height: auto !important;
+        margin-top: 0 !important;
+        page-break-after: avoid;
+    }
+    
+    .recipe-hero-image {
+        position: relative !important;
+        height: 200px !important;
+        page-break-inside: avoid;
+    }
+    
+    .recipe-hero-image img {
+        object-fit: contain !important;
+        max-height: 200px !important;
+    }
+    
+    .recipe-hero-overlay {
+        display: none !important;
+    }
+    
+    .recipe-hero-content {
+        padding: 1rem 0 !important;
+        color: black !important;
+    }
+    
+    .recipe-title {
+        font-size: 24pt !important;
+        color: black !important;
+        text-shadow: none !important;
+        margin-bottom: 0.5rem !important;
+    }
+    
+    .recipe-category {
+        background: #ddd !important;
+        color: black !important;
+        print-color-adjust: exact;
+        -webkit-print-color-adjust: exact;
+    }
+    
+    .recipe-meta {
+        display: flex !important;
+        flex-wrap: wrap !important;
+        gap: 1rem !important;
+        margin-top: 1rem !important;
+    }
+    
+    .recipe-meta-item {
+        flex-direction: row !important;
+        align-items: center !important;
+        gap: 0.25rem !important;
+    }
+    
+    .recipe-meta-label {
+        font-size: 9pt !important;
+        opacity: 1 !important;
+    }
+    
+    .recipe-meta-value {
+        font-size: 10pt !important;
+    }
+    
+    /* Main Content */
+    .main {
+        padding: 1rem 0 !important;
+    }
+    
+    .recipe-content {
+        display: block !important;
+    }
+    
+    /* Ingredients */
+    .recipe-sidebar {
+        position: static !important;
+        margin-bottom: 2rem !important;
+        page-break-inside: avoid;
+    }
+    
+    .ingredients-card {
+        box-shadow: none !important;
+        border: 1px solid #ddd !important;
+        padding: 1rem !important;
+    }
+    
+    .ingredients-title {
+        font-size: 16pt !important;
+        margin-bottom: 1rem !important;
+    }
+    
+    .ingredients-list {
+        display: block !important;
+    }
+    
+    .ingredient-item {
+        padding: 0.25rem 0 !important;
+        border-bottom: 1px dotted #ccc !important;
+    }
+    
+    .ingredient-text {
+        font-size: 11pt !important;
+    }
+    
+    /* Instructions */
+    .recipe-instructions {
+        max-width: none !important;
+    }
+    
+    .instructions-content {
+        font-size: 11pt !important;
+        line-height: 1.6 !important;
+    }
+    
+    .instructions-content h2 {
+        font-size: 16pt !important;
+        margin: 1.5rem 0 1rem !important;
+        border-bottom: 2px solid #333 !important;
+        page-break-after: avoid;
+    }
+    
+    .instructions-content h3 {
+        font-size: 13pt !important;
+        margin: 1rem 0 0.5rem !important;
+        color: #333 !important;
+    }
+    
+    .instructions-content p {
+        margin-bottom: 0.75rem !important;
+        text-align: justify !important;
+    }
+    
+    .instructions-content ul,
+    .instructions-content ol {
+        margin-bottom: 1rem !important;
+        padding-left: 1.5rem !important;
+    }
+    
+    .instructions-content li {
+        margin-bottom: 0.5rem !important;
+    }
+    
+    .instructions-content blockquote {
+        background: #f5f5f5 !important;
+        border-left: 3px solid #333 !important;
+        padding: 0.75rem 1rem !important;
+        margin: 1rem 0 !important;
+        font-style: italic !important;
+        page-break-inside: avoid;
+    }
+    
+    /* Links */
+    a {
+        color: black !important;
+        text-decoration: none !important;
+    }
+    
+    a[href]::after {
+        content: "" !important;
+    }
+    
+    /* Page breaks */
+    .recipe-hero,
+    .ingredients-card {
+        page-break-inside: avoid;
+    }
+    
+    h2, h3 {
+        page-break-after: avoid;
+    }
+    
+    p, li {
+        page-break-inside: avoid;
+    }
+    
+    /* Container */
+    .container {
+        max-width: none !important;
+        padding: 0 !important;
+    }
+    
+    /* Header info */
+    .print-header {
+        text-align: center;
+        border-bottom: 1px solid #ccc;
+        padding-bottom: 0.5rem;
+        margin-bottom: 1rem;
+    }
+    
+    .print-header-logo {
+        font-family: 'Playfair Display', Georgia, serif;
+        font-size: 14pt;
+        font-weight: 600;
+    }
+    
+    .print-header-url {
+        font-size: 9pt;
+        color: #666;
+    }
+    
+    /* Footer */
+    .print-footer {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        text-align: center;
+        font-size: 9pt;
+        color: #666;
+        border-top: 1px solid #ccc;
+        padding-top: 0.5rem;
+    }
+}
+
+/* Print-specific utility class */
+.print-only {
+    display: none;
+}
+
+@media print {
+    .print-only {
+        display: block !important;
+    }
+}
