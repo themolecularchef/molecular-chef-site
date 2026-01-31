@@ -1,4 +1,5 @@
-<!DOCTYPE html>
+
+recipe_html = '''<!DOCTYPE html>
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
@@ -12,12 +13,31 @@
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
     
     <!-- CSS -->
-    <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="css/components.css">
-    <link rel="stylesheet" href="css/print.css" media="print">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="components.css">
+    <link rel="stylesheet" href="print.css" media="print">
     
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍳</text></svg>">
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyDNH6hv0hbDYDcpQurTq0bDqtY87dhDzjo",
+            authDomain: "membership-system-3efc1.firebaseapp.com",
+            projectId: "membership-system-3efc1",
+            storageBucket: "membership-system-3efc1.firebasestorage.app",
+            messagingSenderId: "129656126432",
+            appId: "1:129656126432:web:c4d5ad257f8eb96cd88985"
+        };
+        
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+    </script>
 </head>
 <body>
     <!-- Navigation -->
@@ -38,7 +58,7 @@
                     <span class="theme-toggle-light">☀️</span>
                     <span class="theme-toggle-dark">🌙</span>
                 </button>
-                <a href="auth.html" class="nav-auth" id="navAuth">Giriş</a>
+                <a href="index.html" onclick="showAuthScreen(); return false;" class="nav-auth" id="navAuth">Giriş</a>
                 <div class="nav-user hidden" id="navUser">
                     <span class="nav-user-name" id="navUserName"></span>
                     <button class="nav-logout" id="navLogout" title="Çıkış yap">→</button>
@@ -57,7 +77,7 @@
     <div class="mobile-menu" id="mobileMenu">
         <a href="index.html" class="mobile-link">Tarifler</a>
         <a href="dashboard.html" class="mobile-link mobile-link-lists hidden" id="mobileLists">Listelerim</a>
-        <a href="auth.html" class="mobile-link" id="mobileAuth">Giriş</a>
+        <a href="index.html" onclick="showAuthScreen(); return false;" class="mobile-link" id="mobileAuth">Giriş</a>
         <div class="mobile-user hidden" id="mobileUser">
             <span class="mobile-user-name" id="mobileUserName"></span>
             <button class="mobile-logout" id="mobileLogout">Çıkış Yap</button>
@@ -104,9 +124,9 @@
     <div class="action-bar" id="actionBar">
         <div class="container">
             <div class="action-bar-content">
-                <button class="action-btn" id="addToListBtn">
+                <button class="action-btn" id="addToFavoritesBtn">
                     <span class="action-btn-icon">🤍</span>
-                    <span class="action-btn-text">Listeme Ekle</span>
+                    <span class="action-btn-text">Favorilere Ekle</span>
                 </button>
                 <button class="action-btn" id="shareBtn">
                     <span class="action-btn-icon">📤</span>
@@ -191,7 +211,7 @@
                 </div>
                 <div class="footer-links">
                     <a href="index.html">Tarifler</a>
-                    <a href="auth.html">Giriş</a>
+                    <a href="index.html" onclick="showAuthScreen(); return false;">Giriş</a>
                 </div>
             </div>
             <div class="footer-bottom">
@@ -202,9 +222,148 @@
 
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-    <script src="js/app.js"></script>
-    <script src="js/auth.js"></script>
-    <script src="js/recipes.js"></script>
-    <script src="js/lists.js"></script>
+    <script src="app.js"></script>
+    <script src="firebase-auth.js"></script>
+    <script src="firebase-lists.js"></script>
+    <script src="recipes.js"></script>
+
+    <script>
+        // Auth state ve UI kontrolü
+        firebase.auth().onAuthStateChanged((user) => {
+            const navAuth = document.getElementById('navAuth');
+            const navUser = document.getElementById('navUser');
+            const navUserName = document.getElementById('navUserName');
+            const navLists = document.getElementById('navLists');
+            const mobileAuth = document.getElementById('mobileAuth');
+            const mobileUser = document.getElementById('mobileUser');
+            const mobileUserName = document.getElementById('mobileUserName');
+            const mobileLists = document.getElementById('mobileLists');
+            const addToFavoritesBtn = document.getElementById('addToFavoritesBtn');
+
+            if (user) {
+                // Giriş yapılmışsa
+                if (navAuth) navAuth.classList.add('hidden');
+                if (navUser) navUser.classList.remove('hidden');
+                if (navUserName) navUserName.textContent = user.displayName || user.email;
+                if (navLists) navLists.classList.remove('hidden');
+                
+                if (mobileAuth) mobileAuth.classList.add('hidden');
+                if (mobileUser) mobileUser.classList.remove('hidden');
+                if (mobileUserName) mobileUserName.textContent = user.displayName || user.email;
+                if (mobileLists) mobileLists.classList.remove('hidden');
+                
+                // Favori butonunu kontrol et
+                if (addToFavoritesBtn) {
+                    checkFavoriteStatus();
+                }
+            } else {
+                // Giriş yapılmamışsa
+                if (navAuth) navAuth.classList.remove('hidden');
+                if (navUser) navUser.classList.add('hidden');
+                if (navLists) navLists.classList.add('hidden');
+                if (mobileAuth) mobileAuth.classList.remove('hidden');
+                if (mobileUser) mobileUser.classList.add('hidden');
+                if (mobileLists) mobileLists.classList.add('hidden');
+            }
+        });
+
+        // Çıkış butonları
+        document.getElementById('navLogout')?.addEventListener('click', async () => {
+            await firebase.auth().signOut();
+            localStorage.removeItem('skipAuth');
+            window.location.href = 'index.html';
+        });
+        
+        document.getElementById('mobileLogout')?.addEventListener('click', async () => {
+            await firebase.auth().signOut();
+            localStorage.removeItem('skipAuth');
+            window.location.href = 'index.html';
+        });
+
+        // Favori durumunu kontrol et
+        async function checkFavoriteStatus() {
+            const recipeId = Utils.getUrlParam('id');
+            if (!recipeId) return;
+            
+            try {
+                const isFav = await Lists.isFavorited(recipeId);
+                updateFavoriteButton(isFav);
+            } catch (e) {
+                console.error("Favori kontrol hatası:", e);
+            }
+        }
+
+        // Favori butonunu güncelle
+        function updateFavoriteButton(isFavorited) {
+            const btn = document.getElementById('addToFavoritesBtn');
+            if (!btn) return;
+            
+            const icon = btn.querySelector('.action-btn-icon');
+            const text = btn.querySelector('.action-btn-text');
+            
+            if (isFavorited) {
+                btn.classList.add('active');
+                if (icon) icon.textContent = '❤️';
+                if (text) text.textContent = 'Favorilerden Çıkar';
+            } else {
+                btn.classList.remove('active');
+                if (icon) icon.textContent = '🤍';
+                if (text) text.textContent = 'Favorilere Ekle';
+            }
+        }
+
+        // Favori butonu tıklama
+        document.getElementById('addToFavoritesBtn')?.addEventListener('click', async () => {
+            const user = firebase.auth().currentUser;
+            if (!user) {
+                Toast.show('Favorilere eklemek için giriş yapmalısınız', 'error');
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 1500);
+                return;
+            }
+            
+            const recipeId = Utils.getUrlParam('id');
+            if (!recipeId) return;
+            
+            try {
+                const result = await Lists.toggleFavorite(recipeId);
+                if (result) {
+                    if (result.action === 'added') {
+                        updateFavoriteButton(true);
+                        Toast.show('Favorilere eklendi!', 'success');
+                    } else {
+                        updateFavoriteButton(false);
+                        Toast.show('Favorilerden çıkarıldı');
+                    }
+                }
+            } catch (error) {
+                console.error("Favori hatası:", error);
+                Toast.show('İşlem yapılamadı', 'error');
+            }
+        });
+
+        function showAuthScreen() {
+            localStorage.removeItem('skipAuth');
+            window.location.href = 'index.html';
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toastMessage').textContent = message;
+            toast.className = 'toast active';
+            setTimeout(() => toast.classList.remove('active'), 3000);
+        }
+    </script>
 </body>
-</html>
+</html>'''
+
+print("RECIPE.HTML HAZIR")
+print("=" * 50)
+print("Bu kodu recipe.html dosyası olarak kaydet.")
+print("Değişiklikler:")
+print("- Firebase SDK eklendi")
+print("- Eski auth.js ve lists.js kaldırıldı")
+print("- firebase-auth.js ve firebase-lists.js eklendi")
+print("- Favori butonu Firebase'e bağlandı")
+print("- Giriş/Kayıt kontrolü Firebase Auth ile yapılıyor")
