@@ -1,0 +1,23 @@
+backend:
+  name: git-gateway
+  branch: main
+
+media_folder: "assets/images"
+public_folder: "/assets/images"
+
+collections:
+  - name: "recipes"
+    label: "Tarifler"
+    folder: "content/recipes"
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - {label: "Başlık", name: "title", widget: "string"}
+      - {label: "Kısa Açıklama", name: "description", widget: "text"}
+      - {label: "Görsel", name: "image", widget: "image"}
+      - {label: "Hazırlık Süresi", name: "prepTime", widget: "string"}
+      - {label: "Pişirme Süresi", name: "cookTime", widget: "string"}
+      - {label: "Kişi Sayısı", name: "servings", widget: "number", value_type: "int"}
+      - {label: "Zorluk", name: "difficulty", widget: "select", options: ["Kolay", "Orta", "Zor"]}
+      - {label: "Kategori", name: "category", widget: "select", options: ["Et Yemekleri", "Tavuk Yemekleri", "Makarna", "Çorba", "Meze"]}
+      - {label: "İçerik (Markdown)", name: "body", widget: "markdown"}
