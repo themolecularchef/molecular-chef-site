@@ -17,6 +17,25 @@
     
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍳</text></svg>">
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyDNH6hv0hbDYDcpQurTq0bDqtY87dhDzjo",
+            authDomain: "membership-system-3efc1.firebaseapp.com",
+            projectId: "membership-system-3efc1",
+            storageBucket: "membership-system-3efc1.firebasestorage.app",
+            messagingSenderId: "129656126432",
+            appId: "1:129656126432:web:c4d5ad257f8eb96cd88985"
+        };
+        
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+    </script>
 </head>
 <body>
     <!-- GİRİŞ EKRANI (İlk Başlangıç) -->
@@ -213,7 +232,9 @@
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script src="js/app.js"></script>
-    <script src="js/auth.js"></script>
+    <!-- ESKİ: <script src="js/auth.js"></script> -->
+    <!-- YENİ: Firebase Auth kullan -->
+    <script src="js/firebase-auth.js"></script>
     <script src="js/recipes.js"></script>
     <script src="js/lists.js"></script>
     
@@ -223,148 +244,163 @@
             const authScreen = document.getElementById('authScreen');
             const mainWebsite = document.getElementById('mainWebsite');
             const skipBtn = document.getElementById('skipAuthBtn');
+            const toggleBtn = document.getElementById('authToggleBtn');
+            const form = document.getElementById('authForm');
             
-            // Kontrol: Kullanıcı daha önce "üye olmadan devam et" dedi mi veya giriş yaptı mı?
-            const hasSkippedAuth = localStorage.getItem('skipAuth');
-            const currentUser = localStorage.getItem('currentUser');
+            // Auth state dinleyici
+            firebase.auth().onAuthStateChanged((user) => {
+                if (user) {
+                    // Kullanıcı giriş yapmış
+                    authScreen.style.display = 'none';
+                    mainWebsite.style.display = 'block';
+                    localStorage.setItem('skipAuth', 'true');
+                    
+                    // Navigasyonu güncelle
+                    const navAuth = document.getElementById('navAuth');
+                    const navUser = document.getElementById('navUser');
+                    const navUserName = document.getElementById('navUserName');
+                    
+                    if (navAuth) navAuth.classList.add('hidden');
+                    if (navUser) navUser.classList.remove('hidden');
+                    if (navUserName) navUserName.textContent = user.displayName || user.email;
+                } else {
+                    // Kullanıcı giriş yapmamış
+                    const hasSkipped = localStorage.getItem('skipAuth');
+                    if (hasSkipped) {
+                        authScreen.style.display = 'none';
+                        mainWebsite.style.display = 'block';
+                    }
+                }
+            });
             
-            if (hasSkippedAuth || currentUser) {
-                // Doğrudan ana sayfayı göster
-                authScreen.style.display = 'none';
-                mainWebsite.style.display = 'block';
-                document.body.style.overflow = 'auto';
-            } else {
-                // Giriş ekranını göster, sayfayı kaydırılabilir yapma (sadece auth ekranı görünsün)
-                authScreen.style.display = 'flex';
-                mainWebsite.style.display = 'none';
-                document.body.style.overflow = 'hidden';
-            }
-            
-            // Üye Olmadan Devam Et butonu
+            // Üye Olmadan Devam Et
             if (skipBtn) {
                 skipBtn.addEventListener('click', () => {
                     localStorage.setItem('skipAuth', 'true');
                     authScreen.style.display = 'none';
                     mainWebsite.style.display = 'block';
                     document.body.style.overflow = 'auto';
-                    Toast.show('Tarifleri keşfetmeye başlayabilirsiniz!', 'success');
+                    showToast('Tarifleri keşfetmeye başlayabilirsiniz!', 'success');
                 });
             }
             
-            // Auth Toggle (Giriş/Kayıt arası geçiş)
-            const authToggleBtn = document.getElementById('authToggleBtn');
-            const authTitle = document.getElementById('authTitle');
-            const authSubtitle = document.getElementById('authSubtitle');
-            const authSubmit = document.getElementById('authSubmit');
-            const nameGroup = document.getElementById('nameGroup');
-            const confirmPasswordGroup = document.getElementById('confirmPasswordGroup');
-            const authToggleText = document.getElementById('authToggleText');
-            
+            // Toggle Login/Register
             let isLoginMode = true;
-            
-            if (authToggleBtn) {
-                authToggleBtn.addEventListener('click', () => {
+            if (toggleBtn) {
+                toggleBtn.addEventListener('click', () => {
                     isLoginMode = !isLoginMode;
-                    
-                    if (isLoginMode) {
-                        authTitle.textContent = 'Giriş Yap';
-                        authSubtitle.textContent = 'Hesabınıza giriş yaparak tariflerinizi kaydedin';
-                        authSubmit.textContent = 'Giriş Yap';
-                        nameGroup.style.display = 'none';
-                        confirmPasswordGroup.style.display = 'none';
-                        authToggleText.textContent = 'Hesabınız yok mu?';
-                        authToggleBtn.textContent = 'Kayıt Ol';
-                    } else {
-                        authTitle.textContent = 'Kayıt Ol';
-                        authSubtitle.textContent = 'Yeni bir hesap oluşturun';
-                        authSubmit.textContent = 'Kayıt Ol';
-                        nameGroup.style.display = 'block';
-                        confirmPasswordGroup.style.display = 'block';
-                        authToggleText.textContent = 'Zaten hesabınız var mı?';
-                        authToggleBtn.textContent = 'Giriş Yap';
-                    }
+                    document.getElementById('authTitle').textContent = isLoginMode ? 'Giriş Yap' : 'Kayıt Ol';
+                    document.getElementById('authSubtitle').textContent = isLoginMode ? 'Hesabınıza giriş yaparak tariflerinizi kaydedin' : 'Yeni bir hesap oluşturun';
+                    document.getElementById('authSubmit').textContent = isLoginMode ? 'Giriş Yap' : 'Kayıt Ol';
+                    document.getElementById('nameGroup').style.display = isLoginMode ? 'none' : 'block';
+                    document.getElementById('confirmPasswordGroup').style.display = isLoginMode ? 'none' : 'block';
+                    document.getElementById('authToggleText').textContent = isLoginMode ? 'Hesabınız yok mu?' : 'Zaten hesabınız var mı?';
+                    toggleBtn.textContent = isLoginMode ? 'Kayıt Ol' : 'Giriş Yap';
                 });
             }
             
-            // Form Submit (Auth.js ile entegrasyon)
-            const authForm = document.getElementById('authForm');
-            if (authForm) {
-                authForm.addEventListener('submit', (e) => {
+            // Form Submit - Firebase Entegrasyonu
+            if (form) {
+                form.addEventListener('submit', async (e) => {
                     e.preventDefault();
-                    
                     const email = document.getElementById('email').value;
                     const password = document.getElementById('password').value;
                     
                     if (isLoginMode) {
-                        // Giriş işlemi
-                        if (typeof Auth !== 'undefined') {
-                            const result = Auth.login(email, password);
-                            if (result.success) {
-                                Toast.show(result.message, 'success');
-                                setTimeout(() => {
-                                    authScreen.style.display = 'none';
-                                    mainWebsite.style.display = 'block';
-                                    if (typeof Auth.updateNavigation === 'function') {
-                                        Auth.updateNavigation();
-                                    }
-                                    if (typeof Recipes !== 'undefined' && typeof Recipes.renderRecipesGrid === 'function') {
-                                        Recipes.renderRecipesGrid();
-                                    }
-                                }, 500);
-                            } else {
-                                Toast.show(result.message, 'error');
-                            }
+                        // Giriş yap
+                        try {
+                            await firebase.auth().signInWithEmailAndPassword(email, password);
+                            showToast('Giriş başarılı!', 'success');
+                        } catch (error) {
+                            let msg = 'Giriş yapılamadı';
+                            if (error.code === 'auth/user-not-found') msg = 'Kullanıcı bulunamadı';
+                            if (error.code === 'auth/wrong-password') msg = 'Şifre hatalı';
+                            showToast(msg, 'error');
                         }
                     } else {
-                        // Kayıt işlemi
+                        // Kayıt ol
                         const name = document.getElementById('name').value;
-                        const confirmPassword = document.getElementById('confirmPassword').value;
+                        const confirmPass = document.getElementById('confirmPassword').value;
                         
                         if (!name.trim()) {
-                            Toast.show('Lütfen isminizi girin', 'error');
+                            showToast('Lütfen isminizi girin', 'error');
                             return;
                         }
                         
-                        if (password !== confirmPassword) {
-                            Toast.show('Şifreler eşleşmiyor', 'error');
+                        if (password !== confirmPass) {
+                            showToast('Şifreler eşleşmiyor', 'error');
                             return;
                         }
                         
                         if (password.length < 6) {
-                            Toast.show('Şifre en az 6 karakter olmalı', 'error');
+                            showToast('Şifre en az 6 karakter olmalı', 'error');
                             return;
                         }
                         
-                        if (typeof Auth !== 'undefined') {
-                            const result = Auth.register(name, email, password);
-                            if (result.success) {
-                                Toast.show(result.message, 'success');
-                                setTimeout(() => {
-                                    authScreen.style.display = 'none';
-                                    mainWebsite.style.display = 'block';
-                                    if (typeof Auth.updateNavigation === 'function') {
-                                        Auth.updateNavigation();
-                                    }
-                                }, 500);
-                            } else {
-                                Toast.show(result.message, 'error');
-                            }
+                        try {
+                            const result = await firebase.auth().createUserWithEmailAndPassword(email, password);
+                            await result.user.updateProfile({ displayName: name });
+                            
+                            // Firestore'a kullanıcı bilgisi ekle
+                            await db.collection('users').doc(result.user.uid).set({
+                                name: name,
+                                email: email,
+                                createdAt: new Date(),
+                                favorites: []
+                            });
+                            
+                            showToast('Kayıt başarılı!', 'success');
+                        } catch (error) {
+                            let msg = 'Kayıt yapılamadı';
+                            if (error.code === 'auth/email-already-in-use') msg = 'Bu e-posta zaten kayıtlı';
+                            if (error.code === 'auth/weak-password') msg = 'Şifre çok zayıf';
+                            showToast(msg, 'error');
                         }
                     }
                 });
             }
+            
+            // Çıkış yap
+            const navLogout = document.getElementById('navLogout');
+            const mobileLogout = document.getElementById('mobileLogout');
+            
+            if (navLogout) {
+                navLogout.addEventListener('click', async () => {
+                    await firebase.auth().signOut();
+                    localStorage.removeItem('skipAuth');
+                    showToast('Çıkış yapıldı', 'success');
+                    setTimeout(() => location.reload(), 500);
+                });
+            }
+            
+            if (mobileLogout) {
+                mobileLogout.addEventListener('click', async () => {
+                    await firebase.auth().signOut();
+                    localStorage.removeItem('skipAuth');
+                    showToast('Çıkış yapıldı', 'success');
+                    setTimeout(() => location.reload(), 500);
+                });
+            }
         });
         
-        // Ana sayfadan tekrar giriş ekranına dönmek için
         function showAuthScreen() {
             const authScreen = document.getElementById('authScreen');
             const mainWebsite = document.getElementById('mainWebsite');
-            
             if (authScreen && mainWebsite) {
                 authScreen.style.display = 'flex';
                 mainWebsite.style.display = 'none';
                 document.body.style.overflow = 'hidden';
-                window.scrollTo(0, 0);
+                localStorage.removeItem('skipAuth');
+            }
+        }
+        
+        function showToast(message, type) {
+            const toast = document.getElementById('toast');
+            const msg = document.getElementById('toastMessage');
+            if (toast && msg) {
+                msg.textContent = message;
+                toast.className = 'toast active ' + (type || '');
+                setTimeout(() => toast.classList.remove('active'), 3000);
             }
         }
     </script>
