@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Lezzetli yemek tarifleri, adım adım anlatımlar ve püf noktaları. Evde profesyonel sonuçlar için tariflerimizi keşfedin.">
+    <title>Lezzet Yolculuğu | Yemek Tarifleri</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/components.css">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍳</text></svg>">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="nav" id="nav">
+        <div class="nav-container">
+            <a href="index.html" class="nav-logo">
+                <span class="nav-logo-icon">🍳</span>
+                <span class="nav-logo-text">Lezzet Yolculuğu</span>
+            </a>
+            
+            <div class="nav-links">
+                <a href="index.html" class="nav-link active">Tarifler</a>
+                <a href="dashboard.html" class="nav-link nav-link-lists hidden" id="navLists">Listelerim</a>
+            </div>
+            
+            <div class="nav-actions">
+                <button class="theme-toggle" id="themeToggle" aria-label="Karanlık moda geç">
+                    <span class="theme-toggle-light">☀️</span>
+                    <span class="theme-toggle-dark">🌙</span>
+                </button>
+                <a href="auth.html" class="nav-auth" id="navAuth">Giriş</a>
+                <div class="nav-user hidden" id="navUser">
+                    <span class="nav-user-name" id="navUserName"></span>
+                    <button class="nav-logout" id="navLogout" title="Çıkış yap">→</button>
+                </div>
+            </div>
+            
+            <button class="nav-mobile-toggle" id="navMobileToggle" aria-label="Menüyü aç">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Mobile Menu -->
+    <div class="mobile-menu" id="mobileMenu">
+        <a href="index.html" class="mobile-link active">Tarifler</a>
+        <a href="dashboard.html" class="mobile-link mobile-link-lists hidden" id="mobileLists">Listelerim</a>
+        <a href="auth.html" class="mobile-link" id="mobileAuth">Giriş</a>
+        <div class="mobile-user hidden" id="mobileUser">
+            <span class="mobile-user-name" id="mobileUserName"></span>
+            <button class="mobile-logout" id="mobileLogout">Çıkış Yap</button>
+        </div>
+    </div>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-bg">
+            <img src="assets/images/iskender-kebap.webp" alt="Yemek arka plan" loading="eager">
+            <div class="hero-overlay"></div>
+        </div>
+        <div class="hero-content">
+            <h1 class="hero-title">Lezzetin Sırlarını Keşfedin</h1>
+            <p class="hero-subtitle">Evde profesyonel sonuçlar için özenle hazırlanmış tarifler</p>
+            <div class="hero-search">
+                <input type="text" class="hero-search-input" id="searchInput" placeholder="Tarif ara...">
+                <button class="hero-search-btn" aria-label="Ara">🔍</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <main class="main">
+        <div class="container">
+            <!-- Filters -->
+            <div class="filters">
+                <button class="filter-btn active" data-filter="all">Tümü</button>
+                <button class="filter-btn" data-filter="Et Yemekleri">Et</button>
+                <button class="filter-btn" data-filter="Tavuk Yemekleri">Tavuk</button>
+                <button class="filter-btn" data-filter="Makarna">Makarna</button>
+                <button class="filter-btn" data-filter="Çorba">Çorba</button>
+                <button class="filter-btn" data-filter="Meze">Meze</button>
+            </div>
+
+            <!-- Recipes Grid -->
+            <div class="recipes-grid" id="recipesGrid">
+                <!-- Recipes will be loaded dynamically -->
+            </div>
+
+            <!-- Empty State -->
+            <div class="empty-state hidden" id="emptyState">
+                <div class="empty-state-icon">🔍</div>
+                <h3 class="empty-state-title">Sonuç bulunamadı</h3>
+                <p class="empty-state-text">Aramanıza uygun tarif bulamadık. Farklı bir kelime deneyin.</p>
+            </div>
+        </div>
+    </main>
+
+    <!-- Quick View Modal -->
+    <div class="modal" id="quickViewModal">
+        <div class="modal-backdrop"></div>
+        <div class="modal-content">
+            <button class="modal-close" aria-label="Kapat">×</button>
+            <div class="modal-body" id="quickViewBody">
+                <!-- Content loaded dynamically -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast">
+        <span class="toast-message" id="toastMessage"></span>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <span class="footer-logo">🍳 Lezzet Yolculuğu</span>
+                    <p class="footer-tagline">Evde profesyonel lezzetler</p>
+                </div>
+                <div class="footer-links">
+                    <a href="index.html">Tarifler</a>
+                    <a href="auth.html">Giriş</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Lezzet Yolculuğu. Tüm hakları saklıdır.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/recipes.js"></script>
+    <script src="js/lists.js"></script>
+</body>
+</html>

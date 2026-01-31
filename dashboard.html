@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Kişisel tarif listenizi yönetin. Favorilerinizi kaydedin, özel listeler oluşturun.">
+    <title>Listelerim | Lezzet Yolculuğu</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/components.css">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍳</text></svg>">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="nav" id="nav">
+        <div class="nav-container">
+            <a href="index.html" class="nav-logo">
+                <span class="nav-logo-icon">🍳</span>
+                <span class="nav-logo-text">Lezzet Yolculuğu</span>
+            </a>
+            
+            <div class="nav-links">
+                <a href="index.html" class="nav-link">Tarifler</a>
+                <a href="dashboard.html" class="nav-link active">Listelerim</a>
+            </div>
+            
+            <div class="nav-actions">
+                <button class="theme-toggle" id="themeToggle" aria-label="Karanlık moda geç">
+                    <span class="theme-toggle-light">☀️</span>
+                    <span class="theme-toggle-dark">🌙</span>
+                </button>
+                <div class="nav-user" id="navUser">
+                    <span class="nav-user-name" id="navUserName"></span>
+                    <button class="nav-logout" id="navLogout" title="Çıkış yap">→</button>
+                </div>
+            </div>
+            
+            <button class="nav-mobile-toggle" id="navMobileToggle" aria-label="Menüyü aç">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Mobile Menu -->
+    <div class="mobile-menu" id="mobileMenu">
+        <a href="index.html" class="mobile-link">Tarifler</a>
+        <a href="dashboard.html" class="mobile-link active">Listelerim</a>
+        <button class="mobile-logout" id="mobileLogout">Çıkış Yap</button>
+    </div>
+
+    <!-- Main Content -->
+    <main class="main main-dashboard">
+        <div class="container">
+            <!-- Dashboard Header -->
+            <div class="dashboard-header">
+                <h1 class="dashboard-title">Merhaba, <span id="userName">Misafir</span> 👋</h1>
+                <p class="dashboard-subtitle">Tarif koleksiyonunuzu yönetin</p>
+            </div>
+
+            <!-- Lists Section -->
+            <div class="lists-section">
+                <div class="lists-header">
+                    <h2 class="section-title">Listelerim</h2>
+                    <button class="btn btn-primary btn-sm" id="createListBtn">
+                        <span>+</span> Yeni Liste
+                    </button>
+                </div>
+
+                <!-- Lists Grid -->
+                <div class="lists-grid" id="listsGrid">
+                    <!-- Lists loaded dynamically -->
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Create List Modal -->
+    <div class="modal" id="createListModal">
+        <div class="modal-backdrop"></div>
+        <div class="modal-content modal-sm">
+            <button class="modal-close" aria-label="Kapat">×</button>
+            <div class="modal-header">
+                <h3 class="modal-title">Yeni Liste Oluştur</h3>
+            </div>
+            <div class="modal-body">
+                <form id="createListForm">
+                    <div class="form-group">
+                        <label class="form-label" for="listName">Liste Adı</label>
+                        <input type="text" class="form-input" id="listName" placeholder="Örn: Hafta Sonu Tarifleri" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-full">Oluştur</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- List Detail Modal -->
+    <div class="modal" id="listDetailModal">
+        <div class="modal-backdrop"></div>
+        <div class="modal-content modal-lg">
+            <button class="modal-close" aria-label="Kapat">×</button>
+            <div class="modal-header">
+                <h3 class="modal-title" id="listDetailTitle">Liste Adı</h3>
+                <p class="modal-subtitle" id="listDetailCount">0 tarif</p>
+            </div>
+            <div class="modal-body">
+                <div class="list-recipes-grid" id="listRecipesGrid">
+                    <!-- Recipes loaded dynamically -->
+                </div>
+                <div class="empty-state hidden" id="emptyListState">
+                    <div class="empty-state-icon">📋</div>
+                    <h4 class="empty-state-title">Liste boş</h4>
+                    <p class="empty-state-text">Bu listeye henüz tarif eklenmemiş.</p>
+                    <a href="index.html" class="btn btn-primary btn-sm">Tariflere Göz At</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast">
+        <span class="toast-message" id="toastMessage"></span>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <span class="footer-logo">🍳 Lezzet Yolculuğu</span>
+                    <p class="footer-tagline">Evde profesyonel lezzetler</p>
+                </div>
+                <div class="footer-links">
+                    <a href="index.html">Tarifler</a>
+                    <a href="dashboard.html">Listelerim</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Lezzet Yolculuğu. Tüm hakları saklıdır.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="js/app.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/lists.js"></script>
+</body>
+</html>

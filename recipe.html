@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Detaylı yemek tarifi. Malzemeler, adım adım hazırlık ve püf noktaları.">
+    <title>Tarif | Lezzet Yolculuğu</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/print.css" media="print">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍳</text></svg>">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="nav" id="nav">
+        <div class="nav-container">
+            <a href="index.html" class="nav-logo">
+                <span class="nav-logo-icon">🍳</span>
+                <span class="nav-logo-text">Lezzet Yolculuğu</span>
+            </a>
+            
+            <div class="nav-links">
+                <a href="index.html" class="nav-link">Tarifler</a>
+                <a href="dashboard.html" class="nav-link nav-link-lists hidden" id="navLists">Listelerim</a>
+            </div>
+            
+            <div class="nav-actions">
+                <button class="theme-toggle" id="themeToggle" aria-label="Karanlık moda geç">
+                    <span class="theme-toggle-light">☀️</span>
+                    <span class="theme-toggle-dark">🌙</span>
+                </button>
+                <a href="auth.html" class="nav-auth" id="navAuth">Giriş</a>
+                <div class="nav-user hidden" id="navUser">
+                    <span class="nav-user-name" id="navUserName"></span>
+                    <button class="nav-logout" id="navLogout" title="Çıkış yap">→</button>
+                </div>
+            </div>
+            
+            <button class="nav-mobile-toggle" id="navMobileToggle" aria-label="Menüyü aç">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Mobile Menu -->
+    <div class="mobile-menu" id="mobileMenu">
+        <a href="index.html" class="mobile-link">Tarifler</a>
+        <a href="dashboard.html" class="mobile-link mobile-link-lists hidden" id="mobileLists">Listelerim</a>
+        <a href="auth.html" class="mobile-link" id="mobileAuth">Giriş</a>
+        <div class="mobile-user hidden" id="mobileUser">
+            <span class="mobile-user-name" id="mobileUserName"></span>
+            <button class="mobile-logout" id="mobileLogout">Çıkış Yap</button>
+        </div>
+    </div>
+
+    <!-- Recipe Hero -->
+    <section class="recipe-hero" id="recipeHero">
+        <div class="recipe-hero-image">
+            <img src="" alt="" id="recipeHeroImage" loading="eager">
+            <div class="recipe-hero-overlay"></div>
+        </div>
+        <div class="recipe-hero-content">
+            <div class="container">
+                <span class="recipe-category" id="recipeCategory"></span>
+                <h1 class="recipe-title" id="recipeTitle"></h1>
+                <div class="recipe-meta">
+                    <div class="recipe-meta-item">
+                        <span class="recipe-meta-icon">⏱️</span>
+                        <span class="recipe-meta-label">Hazırlık</span>
+                        <span class="recipe-meta-value" id="recipePrepTime"></span>
+                    </div>
+                    <div class="recipe-meta-item">
+                        <span class="recipe-meta-icon">🔥</span>
+                        <span class="recipe-meta-label">Pişirme</span>
+                        <span class="recipe-meta-value" id="recipeCookTime"></span>
+                    </div>
+                    <div class="recipe-meta-item">
+                        <span class="recipe-meta-icon">🍽️</span>
+                        <span class="recipe-meta-label">Kişi</span>
+                        <span class="recipe-meta-value" id="recipeServings"></span>
+                    </div>
+                    <div class="recipe-meta-item">
+                        <span class="recipe-meta-icon">📊</span>
+                        <span class="recipe-meta-label">Zorluk</span>
+                        <span class="recipe-meta-value" id="recipeDifficulty"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Action Bar -->
+    <div class="action-bar" id="actionBar">
+        <div class="container">
+            <div class="action-bar-content">
+                <button class="action-btn" id="addToListBtn">
+                    <span class="action-btn-icon">🤍</span>
+                    <span class="action-btn-text">Listeme Ekle</span>
+                </button>
+                <button class="action-btn" id="shareBtn">
+                    <span class="action-btn-icon">📤</span>
+                    <span class="action-btn-text">Paylaş</span>
+                </button>
+                <button class="action-btn" id="printBtn">
+                    <span class="action-btn-icon">🖨️</span>
+                    <span class="action-btn-text">Yazdır</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recipe Content -->
+    <main class="main recipe-main">
+        <div class="container">
+            <div class="recipe-content">
+                <!-- Left: Ingredients -->
+                <aside class="recipe-sidebar">
+                    <div class="ingredients-card">
+                        <h2 class="ingredients-title">Malzemeler</h2>
+                        <div class="ingredients-servings">
+                            <button class="servings-btn" id="decreaseServings">−</button>
+                            <span class="servings-count"><span id="servingsCount">4</span> kişilik</span>
+                            <button class="servings-btn" id="increaseServings">+</button>
+                        </div>
+                        <div class="ingredients-list" id="ingredientsList">
+                            <!-- Ingredients loaded dynamically -->
+                        </div>
+                    </div>
+                </aside>
+
+                <!-- Right: Instructions -->
+                <article class="recipe-instructions">
+                    <div class="instructions-content" id="instructionsContent">
+                        <!-- Content loaded from markdown -->
+                    </div>
+                </article>
+            </div>
+        </div>
+    </main>
+
+    <!-- Share Modal -->
+    <div class="modal" id="shareModal">
+        <div class="modal-backdrop"></div>
+        <div class="modal-content modal-sm">
+            <button class="modal-close" aria-label="Kapat">×</button>
+            <div class="modal-header">
+                <h3 class="modal-title">Tarifi Paylaş</h3>
+            </div>
+            <div class="modal-body">
+                <div class="share-options">
+                    <button class="share-option" id="shareNative">
+                        <span class="share-option-icon">📱</span>
+                        <span class="share-option-text">Paylaş</span>
+                    </button>
+                    <button class="share-option" id="shareWhatsApp">
+                        <span class="share-option-icon">💬</span>
+                        <span class="share-option-text">WhatsApp</span>
+                    </button>
+                    <button class="share-option" id="shareCopy">
+                        <span class="share-option-icon">📋</span>
+                        <span class="share-option-text">Link Kopyala</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast">
+        <span class="toast-message" id="toastMessage"></span>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <span class="footer-logo">🍳 Lezzet Yolculuğu</span>
+                    <p class="footer-tagline">Evde profesyonel lezzetler</p>
+                </div>
+                <div class="footer-links">
+                    <a href="index.html">Tarifler</a>
+                    <a href="auth.html">Giriş</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Lezzet Yolculuğu. Tüm hakları saklıdır.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/recipes.js"></script>
+    <script src="js/lists.js"></script>
+</body>
+</html>
