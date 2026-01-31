@@ -237,6 +237,20 @@
       "tags": ["bonfile", "kavurma", "ekmek arası", "sokak lezzeti", "biber", "marine"],
       "contentFile": "content/markdown/marineli-bonfile-kavurma-baharatli-soganli-ekmek-arasi.md",
       "description": "Sebzeli marineyle tatlandırılmış, yavaş pişirilmiş bonfile kavurma, ramazan pidesi arası sunum ve baharatlı çiğ soğan ile."
+    },
+    {
+      "id": "baharat-bombasi-firin-tavuk-but-sade-elma-dilim-patates",
+      "title": "Baharat Bombası Fırın Tavuk Butu & Sade Elma Dilim Patates",
+      "image": "assets/images/baharat-bombasi-firin-tavuk-but-sade-elma-dilim-patates.webp",
+      "prepTime": "20 dk (marine hariç)",
+      "cookTime": "50 dk",
+      "totalTime": "3 saat (marine dahil)",
+      "servings": 4,
+      "difficulty": "Orta",
+      "category": "Tavuk Yemekleri",
+      "tags": ["tavuk", "but", "incik", "patates", "fırın", "marine", "baharat", "elma dilim"],
+      "contentFile": "content/markdown/baharat-bombasi-firin-tavuk-but-sade-elma-dilim-patates.md",
+      "description": "Yoğun baharat karışımıyla marine edilmiş, çıtır derili fırın tavuk butları ve sade baharatlı elma dilim patates."
     }
   ]   
 }
