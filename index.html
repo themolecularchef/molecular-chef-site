@@ -3,22 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Lezzetli yemek tarifleri, adım adım anlatımlar ve püf noktaları. Evde profesyonel sonuçlar için tariflerimizi keşfedin.">
-    <title>Lezzet Yolculuğu | Yemek Tarifleri</title>
+    <meta name="description" content="Lezzet Yolculuğu - Profesyonel yemek tarifleri, püf noktaları ve özel listeleriniz için modern bir platform.">
+    <title>Lezzet Yolculuğu | Profesyonel Yemek Tarifleri</title>
     
-    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
     
-    <!-- CSS -->
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/components.css">
     
-    <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍳</text></svg>">
 
-    <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
@@ -32,212 +28,189 @@
             messagingSenderId: "129656126432",
             appId: "1:129656126432:web:c4d5ad257f8eb96cd88985"
         };
-        
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
     </script>
+    
+    <style>
+        /* Flash of Unauthenticated Content önlemi */
+        #navAuth, #navUser, #mobileAuth, #mobileUser {
+            visibility: hidden;
+        }
+    </style>
 </head>
 <body>
-    <!-- GİRİŞ EKRANI (İlk Başlangıç) -->
-    <div id="authScreen" style="position: fixed; inset: 0; z-index: 9999; background: linear-gradient(135deg, var(--color-bg) 0%, var(--color-bg-secondary) 100%); min-height: 100vh; display: flex; flex-direction: column;">
-        <!-- Navigation -->
-        <nav class="nav nav-transparent">
-            <div class="nav-container">
-                <a href="#" class="nav-logo">
-                    <span class="nav-logo-icon">🍳</span>
-                    <span class="nav-logo-text">Lezzet Yolculuğu</span>
-                </a>
-                <button class="theme-toggle" id="themeToggleAuth" aria-label="Karanlık moda geç">
+    <nav class="nav" id="nav">
+        <div class="nav-container">
+            <a href="index.html" class="nav-logo">
+                <span class="nav-logo-icon">🍳</span>
+                <span class="nav-logo-text">Lezzet Yolculuğu</span>
+            </a>
+            
+            <div class="nav-links">
+                <a href="index.html" class="nav-link active">Ana Sayfa</a>
+                <a href="#recipes" class="nav-link">Tarifler</a>
+                <a href="dashboard.html" class="nav-link nav-link-lists hidden" id="navLists">Listelerim</a>
+            </div>
+            
+            <div class="nav-actions">
+                <button class="theme-toggle" id="themeToggle" aria-label="Tema değiştir">
                     <span class="theme-toggle-light">☀️</span>
                     <span class="theme-toggle-dark">🌙</span>
                 </button>
+                <a href="auth.html" class="nav-auth" id="navAuth">Giriş</a>
+                <div class="nav-user hidden" id="navUser">
+                    <span class="nav-user-name" id="navUserName"></span>
+                    <button class="nav-logout" id="navLogout" title="Çıkış yap">→</button>
+                </div>
             </div>
-        </nav>
+            
+            <button class="nav-mobile-toggle" id="navMobileToggle" aria-label="Menüyü aç">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </nav>
 
-        <!-- Auth Container -->
-        <main style="flex: 1; display: flex; align-items: center; justify-content: center; padding: 2rem;">
-            <div style="width: 100%; max-width: 420px; background: var(--color-surface); border-radius: 16px; padding: 2.5rem; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);">
-                <div style="text-align: center; margin-bottom: 2rem;">
-                    <h1 id="authTitle" style="font-family: var(--font-heading); font-size: 1.75rem; font-weight: 600; margin-bottom: 0.5rem;">Giriş Yap</h1>
-                    <p id="authSubtitle" style="font-size: 0.9375rem; color: var(--color-text-secondary);">Hesabınıza giriş yaparak tariflerinizi kaydedin</p>
-                </div>
-                
-                <form id="authForm" style="margin-bottom: 1.5rem;">
-                    <div id="nameGroup" style="display: none; margin-bottom: 1.5rem;">
-                        <label style="display: block; font-size: 0.875rem; font-weight: 500; margin-bottom: 0.5rem;">İsim</label>
-                        <input type="text" id="name" placeholder="İsminizi girin" style="width: 100%; padding: 0.75rem; border: 1px solid var(--color-border); border-radius: 8px; background: var(--color-bg);">
-                    </div>
-                    
-                    <div style="margin-bottom: 1.5rem;">
-                        <label style="display: block; font-size: 0.875rem; font-weight: 500; margin-bottom: 0.5rem;">E-posta</label>
-                        <input type="email" id="email" placeholder="ornek@email.com" required style="width: 100%; padding: 0.75rem; border: 1px solid var(--color-border); border-radius: 8px; background: var(--color-bg);">
-                    </div>
-                    
-                    <div style="margin-bottom: 1.5rem;">
-                        <label style="display: block; font-size: 0.875rem; font-weight: 500; margin-bottom: 0.5rem;">Şifre</label>
-                        <input type="password" id="password" placeholder="••••••••" required style="width: 100%; padding: 0.75rem; border: 1px solid var(--color-border); border-radius: 8px; background: var(--color-bg);">
-                    </div>
-                    
-                    <div id="confirmPasswordGroup" style="display: none; margin-bottom: 1.5rem;">
-                        <label style="display: block; font-size: 0.875rem; font-weight: 500; margin-bottom: 0.5rem;">Şifre Tekrar</label>
-                        <input type="password" id="confirmPassword" placeholder="••••••••" style="width: 100%; padding: 0.75rem; border: 1px solid var(--color-border); border-radius: 8px; background: var(--color-bg);">
-                    </div>
-                    
-                    <button type="submit" id="authSubmit" style="width: 100%; padding: 0.75rem; background: var(--color-accent); color: white; border: none; border-radius: 8px; font-weight: 500; cursor: pointer; font-size: 1rem;">Giriş Yap</button>
-                </form>
-                
-                <div style="display: flex; align-items: center; gap: 1rem; margin: 1.5rem 0; color: var(--color-text-muted); font-size: 0.875rem;">
-                    <span style="flex: 1; height: 1px; background: var(--color-border);"></span>
-                    <span>veya</span>
-                    <span style="flex: 1; height: 1px; background: var(--color-border);"></span>
-                </div>
-                
-                <button id="skipAuthBtn" style="width: 100%; padding: 0.75rem; background: transparent; border: 1px solid var(--color-border); border-radius: 8px; font-weight: 500; cursor: pointer; color: var(--color-text-secondary); margin-bottom: 1.5rem;">
-                    Üye Olmadan Devam Et
-                </button>
-                
-                <div style="text-align: center; font-size: 0.9375rem; color: var(--color-text-secondary);">
-                    <span id="authToggleText">Hesabınız yok mu?</span>
-                    <button id="authToggleBtn" style="background: none; border: none; color: var(--color-accent); font-weight: 500; cursor: pointer; margin-left: 0.25rem;">Kayıt Ol</button>
-                </div>
-            </div>
-        </main>
+    <div class="mobile-menu" id="mobileMenu">
+        <a href="index.html" class="mobile-link active">Ana Sayfa</a>
+        <a href="#recipes" class="mobile-link">Tarifler</a>
+        <a href="dashboard.html" class="mobile-link mobile-link-lists hidden" id="mobileLists">Listelerim</a>
+        <a href="auth.html" class="mobile-link" id="mobileAuth">Giriş</a>
+        <div class="mobile-user hidden" id="mobileUser">
+            <span class="mobile-user-name" id="mobileUserName"></span>
+            <button class="mobile-logout" id="mobileLogout">Çıkış Yap</button>
+        </div>
     </div>
 
-    <!-- ANA WEB SİTESİ -->
-    <div id="mainWebsite" style="display: none;">
-        <!-- Navigation -->
-        <nav class="nav" id="nav">
-            <div class="nav-container">
-                <a href="index.html" class="nav-logo">
-                    <span class="nav-logo-icon">🍳</span>
-                    <span class="nav-logo-text">Lezzet Yolculuğu</span>
-                </a>
-                
-                <div class="nav-links">
-                    <a href="index.html" class="nav-link active">Tarifler</a>
-                    <a href="dashboard.html" class="nav-link nav-link-lists hidden" id="navLists">Listelerim</a>
-                </div>
-                
-                <div class="nav-actions">
-                    <button class="theme-toggle" id="themeToggle" aria-label="Karanlık moda geç">
-                        <span class="theme-toggle-light">☀️</span>
-                        <span class="theme-toggle-dark">🌙</span>
-                    </button>
-                    <a href="#" onclick="showAuthScreen(); return false;" class="nav-auth" id="navAuth">Giriş</a>
-                    <div class="nav-user hidden" id="navUser">
-                        <span class="nav-user-name" id="navUserName"></span>
-                        <button class="nav-logout" id="navLogout" title="Çıkış yap">→</button>
-                    </div>
-                </div>
-                
-                <button class="nav-mobile-toggle" id="navMobileToggle" aria-label="Menüyü aç">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </button>
-            </div>
-        </nav>
-
-        <!-- Mobile Menu -->
-        <div class="mobile-menu" id="mobileMenu">
-            <a href="index.html" class="mobile-link active">Tarifler</a>
-            <a href="dashboard.html" class="mobile-link mobile-link-lists hidden" id="mobileLists">Listelerim</a>
-            <a href="#" onclick="showAuthScreen(); return false;" class="mobile-link" id="mobileAuth">Giriş</a>
-            <div class="mobile-user hidden" id="mobileUser">
-                <span class="mobile-user-name" id="mobileUserName"></span>
-                <button class="mobile-logout" id="mobileLogout">Çıkış Yap</button>
+    <header class="hero">
+        <div class="hero-content">
+            <h1 class="hero-title">Evde Profesyonel Lezzetler</h1>
+            <p class="hero-subtitle">Detaylı tarifler, püf noktaları ve kendi listenizi oluşturma imkanı</p>
+            <div class="hero-actions">
+                <a href="#recipes" class="btn btn-primary btn-lg">Tariflere Göz At</a>
+                <a href="auth.html" class="btn btn-ghost btn-lg" id="heroAuthBtn">Giriş Yap</a>
             </div>
         </div>
+        <div class="hero-scroll">
+            <span>Aşağı kaydır</span>
+            <span>↓</span>
+        </div>
+    </header>
 
-        <!-- Hero Section -->
-        <section class="hero">
-            <div class="hero-bg">
-                <img src="assets/images/iskender-kebap.webp" alt="Yemek arka plan" loading="eager">
-                <div class="hero-overlay"></div>
+    <section class="section" id="recipes">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Tarifler</h2>
+                <p class="section-subtitle">Profesyonel dokunuşlarla hazırlanmış özel tarifler</p>
             </div>
-            <div class="hero-content">
-                <h1 class="hero-title">Lezzetin Sırlarını Keşfedin</h1>
-                <p class="hero-subtitle">Evde profesyonel sonuçlar için özenle hazırlanmış tarifler</p>
-                <div class="hero-search">
-                    <input type="text" class="hero-search-input" id="searchInput" placeholder="Tarif ara...">
-                    <button class="hero-search-btn" aria-label="Ara">🔍</button>
-                </div>
+            
+            <div class="filters">
+                <button class="filter-btn active" data-filter="all">Tümü</button>
+                <button class="filter-btn" data-filter="Ana Yemek">Ana Yemek</button>
+                <button class="filter-btn" data-filter="Başlangıç">Başlangıç</button>
+                <button class="filter-btn" data-filter="Tatlı">Tatlı</button>
+                <button class="filter-btn" data-filter="İçecek">İçecek</button>
             </div>
-        </section>
-
-        <!-- Main Content -->
-        <main class="main">
-            <div class="container">
-                <!-- Filters -->
-                <div class="filters">
-                    <button class="filter-btn active" data-filter="all">Tümü</button>
-                    <button class="filter-btn" data-filter="Et Yemekleri">Et</button>
-                    <button class="filter-btn" data-filter="Tavuk Yemekleri">Tavuk</button>
-                    <button class="filter-btn" data-filter="Makarna">Makarna</button>
-                    <button class="filter-btn" data-filter="Çorba">Çorba</button>
-                    <button class="filter-btn" data-filter="Meze">Meze</button>
-                </div>
-
-                <!-- Recipes Grid -->
-                <div class="recipes-grid" id="recipesGrid"></div>
-
-                <!-- Empty State -->
-                <div class="empty-state hidden" id="emptyState">
-                    <div class="empty-state-icon">🔍</div>
-                    <h3 class="empty-state-title">Sonuç bulunamadı</h3>
-                    <p class="empty-state-text">Aramanıza uygun tarif bulamadık. Farklı bir kelime deneyin.</p>
-                </div>
+            
+            <div class="search-box">
+                <input type="text" class="search-input" id="searchInput" placeholder="Tarif ara...">
+                <span class="search-icon">🔍</span>
             </div>
-        </main>
-
-        <!-- Quick View Modal -->
-        <div class="modal" id="quickViewModal">
-            <div class="modal-backdrop"></div>
-            <div class="modal-content">
-                <button class="modal-close" aria-label="Kapat">×</button>
-                <div class="modal-body" id="quickViewBody"></div>
+            
+            <div class="recipes-grid" id="recipesGrid">
+                <!-- Tarifler buraya yüklenecek -->
+            </div>
+            
+            <div class="empty-state hidden" id="emptyState">
+                <span class="empty-state-icon">🔍</span>
+                <h3 class="empty-state-title">Sonuç bulunamadı</h3>
+                <p class="empty-state-text">Aramanıza uygun tarif bulunamadı.</p>
             </div>
         </div>
+    </section>
 
-        <!-- Toast -->
-        <div class="toast" id="toast">
-            <span class="toast-message" id="toastMessage"></span>
-        </div>
-
-        <!-- Footer -->
-        <footer class="footer">
-            <div class="container">
-                <div class="footer-content">
-                    <div class="footer-brand">
-                        <span class="footer-logo">🍳 Lezzet Yolculuğu</span>
-                        <p class="footer-tagline">Evde profesyonel lezzetler</p>
-                    </div>
-                    <div class="footer-links">
-                        <a href="index.html">Tarifler</a>
-                        <a href="#" onclick="showAuthScreen(); return false;">Giriş</a>
-                    </div>
-                </div>
-                <div class="footer-bottom">
-                    <p>&copy; 2025 Lezzet Yolculuğu. Tüm hakları saklıdır.</p>
-                </div>
+    <div class="modal" id="quickViewModal">
+        <div class="modal-backdrop"></div>
+        <div class="modal-content modal-lg">
+            <button class="modal-close" aria-label="Kapat">×</button>
+            <div class="modal-body" id="quickViewBody">
+                <!-- İçerik dinamik yüklenecek -->
             </div>
-        </footer>
+        </div>
     </div>
 
-    <!-- Scripts -->
+    <div class="toast" id="toast">
+        <span class="toast-message" id="toastMessage"></span>
+    </div>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <span class="footer-logo">🍳 Lezzet Yolculuğu</span>
+                    <p class="footer-tagline">Evde profesyonel lezzetler</p>
+                </div>
+                <div class="footer-links">
+                    <a href="#recipes">Tarifler</a>
+                    <a href="auth.html">Giriş</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Lezzet Yolculuğu. Tüm hakları saklıdır.</p>
+            </div>
+        </div>
+    </footer>
+
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script src="js/app.js"></script>
     <script src="js/firebase-auth.js"></script>
     <script src="js/firebase-lists.js"></script>
     <script src="js/recipes.js"></script>
 
-    <!-- Main Logic -->
     <script>
-        // Auth state ve UI kontrolü
+        // Theme Manager
+        const ThemeManager = {
+            init() {
+                const savedTheme = localStorage.getItem('theme');
+                const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                
+                if (savedTheme) {
+                    document.documentElement.setAttribute('data-theme', savedTheme);
+                } else if (prefersDark) {
+                    document.documentElement.setAttribute('data-theme', 'dark');
+                }
+                
+                const toggle = document.getElementById('themeToggle');
+                if (toggle) {
+                    toggle.addEventListener('click', () => this.toggle());
+                }
+            },
+            
+            toggle() {
+                const current = document.documentElement.getAttribute('data-theme');
+                const next = current === 'dark' ? 'light' : 'dark';
+                document.documentElement.setAttribute('data-theme', next);
+                localStorage.setItem('theme', next);
+            }
+        };
+        
+        ThemeManager.init();
+
+        // Mobile Menu
+        const mobileToggle = document.getElementById('navMobileToggle');
+        const mobileMenu = document.getElementById('mobileMenu');
+        
+        if (mobileToggle && mobileMenu) {
+            mobileToggle.addEventListener('click', () => {
+                mobileMenu.classList.toggle('active');
+                mobileToggle.classList.toggle('active');
+            });
+        }
+
+        // Auth State - Flash önlemi ile birlikte
         firebase.auth().onAuthStateChanged((user) => {
-            const authScreen = document.getElementById('authScreen');
-            const mainWebsite = document.getElementById('mainWebsite');
             const navAuth = document.getElementById('navAuth');
             const navUser = document.getElementById('navUser');
             const navUserName = document.getElementById('navUserName');
@@ -246,16 +219,21 @@
             const mobileUser = document.getElementById('mobileUser');
             const mobileUserName = document.getElementById('mobileUserName');
             const mobileLists = document.getElementById('mobileLists');
+            const heroAuthBtn = document.getElementById('heroAuthBtn');
+
+            // Görünürlüğü aç (artık gizli değil, sadece hidden class'ı ile kontrol edilecek)
+            if (navAuth) navAuth.style.visibility = 'visible';
+            if (navUser) navUser.style.visibility = 'visible';
+            if (mobileAuth) mobileAuth.style.visibility = 'visible';
+            if (mobileUser) mobileUser.style.visibility = 'visible';
 
             if (user) {
-                // Giriş yapılmışsa ana sayfayı göster
-                authScreen.style.display = 'none';
-                mainWebsite.style.display = 'block';
-                document.body.style.overflow = 'auto';
-                
-                // Navigasyonu güncelle
+                // Giriş yapılmışsa
                 if (navAuth) navAuth.classList.add('hidden');
-                if (navUser) navUser.classList.remove('hidden');
+                if (navUser) {
+                    navUser.classList.remove('hidden');
+                    navUser.style.display = 'flex';
+                }
                 if (navUserName) navUserName.textContent = user.displayName || user.email;
                 if (navLists) navLists.classList.remove('hidden');
                 
@@ -263,146 +241,34 @@
                 if (mobileUser) mobileUser.classList.remove('hidden');
                 if (mobileUserName) mobileUserName.textContent = user.displayName || user.email;
                 if (mobileLists) mobileLists.classList.remove('hidden');
-            } else {
-                // Giriş yapılmamışsa kontrol et
-                const hasSkipped = localStorage.getItem('skipAuth');
-                if (hasSkipped) {
-                    authScreen.style.display = 'none';
-                    mainWebsite.style.display = 'block';
-                    document.body.style.overflow = 'auto';
-                } else {
-                    authScreen.style.display = 'flex';
-                    mainWebsite.style.display = 'none';
-                    document.body.style.overflow = 'hidden';
-                }
                 
+                if (heroAuthBtn) heroAuthBtn.style.display = 'none';
+            } else {
+                // Giriş yapılmamışsa
                 if (navAuth) navAuth.classList.remove('hidden');
                 if (navUser) navUser.classList.add('hidden');
                 if (navLists) navLists.classList.add('hidden');
+                
                 if (mobileAuth) mobileAuth.classList.remove('hidden');
                 if (mobileUser) mobileUser.classList.add('hidden');
                 if (mobileLists) mobileLists.classList.add('hidden');
+                
+                if (heroAuthBtn) heroAuthBtn.style.display = 'inline-flex';
             }
         });
 
-        // Auth Screen Logic
-        document.addEventListener('DOMContentLoaded', () => {
-            const skipBtn = document.getElementById('skipAuthBtn');
-            const toggleBtn = document.getElementById('authToggleBtn');
-            const form = document.getElementById('authForm');
-            
-            // Skip Auth
-            if (skipBtn) {
-                skipBtn.addEventListener('click', () => {
-                    localStorage.setItem('skipAuth', 'true');
-                    document.getElementById('authScreen').style.display = 'none';
-                    document.getElementById('mainWebsite').style.display = 'block';
-                    document.body.style.overflow = 'auto';
-                });
-            }
-            
-            // Toggle Login/Register
-            let isLoginMode = true;
-            if (toggleBtn) {
-                toggleBtn.addEventListener('click', () => {
-                    isLoginMode = !isLoginMode;
-                    document.getElementById('authTitle').textContent = isLoginMode ? 'Giriş Yap' : 'Kayıt Ol';
-                    document.getElementById('authSubtitle').textContent = isLoginMode ? 'Hesabınıza giriş yaparak tariflerinizi kaydedin' : 'Yeni bir hesap oluşturun';
-                    document.getElementById('authSubmit').textContent = isLoginMode ? 'Giriş Yap' : 'Kayıt Ol';
-                    document.getElementById('nameGroup').style.display = isLoginMode ? 'none' : 'block';
-                    document.getElementById('confirmPasswordGroup').style.display = isLoginMode ? 'none' : 'block';
-                    document.getElementById('authToggleText').textContent = isLoginMode ? 'Hesabınız yok mu?' : 'Zaten hesabınız var mı?';
-                    toggleBtn.textContent = isLoginMode ? 'Kayıt Ol' : 'Giriş Yap';
-                });
-            }
-            
-            // Form Submit
-            if (form) {
-                form.addEventListener('submit', async (e) => {
-                    e.preventDefault();
-                    const email = document.getElementById('email').value;
-                    const password = document.getElementById('password').value;
-                    const authTitle = document.getElementById('authTitle');
-                    
-                    if (isLoginMode) {
-                        // Giriş yap
-                        try {
-                            await firebase.auth().signInWithEmailAndPassword(email, password);
-                            // Başarılı - onAuthStateChanged otomatik yönlendirecek
-                        } catch (error) {
-                            let msg = 'Giriş yapılamadı';
-                            if (error.code === 'auth/user-not-found') msg = 'Kullanıcı bulunamadı';
-                            if (error.code === 'auth/wrong-password') msg = 'Şifre hatalı';
-                            alert(msg);
-                        }
-                    } else {
-                        // Kayıt ol
-                        const name = document.getElementById('name').value;
-                        const confirmPass = document.getElementById('confirmPassword').value;
-                        
-                        if (!name.trim()) {
-                            alert('Lütfen isminizi girin');
-                            return;
-                        }
-                        
-                        if (password !== confirmPass) {
-                            alert('Şifreler eşleşmiyor');
-                            return;
-                        }
-                        
-                        if (password.length < 6) {
-                            alert('Şifre en az 6 karakter olmalı');
-                            return;
-                        }
-                        
-                        try {
-                            const result = await firebase.auth().createUserWithEmailAndPassword(email, password);
-                            await result.user.updateProfile({ displayName: name });
-                            
-                            // Firestore'a kullanıcı ekle
-                            await db.collection('users').doc(result.user.uid).set({
-                                name: name,
-                                email: email,
-                                createdAt: new Date().toISOString(),
-                                favorites: []
-                            });
-                            
-                            // Başarılı - onAuthStateChanged otomatik yönlendirecek
-                        } catch (error) {
-                            let msg = 'Kayıt yapılamadı';
-                            if (error.code === 'auth/email-already-in-use') msg = 'Bu e-posta zaten kayıtlı';
-                            if (error.code === 'auth/weak-password') msg = 'Şifre çok zayıf';
-                            alert(msg);
-                        }
-                    }
-                });
-            }
-            
-            // Çıkış butonları
-            const navLogout = document.getElementById('navLogout');
-            const mobileLogout = document.getElementById('mobileLogout');
-            
-            if (navLogout) {
-                navLogout.addEventListener('click', async () => {
-                    await firebase.auth().signOut();
-                    localStorage.removeItem('skipAuth');
-                    location.reload();
-                });
-            }
-            
-            if (mobileLogout) {
-                mobileLogout.addEventListener('click', async () => {
-                    await firebase.auth().signOut();
-                    localStorage.removeItem('skipAuth');
-                    location.reload();
-                });
-            }
-        });
-
-        function showAuthScreen() {
+        // Çıkış işlemleri
+        document.getElementById('navLogout')?.addEventListener('click', async () => {
+            await firebase.auth().signOut();
             localStorage.removeItem('skipAuth');
-            location.reload();
-        }
+            window.location.href = 'index.html';
+        });
+        
+        document.getElementById('mobileLogout')?.addEventListener('click', async () => {
+            await firebase.auth().signOut();
+            localStorage.removeItem('skipAuth');
+            window.location.href = 'index.html';
+        });
     </script>
 </body>
 </html>
