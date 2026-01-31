@@ -13,7 +13,6 @@ const Lists = {
             const doc = await userRef.get();
             
             if (!doc.exists) {
-                // Kullanıcı dokümanı yoksa oluştur
                 await userRef.set({ favorites: [recipeId] });
                 return { action: 'added' };
             }
@@ -22,13 +21,11 @@ const Lists = {
             const favorites = data.favorites || [];
             
             if (favorites.includes(recipeId)) {
-                // Favorilerden çıkar
                 await userRef.update({
                     favorites: firebase.firestore.FieldValue.arrayRemove(recipeId)
                 });
                 return { action: 'removed' };
             } else {
-                // Favoriye ekle
                 await userRef.update({
                     favorites: firebase.firestore.FieldValue.arrayUnion(recipeId)
                 });
@@ -38,6 +35,32 @@ const Lists = {
             console.error("Favori hatası:", error);
             return null;
         }
+    },
+    
+    // ESKİ isInList fonksiyonu (recipes.js uyumluluğu için)
+    async isInList(listId, recipeId) {
+        if (listId === 'favorites') {
+            return await this.isFavorited(recipeId);
+        }
+        return false;
+    },
+    
+    // ESKİ addToList fonksiyonu (recipes.js uyumluluğu için)
+    async addToList(listId, recipeId) {
+        if (listId === 'favorites') {
+            const result = await this.toggleFavorite(recipeId);
+            return result && result.action === 'added';
+        }
+        return false;
+    },
+    
+    // ESKİ removeFromList fonksiyonu (recipes.js uyumluluğu için)
+    async removeFromList(listId, recipeId) {
+        if (listId === 'favorites') {
+            const result = await this.toggleFavorite(recipeId);
+            return result && result.action === 'removed';
+        }
+        return false;
     },
     
     // Favori mi kontrol et
