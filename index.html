@@ -19,102 +19,190 @@
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍳</text></svg>">
 </head>
 <body>
-    <!-- Navigation -->
-    <nav class="nav" id="nav">
-        <div class="nav-container">
-            <a href="index.html" class="nav-logo">
-                <span class="nav-logo-icon">🍳</span>
-                <span class="nav-logo-text">Lezzet Yolculuğu</span>
-            </a>
-            
-            <div class="nav-links">
-                <a href="index.html" class="nav-link active">Tarifler</a>
-                <a href="dashboard.html" class="nav-link nav-link-lists hidden" id="navLists">Listelerim</a>
-            </div>
-            
-            <div class="nav-actions">
-                <button class="theme-toggle" id="themeToggle" aria-label="Karanlık moda geç">
+    <!-- GİRİŞ EKRANI (İlk Başlangıç) -->
+    <div id="authScreen" class="auth-landing" style="position: fixed; inset: 0; z-index: 9999; background: linear-gradient(135deg, var(--color-bg) 0%, var(--color-bg-secondary) 100%); min-height: 100vh; display: flex; flex-direction: column;">
+        <!-- Navigation (Minimal) -->
+        <nav class="nav nav-transparent" id="authNav">
+            <div class="nav-container">
+                <a href="#" class="nav-logo">
+                    <span class="nav-logo-icon">🍳</span>
+                    <span class="nav-logo-text">Lezzet Yolculuğu</span>
+                </a>
+                <button class="theme-toggle" id="themeToggleAuth" aria-label="Karanlık moda geç">
                     <span class="theme-toggle-light">☀️</span>
                     <span class="theme-toggle-dark">🌙</span>
                 </button>
-                <a href="auth.html" class="nav-auth" id="navAuth">Giriş</a>
-                <div class="nav-user hidden" id="navUser">
-                    <span class="nav-user-name" id="navUserName"></span>
-                    <button class="nav-logout" id="navLogout" title="Çıkış yap">→</button>
+            </div>
+        </nav>
+
+        <!-- Auth Container -->
+        <main class="auth-container" style="flex: 1; display: flex; align-items: center; justify-content: center; padding: 2rem;">
+            <div class="auth-card" style="width: 100%; max-width: 420px; background: var(--color-surface); border-radius: 16px; padding: 2.5rem; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);">
+                <div class="auth-header" style="text-align: center; margin-bottom: 2rem;">
+                    <h1 class="auth-title" id="authTitle" style="font-family: var(--font-heading); font-size: 1.75rem; font-weight: 600; margin-bottom: 0.5rem;">Giriş Yap</h1>
+                    <p class="auth-subtitle" id="authSubtitle" style="font-size: 0.9375rem; color: var(--color-text-secondary);">Hesabınıza giriş yaparak tariflerinizi kaydedin</p>
+                </div>
+                
+                <form class="auth-form" id="authForm" style="margin-bottom: 1.5rem;">
+                    <div class="form-group" id="nameGroup" style="display: none; margin-bottom: 1.5rem;">
+                        <label class="form-label" for="name" style="display: block; font-size: 0.875rem; font-weight: 500; margin-bottom: 0.5rem;">İsim</label>
+                        <input type="text" class="form-input" id="name" name="name" placeholder="İsminizi girin" style="width: 100%; padding: 0.75rem; border: 1px solid var(--color-border); border-radius: 8px; background: var(--color-bg);">
+                    </div>
+                    
+                    <div class="form-group" style="margin-bottom: 1.5rem;">
+                        <label class="form-label" for="email" style="display: block; font-size: 0.875rem; font-weight: 500; margin-bottom: 0.5rem;">E-posta</label>
+                        <input type="email" class="form-input" id="email" name="email" placeholder="ornek@email.com" required style="width: 100%; padding: 0.75rem; border: 1px solid var(--color-border); border-radius: 8px; background: var(--color-bg);">
+                    </div>
+                    
+                    <div class="form-group" style="margin-bottom: 1.5rem;">
+                        <label class="form-label" for="password" style="display: block; font-size: 0.875rem; font-weight: 500; margin-bottom: 0.5rem;">Şifre</label>
+                        <input type="password" class="form-input" id="password" name="password" placeholder="••••••••" required style="width: 100%; padding: 0.75rem; border: 1px solid var(--color-border); border-radius: 8px; background: var(--color-bg);">
+                    </div>
+                    
+                    <div class="form-group" id="confirmPasswordGroup" style="display: none; margin-bottom: 1.5rem;">
+                        <label class="form-label" for="confirmPassword" style="display: block; font-size: 0.875rem; font-weight: 500; margin-bottom: 0.5rem;">Şifre Tekrar</label>
+                        <input type="password" class="form-input" id="confirmPassword" name="confirmPassword" placeholder="••••••••" style="width: 100%; padding: 0.75rem; border: 1px solid var(--color-border); border-radius: 8px; background: var(--color-bg);">
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary btn-full" id="authSubmit" style="width: 100%; padding: 0.75rem; background: var(--color-accent); color: white; border: none; border-radius: 8px; font-weight: 500; cursor: pointer;">Giriş Yap</button>
+                </form>
+                
+                <div class="auth-divider" style="display: flex; align-items: center; gap: 1rem; margin: 1.5rem 0; color: var(--color-text-muted); font-size: 0.875rem;">
+                    <span style="flex: 1; height: 1px; background: var(--color-border);"></span>
+                    <span>veya</span>
+                    <span style="flex: 1; height: 1px; background: var(--color-border);"></span>
+                </div>
+                
+                <button id="skipAuthBtn" class="btn btn-ghost btn-full" style="width: 100%; padding: 0.75rem; background: transparent; border: 1px solid var(--color-border); border-radius: 8px; font-weight: 500; cursor: pointer; color: var(--color-text-secondary); transition: all 0.2s;">
+                    Üye Olmadan Devam Et
+                </button>
+                
+                <div class="auth-toggle" style="text-align: center; margin-top: 1.5rem; font-size: 0.9375rem; color: var(--color-text-secondary);">
+                    <span id="authToggleText">Hesabınız yok mu?</span>
+                    <button class="auth-toggle-btn" id="authToggleBtn" style="background: none; border: none; color: var(--color-accent); font-weight: 500; cursor: pointer; margin-left: 0.25rem;">Kayıt Ol</button>
                 </div>
             </div>
-            
-            <button class="nav-mobile-toggle" id="navMobileToggle" aria-label="Menüyü aç">
-                <span></span>
-                <span></span>
-                <span></span>
-            </button>
-        </div>
-    </nav>
-
-    <!-- Mobile Menu -->
-    <div class="mobile-menu" id="mobileMenu">
-        <a href="index.html" class="mobile-link active">Tarifler</a>
-        <a href="dashboard.html" class="mobile-link mobile-link-lists hidden" id="mobileLists">Listelerim</a>
-        <a href="auth.html" class="mobile-link" id="mobileAuth">Giriş</a>
-        <div class="mobile-user hidden" id="mobileUser">
-            <span class="mobile-user-name" id="mobileUserName"></span>
-            <button class="mobile-logout" id="mobileLogout">Çıkış Yap</button>
-        </div>
+        </main>
     </div>
 
-    <!-- Hero Section -->
-    <section class="hero">
-        <div class="hero-bg">
-            <img src="assets/images/iskender-kebap.webp" alt="Yemek arka plan" loading="eager">
-            <div class="hero-overlay"></div>
-        </div>
-        <div class="hero-content">
-            <h1 class="hero-title">Lezzetin Sırlarını Keşfedin</h1>
-            <p class="hero-subtitle">Evde profesyonel sonuçlar için özenle hazırlanmış tarifler</p>
-            <div class="hero-search">
-                <input type="text" class="hero-search-input" id="searchInput" placeholder="Tarif ara...">
-                <button class="hero-search-btn" aria-label="Ara">🔍</button>
+    <!-- ANA WEB SİTESİ (Normal İçerik - Başlangıçta Gizli) -->
+    <div id="mainWebsite" style="display: none;">
+        <!-- Navigation -->
+        <nav class="nav" id="nav">
+            <div class="nav-container">
+                <a href="index.html" class="nav-logo">
+                    <span class="nav-logo-icon">🍳</span>
+                    <span class="nav-logo-text">Lezzet Yolculuğu</span>
+                </a>
+                
+                <div class="nav-links">
+                    <a href="index.html" class="nav-link active">Tarifler</a>
+                    <a href="dashboard.html" class="nav-link nav-link-lists hidden" id="navLists">Listelerim</a>
+                </div>
+                
+                <div class="nav-actions">
+                    <button class="theme-toggle" id="themeToggle" aria-label="Karanlık moda geç">
+                        <span class="theme-toggle-light">☀️</span>
+                        <span class="theme-toggle-dark">🌙</span>
+                    </button>
+                    <a href="#" onclick="showAuthScreen(); return false;" class="nav-auth" id="navAuth">Giriş</a>
+                    <div class="nav-user hidden" id="navUser">
+                        <span class="nav-user-name" id="navUserName"></span>
+                        <button class="nav-logout" id="navLogout" title="Çıkış yap">→</button>
+                    </div>
+                </div>
+                
+                <button class="nav-mobile-toggle" id="navMobileToggle" aria-label="Menüyü aç">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
             </div>
-        </div>
-    </section>
+        </nav>
 
-    <!-- Main Content -->
-    <main class="main">
-        <div class="container">
-            <!-- Filters -->
-            <div class="filters">
-                <button class="filter-btn active" data-filter="all">Tümü</button>
-                <button class="filter-btn" data-filter="Et Yemekleri">Et</button>
-                <button class="filter-btn" data-filter="Tavuk Yemekleri">Tavuk</button>
-                <button class="filter-btn" data-filter="Makarna">Makarna</button>
-                <button class="filter-btn" data-filter="Çorba">Çorba</button>
-                <button class="filter-btn" data-filter="Meze">Meze</button>
-            </div>
-
-            <!-- Recipes Grid -->
-            <div class="recipes-grid" id="recipesGrid">
-                <!-- Recipes will be loaded dynamically -->
-            </div>
-
-            <!-- Empty State -->
-            <div class="empty-state hidden" id="emptyState">
-                <div class="empty-state-icon">🔍</div>
-                <h3 class="empty-state-title">Sonuç bulunamadı</h3>
-                <p class="empty-state-text">Aramanıza uygun tarif bulamadık. Farklı bir kelime deneyin.</p>
-            </div>
-        </div>
-    </main>
-
-    <!-- Quick View Modal -->
-    <div class="modal" id="quickViewModal">
-        <div class="modal-backdrop"></div>
-        <div class="modal-content">
-            <button class="modal-close" aria-label="Kapat">×</button>
-            <div class="modal-body" id="quickViewBody">
-                <!-- Content loaded dynamically -->
+        <!-- Mobile Menu -->
+        <div class="mobile-menu" id="mobileMenu">
+            <a href="index.html" class="mobile-link active">Tarifler</a>
+            <a href="dashboard.html" class="mobile-link mobile-link-lists hidden" id="mobileLists">Listelerim</a>
+            <a href="#" onclick="showAuthScreen(); return false;" class="mobile-link" id="mobileAuth">Giriş</a>
+            <div class="mobile-user hidden" id="mobileUser">
+                <span class="mobile-user-name" id="mobileUserName"></span>
+                <button class="mobile-logout" id="mobileLogout">Çıkış Yap</button>
             </div>
         </div>
+
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="hero-bg">
+                <img src="assets/images/iskender-kebap.webp" alt="Yemek arka plan" loading="eager">
+                <div class="hero-overlay"></div>
+            </div>
+            <div class="hero-content">
+                <h1 class="hero-title">Lezzetin Sırlarını Keşfedin</h1>
+                <p class="hero-subtitle">Evde profesyonel sonuçlar için özenle hazırlanmış tarifler</p>
+                <div class="hero-search">
+                    <input type="text" class="hero-search-input" id="searchInput" placeholder="Tarif ara...">
+                    <button class="hero-search-btn" aria-label="Ara">🔍</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Main Content -->
+        <main class="main">
+            <div class="container">
+                <!-- Filters -->
+                <div class="filters">
+                    <button class="filter-btn active" data-filter="all">Tümü</button>
+                    <button class="filter-btn" data-filter="Et Yemekleri">Et</button>
+                    <button class="filter-btn" data-filter="Tavuk Yemekleri">Tavuk</button>
+                    <button class="filter-btn" data-filter="Makarna">Makarna</button>
+                    <button class="filter-btn" data-filter="Çorba">Çorba</button>
+                    <button class="filter-btn" data-filter="Meze">Meze</button>
+                </div>
+
+                <!-- Recipes Grid -->
+                <div class="recipes-grid" id="recipesGrid">
+                    <!-- Recipes will be loaded dynamically -->
+                </div>
+
+                <!-- Empty State -->
+                <div class="empty-state hidden" id="emptyState">
+                    <div class="empty-state-icon">🔍</div>
+                    <h3 class="empty-state-title">Sonuç bulunamadı</h3>
+                    <p class="empty-state-text">Aramanıza uygun tarif bulamadık. Farklı bir kelime deneyin.</p>
+                </div>
+            </div>
+        </main>
+
+        <!-- Quick View Modal -->
+        <div class="modal" id="quickViewModal">
+            <div class="modal-backdrop"></div>
+            <div class="modal-content">
+                <button class="modal-close" aria-label="Kapat">×</button>
+                <div class="modal-body" id="quickViewBody">
+                    <!-- Content loaded dynamically -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="container">
+                <div class="footer-content">
+                    <div class="footer-brand">
+                        <span class="footer-logo">🍳 Lezzet Yolculuğu</span>
+                        <p class="footer-tagline">Evde profesyonel lezzetler</p>
+                    </div>
+                    <div class="footer-links">
+                        <a href="index.html">Tarifler</a>
+                        <a href="#" onclick="showAuthScreen(); return false;">Giriş</a>
+                    </div>
+                </div>
+                <div class="footer-bottom">
+                    <p>&copy; 2025 Lezzet Yolculuğu. Tüm hakları saklıdır.</p>
+                </div>
+            </div>
+        </footer>
     </div>
 
     <!-- Toast Notification -->
@@ -122,30 +210,163 @@
         <span class="toast-message" id="toastMessage"></span>
     </div>
 
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="container">
-            <div class="footer-content">
-                <div class="footer-brand">
-                    <span class="footer-logo">🍳 Lezzet Yolculuğu</span>
-                    <p class="footer-tagline">Evde profesyonel lezzetler</p>
-                </div>
-                <div class="footer-links">
-                    <a href="index.html">Tarifler</a>
-                    <a href="auth.html">Giriş</a>
-                </div>
-            </div>
-            <div class="footer-bottom">
-                <p>&copy; 2025 Lezzet Yolculuğu. Tüm hakları saklıdır.</p>
-            </div>
-        </div>
-    </footer>
-
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script src="js/app.js"></script>
     <script src="js/auth.js"></script>
     <script src="js/recipes.js"></script>
     <script src="js/lists.js"></script>
+    
+    <!-- Auth Screen Logic -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const authScreen = document.getElementById('authScreen');
+            const mainWebsite = document.getElementById('mainWebsite');
+            const skipBtn = document.getElementById('skipAuthBtn');
+            
+            // Kontrol: Kullanıcı daha önce "üye olmadan devam et" dedi mi veya giriş yaptı mı?
+            const hasSkippedAuth = localStorage.getItem('skipAuth');
+            const currentUser = localStorage.getItem('currentUser');
+            
+            if (hasSkippedAuth || currentUser) {
+                // Doğrudan ana sayfayı göster
+                authScreen.style.display = 'none';
+                mainWebsite.style.display = 'block';
+                document.body.style.overflow = 'auto';
+            } else {
+                // Giriş ekranını göster, sayfayı kaydırılabilir yapma (sadece auth ekranı görünsün)
+                authScreen.style.display = 'flex';
+                mainWebsite.style.display = 'none';
+                document.body.style.overflow = 'hidden';
+            }
+            
+            // Üye Olmadan Devam Et butonu
+            if (skipBtn) {
+                skipBtn.addEventListener('click', () => {
+                    localStorage.setItem('skipAuth', 'true');
+                    authScreen.style.display = 'none';
+                    mainWebsite.style.display = 'block';
+                    document.body.style.overflow = 'auto';
+                    Toast.show('Tarifleri keşfetmeye başlayabilirsiniz!', 'success');
+                });
+            }
+            
+            // Auth Toggle (Giriş/Kayıt arası geçiş)
+            const authToggleBtn = document.getElementById('authToggleBtn');
+            const authTitle = document.getElementById('authTitle');
+            const authSubtitle = document.getElementById('authSubtitle');
+            const authSubmit = document.getElementById('authSubmit');
+            const nameGroup = document.getElementById('nameGroup');
+            const confirmPasswordGroup = document.getElementById('confirmPasswordGroup');
+            const authToggleText = document.getElementById('authToggleText');
+            
+            let isLoginMode = true;
+            
+            if (authToggleBtn) {
+                authToggleBtn.addEventListener('click', () => {
+                    isLoginMode = !isLoginMode;
+                    
+                    if (isLoginMode) {
+                        authTitle.textContent = 'Giriş Yap';
+                        authSubtitle.textContent = 'Hesabınıza giriş yaparak tariflerinizi kaydedin';
+                        authSubmit.textContent = 'Giriş Yap';
+                        nameGroup.style.display = 'none';
+                        confirmPasswordGroup.style.display = 'none';
+                        authToggleText.textContent = 'Hesabınız yok mu?';
+                        authToggleBtn.textContent = 'Kayıt Ol';
+                    } else {
+                        authTitle.textContent = 'Kayıt Ol';
+                        authSubtitle.textContent = 'Yeni bir hesap oluşturun';
+                        authSubmit.textContent = 'Kayıt Ol';
+                        nameGroup.style.display = 'block';
+                        confirmPasswordGroup.style.display = 'block';
+                        authToggleText.textContent = 'Zaten hesabınız var mı?';
+                        authToggleBtn.textContent = 'Giriş Yap';
+                    }
+                });
+            }
+            
+            // Form Submit (Auth.js ile entegrasyon)
+            const authForm = document.getElementById('authForm');
+            if (authForm) {
+                authForm.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    
+                    const email = document.getElementById('email').value;
+                    const password = document.getElementById('password').value;
+                    
+                    if (isLoginMode) {
+                        // Giriş işlemi
+                        if (typeof Auth !== 'undefined') {
+                            const result = Auth.login(email, password);
+                            if (result.success) {
+                                Toast.show(result.message, 'success');
+                                setTimeout(() => {
+                                    authScreen.style.display = 'none';
+                                    mainWebsite.style.display = 'block';
+                                    if (typeof Auth.updateNavigation === 'function') {
+                                        Auth.updateNavigation();
+                                    }
+                                    if (typeof Recipes !== 'undefined' && typeof Recipes.renderRecipesGrid === 'function') {
+                                        Recipes.renderRecipesGrid();
+                                    }
+                                }, 500);
+                            } else {
+                                Toast.show(result.message, 'error');
+                            }
+                        }
+                    } else {
+                        // Kayıt işlemi
+                        const name = document.getElementById('name').value;
+                        const confirmPassword = document.getElementById('confirmPassword').value;
+                        
+                        if (!name.trim()) {
+                            Toast.show('Lütfen isminizi girin', 'error');
+                            return;
+                        }
+                        
+                        if (password !== confirmPassword) {
+                            Toast.show('Şifreler eşleşmiyor', 'error');
+                            return;
+                        }
+                        
+                        if (password.length < 6) {
+                            Toast.show('Şifre en az 6 karakter olmalı', 'error');
+                            return;
+                        }
+                        
+                        if (typeof Auth !== 'undefined') {
+                            const result = Auth.register(name, email, password);
+                            if (result.success) {
+                                Toast.show(result.message, 'success');
+                                setTimeout(() => {
+                                    authScreen.style.display = 'none';
+                                    mainWebsite.style.display = 'block';
+                                    if (typeof Auth.updateNavigation === 'function') {
+                                        Auth.updateNavigation();
+                                    }
+                                }, 500);
+                            } else {
+                                Toast.show(result.message, 'error');
+                            }
+                        }
+                    }
+                });
+            }
+        });
+        
+        // Ana sayfadan tekrar giriş ekranına dönmek için
+        function showAuthScreen() {
+            const authScreen = document.getElementById('authScreen');
+            const mainWebsite = document.getElementById('mainWebsite');
+            
+            if (authScreen && mainWebsite) {
+                authScreen.style.display = 'flex';
+                mainWebsite.style.display = 'none';
+                document.body.style.overflow = 'hidden';
+                window.scrollTo(0, 0);
+            }
+        }
+    </script>
 </body>
 </html>
