@@ -209,6 +209,20 @@
   "tags": ["tavuk", "kanat", "fırın", "yoğurt", "marine", "dip sos", "baharatlı"],
   "contentFile": "content/markdown/baharatli-firin-kanat-yogurtlu-dip.md",
   "description": "Yoğurt ve baharatlarla marine edilmiş, fırında gevrek kıvamlı kanatlar, ferahlatıcı yoğurtlu dip sosla servis edilir."
+    },
+    {
+  "id": "domates-kapya-biberli-fusilli-cig-sarimsak",
+  "title": "Domates-Kapya Biberli Fusilli & Çiğ Sarımsak",
+  "image": "assets/images/domates-kapya-biberli-fusilli-cig-sarimsak.webp",
+  "prepTime": "15 dk",
+  "cookTime": "25 dk",
+  "totalTime": "40 dk",
+  "servings": 2,
+  "difficulty": "Kolay",
+  "category": "Makarna",
+  "tags": ["makarna", "fusilli", "domates", "kapya biberi", "sarımsak", "italyan", "vejeteryan"],
+  "contentFile": "content/markdown/domates-kapya-biberli-fusilli-cig-sarimsak.md",
+  "description": "Taze domates ve kırmızı kapya biberiyle hazırlanan, üzerine çiğ sarımsak dilimleriyle süslenmiş burgu makarna."
     }
   ]
 }
