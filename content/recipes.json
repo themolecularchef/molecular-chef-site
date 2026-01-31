@@ -195,6 +195,20 @@
       "tags": ["tiramisu", "muz", "çikolata", "italyan", "soğuk tatlı"],
       "contentFile": "content/markdown/muzlu-tiramisu-cikolata.md",
       "description": "Kedidili bisküvi, mascarpone krema, taze muz ve çikolata toplarıyla zenginleştirilmiş nefis tiramisu."
+    },
+    {
+  "id": "baharatli-firin-kanat-yogurtlu-dip",
+  "title": "Baharatlı Fırın Kanat & Yoğurtlu Dip Sos",
+  "image": "assets/images/baharatli-firin-kanat-yogurtlu-dip.webp",
+  "prepTime": "15 dk (marine hariç)",
+  "cookTime": "45 dk",
+  "totalTime": "180 dk (marine dahil)",
+  "servings": 2,
+  "difficulty": "Orta",
+  "category": "Tavuk Yemekleri",
+  "tags": ["tavuk", "kanat", "fırın", "yoğurt", "marine", "dip sos", "baharatlı"],
+  "contentFile": "content/markdown/baharatli-firin-kanat-yogurtlu-dip.md",
+  "description": "Yoğurt ve baharatlarla marine edilmiş, fırında gevrek kıvamlı kanatlar, ferahlatıcı yoğurtlu dip sosla servis edilir."
     }
   ]
 }
