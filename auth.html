@@ -6,19 +6,15 @@
     <meta name="description" content="Lezzet Yolculuğu'na giriş yapın veya hesap oluşturun. Favori tariflerinizi kaydedin, kişisel listeler oluşturun.">
     <title>Giriş | Lezzet Yolculuğu</title>
     
-    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
     
-    <!-- CSS -->
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="components.css">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/components.css">
     
-    <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍳</text></svg>">
 
-    <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
@@ -32,20 +28,17 @@
             messagingSenderId: "129656126432",
             appId: "1:129656126432:web:c4d5ad257f8eb96cd88985"
         };
-        
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
     </script>
 </head>
 <body class="auth-page">
-    <!-- Navigation -->
     <nav class="nav nav-transparent" id="nav">
         <div class="nav-container">
             <a href="index.html" class="nav-logo">
                 <span class="nav-logo-icon">🍳</span>
                 <span class="nav-logo-text">Lezzet Yolculuğu</span>
             </a>
-            
             <button class="theme-toggle" id="themeToggle" aria-label="Karanlık moda geç">
                 <span class="theme-toggle-light">☀️</span>
                 <span class="theme-toggle-dark">🌙</span>
@@ -53,7 +46,6 @@
         </div>
     </nav>
 
-    <!-- Auth Container -->
     <main class="auth-container">
         <div class="auth-card">
             <div class="auth-header">
@@ -66,29 +58,22 @@
                     <label class="form-label" for="name">İsim</label>
                     <input type="text" class="form-input" id="name" name="name" placeholder="İsminizi girin">
                 </div>
-                
                 <div class="form-group">
                     <label class="form-label" for="email">E-posta</label>
                     <input type="email" class="form-input" id="email" name="email" placeholder="ornek@email.com" required>
                 </div>
-                
                 <div class="form-group">
                     <label class="form-label" for="password">Şifre</label>
                     <input type="password" class="form-input" id="password" name="password" placeholder="••••••••" required>
                 </div>
-                
                 <div class="form-group" id="confirmPasswordGroup" style="display: none;">
                     <label class="form-label" for="confirmPassword">Şifre Tekrar</label>
                     <input type="password" class="form-input" id="confirmPassword" name="confirmPassword" placeholder="••••••••">
                 </div>
-                
                 <button type="submit" class="btn btn-primary btn-full" id="authSubmit">Giriş Yap</button>
             </form>
             
-            <div class="auth-divider">
-                <span>veya</span>
-            </div>
-            
+            <div class="auth-divider"><span>veya</span></div>
             <a href="index.html" onclick="skipAuth(event)" class="btn btn-ghost btn-full">Üye Olmadan Devam Et</a>
             
             <div class="auth-toggle">
@@ -98,33 +83,25 @@
         </div>
     </main>
 
-    <!-- Toast Notification -->
     <div class="toast" id="toast">
         <span class="toast-message" id="toastMessage"></span>
     </div>
 
-    <!-- Scripts -->
-    <script src="app.js"></script>
+    <script src="js/app.js"></script>
     
     <script>
-        // Tema yönetimi
+        // Theme
         const ThemeManager = {
             init() {
                 const savedTheme = localStorage.getItem('theme');
                 const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-                
                 if (savedTheme) {
                     document.documentElement.setAttribute('data-theme', savedTheme);
                 } else if (prefersDark) {
                     document.documentElement.setAttribute('data-theme', 'dark');
                 }
-                
-                const toggle = document.getElementById('themeToggle');
-                if (toggle) {
-                    toggle.addEventListener('click', () => this.toggle());
-                }
+                document.getElementById('themeToggle')?.addEventListener('click', () => this.toggle());
             },
-            
             toggle() {
                 const current = document.documentElement.getAttribute('data-theme');
                 const next = current === 'dark' ? 'light' : 'dark';
@@ -132,133 +109,87 @@
                 localStorage.setItem('theme', next);
             }
         };
-        
         ThemeManager.init();
 
-        // Toast göster
         function showToast(message, type = 'default') {
             const toast = document.getElementById('toast');
-            const msg = document.getElementById('toastMessage');
-            msg.textContent = message;
+            document.getElementById('toastMessage').textContent = message;
             toast.className = 'toast active ' + type;
             setTimeout(() => toast.classList.remove('active'), 3000);
         }
 
-        // Zaten giriş yapmışsa ana sayfaya yönlendir
         firebase.auth().onAuthStateChanged((user) => {
-            if (user) {
-                window.location.href = 'index.html';
-            }
+            if (user) window.location.href = 'index.html';
         });
 
-        // Auth formu yönetimi
         let isLoginMode = true;
-        
         const authForm = document.getElementById('authForm');
         const toggleBtn = document.getElementById('authToggleBtn');
-        const authTitle = document.getElementById('authTitle');
-        const authSubtitle = document.getElementById('authSubtitle');
-        const authSubmit = document.getElementById('authSubmit');
-        const nameGroup = document.getElementById('nameGroup');
-        const confirmGroup = document.getElementById('confirmPasswordGroup');
-        const toggleText = document.getElementById('authToggleText');
 
-        // Giriş/Kayıt arası geçiş
         toggleBtn.addEventListener('click', () => {
             isLoginMode = !isLoginMode;
-            
             if (isLoginMode) {
-                authTitle.textContent = 'Giriş Yap';
-                authSubtitle.textContent = 'Hesabınıza giriş yaparak tariflerinizi kaydedin';
-                authSubmit.textContent = 'Giriş Yap';
-                nameGroup.style.display = 'none';
-                confirmGroup.style.display = 'none';
-                toggleText.textContent = 'Hesabınız yok mu?';
+                document.getElementById('authTitle').textContent = 'Giriş Yap';
+                document.getElementById('authSubtitle').textContent = 'Hesabınıza giriş yaparak tariflerinizi kaydedin';
+                document.getElementById('authSubmit').textContent = 'Giriş Yap';
+                document.getElementById('nameGroup').style.display = 'none';
+                document.getElementById('confirmPasswordGroup').style.display = 'none';
+                document.getElementById('authToggleText').textContent = 'Hesabınız yok mu?';
                 toggleBtn.textContent = 'Kayıt Ol';
             } else {
-                authTitle.textContent = 'Kayıt Ol';
-                authSubtitle.textContent = 'Yeni bir hesap oluşturun';
-                authSubmit.textContent = 'Kayıt Ol';
-                nameGroup.style.display = 'block';
-                confirmGroup.style.display = 'block';
-                toggleText.textContent = 'Zaten hesabınız var mı?';
+                document.getElementById('authTitle').textContent = 'Kayıt Ol';
+                document.getElementById('authSubtitle').textContent = 'Yeni bir hesap oluşturun';
+                document.getElementById('authSubmit').textContent = 'Kayıt Ol';
+                document.getElementById('nameGroup').style.display = 'block';
+                document.getElementById('confirmPasswordGroup').style.display = 'block';
+                document.getElementById('authToggleText').textContent = 'Zaten hesabınız var mı?';
                 toggleBtn.textContent = 'Giriş Yap';
             }
         });
 
-        // Form gönderimi
         authForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            
             const email = document.getElementById('email').value.trim();
             const password = document.getElementById('password').value;
-            
+
             if (isLoginMode) {
-                // Giriş Yap
                 try {
                     await firebase.auth().signInWithEmailAndPassword(email, password);
                     showToast('Giriş başarılı!', 'success');
-                    setTimeout(() => {
-                        window.location.href = 'index.html';
-                    }, 500);
+                    setTimeout(() => window.location.href = 'index.html', 500);
                 } catch (error) {
-                    let message = 'Giriş yapılamadı';
-                    if (error.code === 'auth/user-not-found') message = 'Bu e-posta ile kayıtlı kullanıcı bulunamadı';
-                    if (error.code === 'auth/wrong-password') message = 'Şifre hatalı';
-                    if (error.code === 'auth/invalid-email') message = 'Geçersiz e-posta adresi';
-                    if (error.code === 'auth/too-many-requests') message = 'Çok fazla deneme yaptınız, lütfen bekleyin';
-                    showToast(message, 'error');
+                    let msg = 'Giriş yapılamadı';
+                    if (error.code === 'auth/user-not-found') msg = 'Kullanıcı bulunamadı';
+                    if (error.code === 'auth/wrong-password') msg = 'Şifre hatalı';
+                    showToast(msg, 'error');
                 }
             } else {
-                // Kayıt Ol
                 const name = document.getElementById('name').value.trim();
-                const confirmPassword = document.getElementById('confirmPassword').value;
+                const confirmPass = document.getElementById('confirmPassword').value;
                 
-                if (!name) {
-                    showToast('Lütfen isminizi girin', 'error');
-                    return;
-                }
-                
-                if (password !== confirmPassword) {
-                    showToast('Şifreler eşleşmiyor', 'error');
-                    return;
-                }
-                
-                if (password.length < 6) {
-                    showToast('Şifre en az 6 karakter olmalıdır', 'error');
-                    return;
-                }
-                
+                if (!name) return showToast('İsim girin', 'error');
+                if (password !== confirmPass) return showToast('Şifreler eşleşmiyor', 'error');
+                if (password.length < 6) return showToast('Şifre en az 6 karakter', 'error');
+
                 try {
-                    // Kullanıcı oluştur
                     const result = await firebase.auth().createUserWithEmailAndPassword(email, password);
-                    
-                    // Profil güncelle (isim)
                     await result.user.updateProfile({ displayName: name });
-                    
-                    // Firestore'a kullanıcı bilgilerini kaydet
                     await db.collection('users').doc(result.user.uid).set({
                         name: name,
                         email: email,
                         createdAt: new Date().toISOString(),
                         favorites: []
                     });
-                    
                     showToast('Kayıt başarılı!', 'success');
-                    setTimeout(() => {
-                        window.location.href = 'index.html';
-                    }, 500);
+                    setTimeout(() => window.location.href = 'index.html', 500);
                 } catch (error) {
-                    let message = 'Kayıt yapılamadı';
-                    if (error.code === 'auth/email-already-in-use') message = 'Bu e-posta adresi zaten kullanılıyor';
-                    if (error.code === 'auth/invalid-email') message = 'Geçersiz e-posta adresi';
-                    if (error.code === 'auth/weak-password') message = 'Şifre çok zayıf';
-                    showToast(message, 'error');
+                    let msg = 'Kayıt yapılamadı';
+                    if (error.code === 'auth/email-already-in-use') msg = 'E-posta kullanımda';
+                    showToast(msg, 'error');
                 }
             }
         });
 
-        // Üye olmadan devam et
         function skipAuth(e) {
             e.preventDefault();
             localStorage.setItem('skipAuth', 'true');
