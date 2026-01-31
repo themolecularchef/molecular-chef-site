@@ -66,7 +66,7 @@ const Recipes = {
     // RECIPE GRID (INDEX PAGE)
     // ============================================
     
-    renderRecipesGrid(recipes = null) {
+    async renderRecipesGrid(recipes = null) {
         const grid = document.getElementById('recipesGrid');
         const emptyState = document.getElementById('emptyState');
         
@@ -82,25 +82,47 @@ const Recipes = {
         
         if (emptyState) emptyState.classList.add('hidden');
         
+        // 1. Önce tüm kartları render et (varsayılan boş kalp)
         grid.innerHTML = recipesToRender.map(recipe => this.createRecipeCard(recipe)).join('');
         
-        // Bind card events
+        // 2. Event listener'ları bağla
         this.bindCardEvents();
+        
+        // 3. Giriş yapılmışsa favori durumlarını kontrol et ve güncelle
+        if (Auth.isLoggedIn()) {
+            const favoriteBtns = grid.querySelectorAll('.favorite-btn');
+            
+            for (const btn of favoriteBtns) {
+                const recipeId = btn.dataset.id;
+                try {
+                    const isFavorited = await Lists.isFavorited(recipeId);
+                    
+                    if (isFavorited) {
+                        btn.classList.add('active');
+                        btn.dataset.favorited = "true";
+                        btn.querySelector('span').textContent = '❤️';
+                        btn.title = 'Favorilerden Çıkar';
+                    }
+                } catch (error) {
+                    console.error("Favori kontrolü hatası:", error);
+                }
+            }
+        }
     },
     
     createRecipeCard(recipe) {
-        const isFavorited = Lists.isInList('favorites', recipe.id);
-        
+        // Varsayılan olarak boş kalp, durum sonradan kontrol edilecek
         return `
             <article class="recipe-card" data-id="${recipe.id}">
                 <div class="recipe-card-image">
                     <img src="${recipe.image}" alt="${recipe.title}" loading="lazy">
                     <div class="recipe-card-overlay"></div>
                     <div class="recipe-card-actions">
-                        <button class="recipe-card-action favorite-btn ${isFavorited ? 'active' : ''}" 
+                        <button class="recipe-card-action favorite-btn" 
                                 data-id="${recipe.id}" 
-                                title="${isFavorited ? 'Favorilerden Çıkar' : 'Favorilere Ekle'}">
-                            <span>${isFavorited ? '❤️' : '🤍'}</span>
+                                data-favorited="false"
+                                title="Favorilere Ekle">
+                            <span>🤍</span>
                         </button>
                         <button class="recipe-card-action quick-view-btn" 
                                 data-id="${recipe.id}" 
@@ -131,9 +153,15 @@ const Recipes = {
     },
     
     bindCardEvents() {
-        // Favorite buttons
+        // Favorite buttons - Önce temizle
         document.querySelectorAll('.favorite-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
+            const newBtn = btn.cloneNode(true);
+            btn.parentNode.replaceChild(newBtn, btn);
+        });
+        
+        // Yeni listener'ları ekle
+        document.querySelectorAll('.favorite-btn').forEach(btn => {
+            btn.addEventListener('click', async (e) => {
                 e.preventDefault();
                 e.stopPropagation();
                 
@@ -146,20 +174,29 @@ const Recipes = {
                 }
                 
                 const recipeId = btn.dataset.id;
-                const isFavorited = Lists.isInList('favorites', recipeId);
+                const isCurrentlyFavorited = btn.dataset.favorited === "true";
                 
-                if (isFavorited) {
-                    Lists.removeFromList('favorites', recipeId);
-                    btn.classList.remove('active');
-                    btn.querySelector('span').textContent = '🤍';
-                    btn.title = 'Favorilere Ekle';
-                    Toast.show('Favorilerden çıkarıldı');
-                } else {
-                    Lists.addToList('favorites', recipeId);
-                    btn.classList.add('active');
-                    btn.querySelector('span').textContent = '❤️';
-                    btn.title = 'Favorilerden Çıkar';
-                    Toast.show('Favorilere eklendi!', 'success');
+                try {
+                    if (isCurrentlyFavorited) {
+                        // Favorilerden çıkar
+                        await Lists.removeFromList('favorites', recipeId);
+                        btn.classList.remove('active');
+                        btn.dataset.favorited = "false";
+                        btn.querySelector('span').textContent = '🤍';
+                        btn.title = 'Favorilere Ekle';
+                        Toast.show('Favorilerden çıkarıldı');
+                    } else {
+                        // Favorilere ekle
+                        await Lists.addToList('favorites', recipeId);
+                        btn.classList.add('active');
+                        btn.dataset.favorited = "true";
+                        btn.querySelector('span').textContent = '❤️';
+                        btn.title = 'Favorilerden Çıkar';
+                        Toast.show('Favorilere eklendi!', 'success');
+                    }
+                } catch (error) {
+                    console.error("Favori hatası:", error);
+                    Toast.show('İşlem yapılamadı', 'error');
                 }
             });
         });
