@@ -4,18 +4,11 @@
  */
 
 const Recipes = {
-    // Cache for recipes data
     data: null,
     currentRecipe: null,
-    
-    // Servings multiplier state
     servingsMultiplier: 1,
     originalServings: 4,
     originalIngredients: [],
-    
-    // ============================================
-    // INITIALIZATION
-    // ============================================
     
     init() {
         this.loadRecipes().then(() => {
@@ -24,15 +17,10 @@ const Recipes = {
             this.bindSearchEvents();
         });
         
-        // Check if we're on the recipe detail page
         if (document.querySelector('.recipe-hero')) {
             this.loadRecipeDetail();
         }
     },
-    
-    // ============================================
-    // DATA LOADING
-    // ============================================
     
     async loadRecipes() {
         try {
@@ -61,9 +49,9 @@ const Recipes = {
     getRecipeById(id) {
         return this.data ? this.data.find(r => r.id === id) : null;
     },
-    
+
     // ============================================
-    // RECIPE GRID (INDEX PAGE)
+    // RECIPE GRID - DÜZELTİLMİŞ FAVORİ SİSTEMİ
     // ============================================
     
     async renderRecipesGrid(recipes = null) {
@@ -82,19 +70,20 @@ const Recipes = {
         
         if (emptyState) emptyState.classList.add('hidden');
         
-        // 1. Önce tüm kartları render et (varsayılan boş kalp)
+        // 1. Önce tüm kartları render et (varsayılan boş kalp 🤍)
         grid.innerHTML = recipesToRender.map(recipe => this.createRecipeCard(recipe)).join('');
         
         // 2. Event listener'ları bağla
         this.bindCardEvents();
         
-        // 3. Giriş yapılmışsa favori durumlarını kontrol et ve güncelle
-        if (Auth.isLoggedIn()) {
+        // 3. Eğer giriş yapılmışsa, async olarak favori durumlarını kontrol et ve güncelle
+        if (Auth.isLoggedIn && Auth.isLoggedIn()) {
             const favoriteBtns = grid.querySelectorAll('.favorite-btn');
             
             for (const btn of favoriteBtns) {
                 const recipeId = btn.dataset.id;
                 try {
+                    // Lists.isFavorited async olduğu için await kullan
                     const isFavorited = await Lists.isFavorited(recipeId);
                     
                     if (isFavorited) {
@@ -111,7 +100,7 @@ const Recipes = {
     },
     
     createRecipeCard(recipe) {
-        // Varsayılan olarak boş kalp, durum sonradan kontrol edilecek
+        // Varsayılan olarak boş kalp (🤍) - durum sonradan kontrol edilecek
         return `
             <article class="recipe-card" data-id="${recipe.id}">
                 <div class="recipe-card-image">
@@ -153,7 +142,7 @@ const Recipes = {
     },
     
     bindCardEvents() {
-        // Favorite buttons - Önce temizle
+        // Favorite buttons - Önce eski listener'ları temizle
         document.querySelectorAll('.favorite-btn').forEach(btn => {
             const newBtn = btn.cloneNode(true);
             btn.parentNode.replaceChild(newBtn, btn);
@@ -165,7 +154,7 @@ const Recipes = {
                 e.preventDefault();
                 e.stopPropagation();
                 
-                if (!Auth.isLoggedIn()) {
+                if (!Auth.isLoggedIn || !Auth.isLoggedIn()) {
                     Toast.show('Favorilere eklemek için giriş yapmalısınız', 'error');
                     setTimeout(() => {
                         window.location.href = 'auth.html';
@@ -211,10 +200,6 @@ const Recipes = {
             });
         });
     },
-    
-    // ============================================
-    // QUICK VIEW MODAL
-    // ============================================
     
     async showQuickView(recipeId) {
         const recipe = this.getRecipeById(recipeId);
@@ -268,16 +253,11 @@ const Recipes = {
         Modal.open('quickViewModal');
     },
     
-    // ============================================
-    // FILTERING & SEARCH
-    // ============================================
-    
     bindFilterEvents() {
         const filterButtons = document.querySelectorAll('.filter-btn');
         
         filterButtons.forEach(btn => {
             btn.addEventListener('click', () => {
-                // Update active state
                 filterButtons.forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
                 
@@ -338,7 +318,6 @@ const Recipes = {
             return;
         }
         
-        // Wait for recipes to load
         if (!this.data) {
             await this.loadRecipes();
         }
@@ -351,34 +330,23 @@ const Recipes = {
         }
         
         this.currentRecipe = recipe;
-        
-        // Reset servings multiplier
         this.servingsMultiplier = 1;
         this.originalServings = recipe.servings;
         
-        // Update page title
         document.title = `${recipe.title} | Lezzet Yolculuğu`;
         
-        // Update meta description
         const metaDesc = document.querySelector('meta[name="description"]');
         if (metaDesc) {
             metaDesc.content = recipe.description;
         }
         
-        // Render hero section
         this.renderRecipeHero(recipe);
-        
-        // Render ingredients
         this.renderIngredients(recipe);
         
-        // Render instructions
         const contentHtml = await this.loadRecipeContent(recipe.contentFile);
         this.renderInstructions(contentHtml);
         
-        // Bind action buttons
         this.bindActionButtons(recipe);
-        
-        // Bind servings buttons
         this.bindServingsButtons();
     },
     
@@ -407,7 +375,6 @@ const Recipes = {
         
         if (servingsCount) servingsCount.textContent = recipe.servings;
         
-        // Parse ingredients from markdown content
         if (ingredientsList) {
             ingredientsList.innerHTML = `
                 <div class="ingredient-item">
@@ -422,8 +389,6 @@ const Recipes = {
         const container = document.getElementById('instructionsContent');
         if (container) {
             container.innerHTML = html;
-            
-            // Extract ingredients from the HTML and update the sidebar
             this.extractAndRenderIngredients(html);
         }
     },
@@ -432,15 +397,12 @@ const Recipes = {
         const ingredientsList = document.getElementById('ingredientsList');
         if (!ingredientsList) return;
         
-        // Create a temporary element to parse the HTML
         const temp = document.createElement('div');
         temp.innerHTML = html;
         
-        // Find all list items in the ingredients section
         const lists = temp.querySelectorAll('ul li, ol li');
         
         if (lists.length > 0) {
-            // Store original ingredients for scaling
             this.originalIngredients = Array.from(lists).map(li => li.textContent.trim());
             
             ingredientsList.innerHTML = this.originalIngredients.map(text => `
@@ -458,17 +420,13 @@ const Recipes = {
         return div.innerHTML;
     },
     
-    // ============================================
-    // SERVINGS MULTIPLIER SYSTEM
-    // ============================================
-    
     bindServingsButtons() {
         const increaseBtn = document.getElementById('increaseServings');
         const decreaseBtn = document.getElementById('decreaseServings');
         
         if (increaseBtn) {
             increaseBtn.addEventListener('click', () => {
-                if (this.servingsMultiplier < 4) { // Max 4x (e.g., 4 kişilik -> 16 kişilik)
+                if (this.servingsMultiplier < 4) {
                     this.servingsMultiplier += 0.5;
                     this.updateIngredientsDisplay();
                 }
@@ -477,7 +435,7 @@ const Recipes = {
         
         if (decreaseBtn) {
             decreaseBtn.addEventListener('click', () => {
-                if (this.servingsMultiplier > 0.5) { // Min 0.5x
+                if (this.servingsMultiplier > 0.5) {
                     this.servingsMultiplier -= 0.5;
                     this.updateIngredientsDisplay();
                 }
@@ -492,7 +450,6 @@ const Recipes = {
             servingsCount.textContent = newServings;
         }
         
-        // Update each ingredient
         const ingredientItems = document.querySelectorAll('.ingredient-item');
         ingredientItems.forEach((item, index) => {
             const textSpan = item.querySelector('.ingredient-text');
@@ -505,225 +462,58 @@ const Recipes = {
     },
     
     scaleIngredientText(text, multiplier) {
-        // Regex to match numbers with optional decimal and units
-        // Matches: 4, 1.5, 2.5, etc. followed by optional unit
         const numberRegex = /(\d+(?:[.,]\d+)?)\s*(adet|su bardağı|yemek kaşığı|çay kaşığı|tatlı kaşığı|gr|kg|ml|cl|gram|kilogram|litre|paket|demet|baş|diş)?/gi;
         
         return text.replace(numberRegex, (match, numberStr, unit) => {
-            // Parse number (handle both . and , as decimal separator)
             const number = parseFloat(numberStr.replace(',', '.'));
-            
             if (isNaN(number)) return match;
             
-            // Calculate new value
             let newValue = number * multiplier;
-            
-            // Format the result
             let formattedValue;
+            
             if (newValue < 1) {
-                // Show decimal for small values
                 formattedValue = Math.round(newValue * 100) / 100;
-                // Remove trailing zeros
                 formattedValue = formattedValue.toString().replace(/\.0+$|(\.[0-9]*[1-9])0+$/, '$1');
             } else if (newValue % 1 === 0) {
-                // Whole number
                 formattedValue = Math.round(newValue);
             } else if (newValue % 0.5 === 0) {
-                // Half values (0.5, 1.5, etc.)
                 formattedValue = newValue;
             } else {
-                // Round to 1 decimal place
                 formattedValue = Math.round(newValue * 10) / 10;
             }
             
-            // Replace decimal point with comma for Turkish format
             formattedValue = formattedValue.toString().replace('.', ',');
-            
             return unit ? `${formattedValue} ${unit}` : formattedValue;
         });
     },
     
-    // ============================================
-    // ACTION BUTTONS
-    // ============================================
-    
     bindActionButtons(recipe) {
-        // Add to list button - now opens list selection modal
-        const addToListBtn = document.getElementById('addToListBtn');
-        if (addToListBtn) {
-            // Update button to show list selection modal
-            addToListBtn.addEventListener('click', () => {
-                if (!Auth.isLoggedIn()) {
-                    Toast.show('Listeye eklemek için giriş yapmalısınız', 'error');
-                    setTimeout(() => {
-                        window.location.href = 'auth.html';
-                    }, 1500);
-                    return;
-                }
-                
-                this.showListSelectionModal(recipe.id);
-            });
-        }
-        
-        // Share button
         const shareBtn = document.getElementById('shareBtn');
+        const printBtn = document.getElementById('printBtn');
+        
         if (shareBtn) {
             shareBtn.addEventListener('click', () => {
                 Modal.open('shareModal');
             });
         }
         
-        // Print button
-        const printBtn = document.getElementById('printBtn');
         if (printBtn) {
             printBtn.addEventListener('click', () => {
                 window.print();
             });
         }
         
-        // Share options
         this.bindShareOptions(recipe);
-    },
-    
-    showListSelectionModal(recipeId) {
-        // Get user's lists
-        const userLists = Lists.getLists();
-        
-        // Create modal HTML if not exists
-        let modal = document.getElementById('listSelectionModal');
-        if (!modal) {
-            modal = document.createElement('div');
-            modal.id = 'listSelectionModal';
-            modal.className = 'modal';
-            document.body.appendChild(modal);
-        }
-        
-        // Build list options
-        const listOptions = userLists.map(list => {
-            const isInList = Lists.isInList(list.id, recipeId);
-            return `
-                <label class="list-selection-item">
-                    <input type="checkbox" class="list-selection-checkbox" 
-                           value="${list.id}" ${isInList ? 'checked' : ''}>
-                    <span class="list-selection-name">${list.name}</span>
-                    ${isInList ? '<span class="list-selection-status">✓</span>' : ''}
-                </label>
-            `;
-        }).join('');
-        
-        modal.innerHTML = `
-            <div class="modal-backdrop"></div>
-            <div class="modal-content modal-sm">
-                <button class="modal-close" aria-label="Kapat">×</button>
-                <div class="modal-header">
-                    <h3 class="modal-title">Listeye Ekle</h3>
-                </div>
-                <div class="modal-body">
-                    <div class="list-selection-list">
-                        ${listOptions}
-                    </div>
-                    <button class="list-selection-create-btn" id="quickCreateListBtn">
-                        <span>+</span> Yeni Liste Oluştur
-                    </button>
-                    <button type="button" class="btn btn-primary btn-full" id="saveToListsBtn" style="margin-top: var(--space-md);">
-                        Kaydet
-                    </button>
-                </div>
-            </div>
-        `;
-        
-        // Bind close button
-        modal.querySelector('.modal-close').addEventListener('click', () => {
-            Modal.close('listSelectionModal');
-        });
-        
-        modal.querySelector('.modal-backdrop').addEventListener('click', () => {
-            Modal.close('listSelectionModal');
-        });
-        
-        // Bind quick create button
-        const quickCreateBtn = modal.querySelector('#quickCreateListBtn');
-        if (quickCreateBtn) {
-            quickCreateBtn.addEventListener('click', () => {
-                const listName = prompt('Liste adı:');
-                if (listName && listName.trim()) {
-                    const newList = Lists.createList(listName.trim());
-                    if (newList) {
-                        Toast.show('Liste oluşturuldu!', 'success');
-                        this.showListSelectionModal(recipeId); // Refresh modal
-                    }
-                }
-            });
-        }
-        
-        // Bind save button
-        const saveBtn = modal.querySelector('#saveToListsBtn');
-        if (saveBtn) {
-            saveBtn.addEventListener('click', () => {
-                const checkboxes = modal.querySelectorAll('.list-selection-checkbox');
-                const addedLists = [];
-                const removedLists = [];
-                
-                checkboxes.forEach(checkbox => {
-                    const listId = checkbox.value;
-                    const list = userLists.find(l => l.id === listId);
-                    const wasInList = Lists.isInList(listId, recipeId);
-                    
-                    if (checkbox.checked && !wasInList) {
-                        Lists.addToList(listId, recipeId);
-                        if (list) addedLists.push(list.name);
-                    } else if (!checkbox.checked && wasInList) {
-                        Lists.removeFromList(listId, recipeId);
-                        if (list) removedLists.push(list.name);
-                    }
-                });
-                
-                // Show appropriate toast
-                if (addedLists.length > 0) {
-                    Toast.show(`${addedLists.join(', ')} listesine eklendi`, 'success');
-                }
-                if (removedLists.length > 0) {
-                    Toast.show(`${removedLists.join(', ')} listesinden çıkarıldı`);
-                }
-                if (addedLists.length === 0 && removedLists.length === 0) {
-                    Toast.show('Değişiklik yapılmadı');
-                }
-                
-                Modal.close('listSelectionModal');
-                
-                // Update add to list button state
-                const isInAnyList = userLists.some(l => Lists.isInList(l.id, recipeId));
-                const addToListBtn = document.getElementById('addToListBtn');
-                if (addToListBtn) {
-                    this.updateAddToListButton(addToListBtn, isInAnyList);
-                }
-            });
-        }
-        
-        Modal.open('listSelectionModal');
-    },
-    
-    updateAddToListButton(btn, isInAnyList) {
-        const icon = btn.querySelector('.action-btn-icon');
-        const text = btn.querySelector('.action-btn-text');
-        
-        if (isInAnyList) {
-            btn.classList.add('active');
-            if (icon) icon.textContent = '❤️';
-            if (text) text.textContent = 'Listede';
-        } else {
-            btn.classList.remove('active');
-            if (icon) icon.textContent = '🤍';
-            if (text) text.textContent = 'Listeme Ekle';
-        }
     },
     
     bindShareOptions(recipe) {
         const shareUrl = Utils.getShareUrl(recipe.id);
         const shareText = `${recipe.title} - Lezzet Yolculuğu`;
         
-        // Native share
         const shareNative = document.getElementById('shareNative');
+        const shareWhatsApp = document.getElementById('shareWhatsApp');
+        const shareCopy = document.getElementById('shareCopy');
+        
         if (shareNative) {
             shareNative.addEventListener('click', async () => {
                 if (navigator.share) {
@@ -743,8 +533,6 @@ const Recipes = {
             });
         }
         
-        // WhatsApp share
-        const shareWhatsApp = document.getElementById('shareWhatsApp');
         if (shareWhatsApp) {
             shareWhatsApp.addEventListener('click', () => {
                 const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(shareText + ' ' + shareUrl)}`;
@@ -753,8 +541,6 @@ const Recipes = {
             });
         }
         
-        // Copy link
-        const shareCopy = document.getElementById('shareCopy');
         if (shareCopy) {
             shareCopy.addEventListener('click', async () => {
                 try {
@@ -769,13 +555,8 @@ const Recipes = {
     }
 };
 
-// ============================================
-// INITIALIZATION
-// ============================================
-
 document.addEventListener('DOMContentLoaded', () => {
     Recipes.init();
 });
 
-// Export for other modules
 window.Recipes = Recipes;
