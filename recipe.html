@@ -1,5 +1,4 @@
-
-recipe_html = '''<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
@@ -7,20 +6,16 @@ recipe_html = '''<!DOCTYPE html>
     <meta name="description" content="Detaylı yemek tarifi. Malzemeler, adım adım hazırlık ve püf noktaları.">
     <title>Tarif | Lezzet Yolculuğu</title>
     
-    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
     
-    <!-- CSS -->
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="components.css">
-    <link rel="stylesheet" href="print.css" media="print">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/print.css" media="print">
     
-    <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍳</text></svg>">
 
-    <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
@@ -34,13 +29,11 @@ recipe_html = '''<!DOCTYPE html>
             messagingSenderId: "129656126432",
             appId: "1:129656126432:web:c4d5ad257f8eb96cd88985"
         };
-        
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
     </script>
 </head>
 <body>
-    <!-- Navigation -->
     <nav class="nav" id="nav">
         <div class="nav-container">
             <a href="index.html" class="nav-logo">
@@ -58,7 +51,7 @@ recipe_html = '''<!DOCTYPE html>
                     <span class="theme-toggle-light">☀️</span>
                     <span class="theme-toggle-dark">🌙</span>
                 </button>
-                <a href="index.html" onclick="showAuthScreen(); return false;" class="nav-auth" id="navAuth">Giriş</a>
+                <a href="auth.html" class="nav-auth" id="navAuth">Giriş</a>
                 <div class="nav-user hidden" id="navUser">
                     <span class="nav-user-name" id="navUserName"></span>
                     <button class="nav-logout" id="navLogout" title="Çıkış yap">→</button>
@@ -66,25 +59,21 @@ recipe_html = '''<!DOCTYPE html>
             </div>
             
             <button class="nav-mobile-toggle" id="navMobileToggle" aria-label="Menüyü aç">
-                <span></span>
-                <span></span>
-                <span></span>
+                <span></span><span></span><span></span>
             </button>
         </div>
     </nav>
 
-    <!-- Mobile Menu -->
     <div class="mobile-menu" id="mobileMenu">
         <a href="index.html" class="mobile-link">Tarifler</a>
         <a href="dashboard.html" class="mobile-link mobile-link-lists hidden" id="mobileLists">Listelerim</a>
-        <a href="index.html" onclick="showAuthScreen(); return false;" class="mobile-link" id="mobileAuth">Giriş</a>
+        <a href="auth.html" class="mobile-link" id="mobileAuth">Giriş</a>
         <div class="mobile-user hidden" id="mobileUser">
             <span class="mobile-user-name" id="mobileUserName"></span>
             <button class="mobile-logout" id="mobileLogout">Çıkış Yap</button>
         </div>
     </div>
 
-    <!-- Recipe Hero -->
     <section class="recipe-hero" id="recipeHero">
         <div class="recipe-hero-image">
             <img src="" alt="" id="recipeHeroImage" loading="eager">
@@ -120,7 +109,6 @@ recipe_html = '''<!DOCTYPE html>
         </div>
     </section>
 
-    <!-- Action Bar -->
     <div class="action-bar" id="actionBar">
         <div class="container">
             <div class="action-bar-content">
@@ -140,11 +128,9 @@ recipe_html = '''<!DOCTYPE html>
         </div>
     </div>
 
-    <!-- Recipe Content -->
     <main class="main recipe-main">
         <div class="container">
             <div class="recipe-content">
-                <!-- Left: Ingredients -->
                 <aside class="recipe-sidebar">
                     <div class="ingredients-card">
                         <h2 class="ingredients-title">Malzemeler</h2>
@@ -153,23 +139,17 @@ recipe_html = '''<!DOCTYPE html>
                             <span class="servings-count"><span id="servingsCount">4</span> kişilik</span>
                             <button class="servings-btn" id="increaseServings">+</button>
                         </div>
-                        <div class="ingredients-list" id="ingredientsList">
-                            <!-- Ingredients loaded dynamically -->
-                        </div>
+                        <div class="ingredients-list" id="ingredientsList"></div>
                     </div>
                 </aside>
 
-                <!-- Right: Instructions -->
                 <article class="recipe-instructions">
-                    <div class="instructions-content" id="instructionsContent">
-                        <!-- Content loaded from markdown -->
-                    </div>
+                    <div class="instructions-content" id="instructionsContent"></div>
                 </article>
             </div>
         </div>
     </main>
 
-    <!-- Share Modal -->
     <div class="modal" id="shareModal">
         <div class="modal-backdrop"></div>
         <div class="modal-content modal-sm">
@@ -196,12 +176,10 @@ recipe_html = '''<!DOCTYPE html>
         </div>
     </div>
 
-    <!-- Toast Notification -->
     <div class="toast" id="toast">
         <span class="toast-message" id="toastMessage"></span>
     </div>
 
-    <!-- Footer -->
     <footer class="footer">
         <div class="container">
             <div class="footer-content">
@@ -211,7 +189,7 @@ recipe_html = '''<!DOCTYPE html>
                 </div>
                 <div class="footer-links">
                     <a href="index.html">Tarifler</a>
-                    <a href="index.html" onclick="showAuthScreen(); return false;">Giriş</a>
+                    <a href="auth.html">Giriş</a>
                 </div>
             </div>
             <div class="footer-bottom">
@@ -220,15 +198,14 @@ recipe_html = '''<!DOCTYPE html>
         </div>
     </footer>
 
-    <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-    <script src="app.js"></script>
-    <script src="firebase-auth.js"></script>
-    <script src="firebase-lists.js"></script>
-    <script src="recipes.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/firebase-auth.js"></script>
+    <script src="js/firebase-lists.js"></script>
+    <script src="js/recipes.js"></script>
 
     <script>
-        // Auth state ve UI kontrolü
+        // Auth state
         firebase.auth().onAuthStateChanged((user) => {
             const navAuth = document.getElementById('navAuth');
             const navUser = document.getElementById('navUser');
@@ -238,10 +215,8 @@ recipe_html = '''<!DOCTYPE html>
             const mobileUser = document.getElementById('mobileUser');
             const mobileUserName = document.getElementById('mobileUserName');
             const mobileLists = document.getElementById('mobileLists');
-            const addToFavoritesBtn = document.getElementById('addToFavoritesBtn');
 
             if (user) {
-                // Giriş yapılmışsa
                 if (navAuth) navAuth.classList.add('hidden');
                 if (navUser) navUser.classList.remove('hidden');
                 if (navUserName) navUserName.textContent = user.displayName || user.email;
@@ -252,12 +227,8 @@ recipe_html = '''<!DOCTYPE html>
                 if (mobileUserName) mobileUserName.textContent = user.displayName || user.email;
                 if (mobileLists) mobileLists.classList.remove('hidden');
                 
-                // Favori butonunu kontrol et
-                if (addToFavoritesBtn) {
-                    checkFavoriteStatus();
-                }
+                checkFavoriteStatus();
             } else {
-                // Giriş yapılmamışsa
                 if (navAuth) navAuth.classList.remove('hidden');
                 if (navUser) navUser.classList.add('hidden');
                 if (navLists) navLists.classList.add('hidden');
@@ -267,7 +238,6 @@ recipe_html = '''<!DOCTYPE html>
             }
         });
 
-        // Çıkış butonları
         document.getElementById('navLogout')?.addEventListener('click', async () => {
             await firebase.auth().signOut();
             localStorage.removeItem('skipAuth');
@@ -280,20 +250,21 @@ recipe_html = '''<!DOCTYPE html>
             window.location.href = 'index.html';
         });
 
-        // Favori durumunu kontrol et
         async function checkFavoriteStatus() {
-            const recipeId = Utils.getUrlParam('id');
+            const recipeId = new URLSearchParams(window.location.search).get('id');
             if (!recipeId) return;
             
             try {
-                const isFav = await Lists.isFavorited(recipeId);
-                updateFavoriteButton(isFav);
+                const user = firebase.auth().currentUser;
+                if (!user) return;
+                
+                const doc = await db.collection('users').doc(user.uid).collection('favorites').doc(recipeId).get();
+                updateFavoriteButton(doc.exists);
             } catch (e) {
                 console.error("Favori kontrol hatası:", e);
             }
         }
 
-        // Favori butonunu güncelle
         function updateFavoriteButton(isFavorited) {
             const btn = document.getElementById('addToFavoritesBtn');
             if (!btn) return;
@@ -312,58 +283,42 @@ recipe_html = '''<!DOCTYPE html>
             }
         }
 
-        // Favori butonu tıklama
         document.getElementById('addToFavoritesBtn')?.addEventListener('click', async () => {
             const user = firebase.auth().currentUser;
             if (!user) {
-                Toast.show('Favorilere eklemek için giriş yapmalısınız', 'error');
-                setTimeout(() => {
-                    window.location.href = 'index.html';
-                }, 1500);
+                showToast('Favorilere eklemek için giriş yapmalısınız', 'error');
+                setTimeout(() => window.location.href = 'auth.html', 1500);
                 return;
             }
             
-            const recipeId = Utils.getUrlParam('id');
+            const recipeId = new URLSearchParams(window.location.search).get('id');
             if (!recipeId) return;
             
             try {
-                const result = await Lists.toggleFavorite(recipeId);
-                if (result) {
-                    if (result.action === 'added') {
-                        updateFavoriteButton(true);
-                        Toast.show('Favorilere eklendi!', 'success');
-                    } else {
-                        updateFavoriteButton(false);
-                        Toast.show('Favorilerden çıkarıldı');
-                    }
+                const favRef = db.collection('users').doc(user.uid).collection('favorites').doc(recipeId);
+                const doc = await favRef.get();
+                
+                if (doc.exists) {
+                    await favRef.delete();
+                    updateFavoriteButton(false);
+                    showToast('Favorilerden çıkarıldı');
+                } else {
+                    await favRef.set({ addedAt: new Date().toISOString() });
+                    updateFavoriteButton(true);
+                    showToast('Favorilere eklendi!', 'success');
                 }
             } catch (error) {
                 console.error("Favori hatası:", error);
-                Toast.show('İşlem yapılamadı', 'error');
+                showToast('İşlem yapılamadı', 'error');
             }
         });
 
-        function showAuthScreen() {
-            localStorage.removeItem('skipAuth');
-            window.location.href = 'index.html';
-        }
-
-        function showToast(message) {
+        function showToast(message, type = 'default') {
             const toast = document.getElementById('toast');
             document.getElementById('toastMessage').textContent = message;
-            toast.className = 'toast active';
+            toast.className = 'toast active ' + type;
             setTimeout(() => toast.classList.remove('active'), 3000);
         }
     </script>
 </body>
-</html>'''
-
-print("RECIPE.HTML HAZIR")
-print("=" * 50)
-print("Bu kodu recipe.html dosyası olarak kaydet.")
-print("Değişiklikler:")
-print("- Firebase SDK eklendi")
-print("- Eski auth.js ve lists.js kaldırıldı")
-print("- firebase-auth.js ve firebase-lists.js eklendi")
-print("- Favori butonu Firebase'e bağlandı")
-print("- Giriş/Kayıt kontrolü Firebase Auth ile yapılıyor")
+</html>
