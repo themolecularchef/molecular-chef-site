@@ -1,3 +1,52 @@
 {
-  "recipes": []
+  "recipes": [
+    {
+      "id": "iskender-kebap",
+      "title": "İskender Kebap",
+      "image": "assets/images/iskender-kebap.webp",
+      "prepTime": "20 dk",
+      "cookTime": "40 dk",
+      "servings": 4,
+      "difficulty": "Orta",
+      "category": "Et Yemekleri",
+      "contentFile": "content/markdown/iskender-kebap.md",
+      "description": "Evde kolayca yapabileceğiniz nefis İskender Kebap tarifi."
+    },
+    {
+      "id": "tavuk-but-lahana",
+      "title": "Tavuk But Lahana",
+      "image": "assets/images/tavuk-but-lahana.webp",
+      "prepTime": "15 dk",
+      "cookTime": "45 dk",
+      "servings": 4,
+      "difficulty": "Kolay",
+      "category": "Tavuk Yemekleri",
+      "contentFile": "content/markdown/tavuk-but-lahana.md",
+      "description": "Lahanalı tavuk but yemeği."
+    },
+    {
+      "id": "sucuk-spagetti",
+      "title": "Sucuklu Spagetti",
+      "image": "assets/images/sucuk-spagetti.webp",
+      "prepTime": "10 dk",
+      "cookTime": "20 dk",
+      "servings": 2,
+      "difficulty": "Kolay",
+      "category": "Makarna",
+      "contentFile": "content/markdown/sucuk-spagetti.md",
+      "description": "Kolay ve lezzetli sucuklu makarna."
+    },
+    {
+      "id": "dovga-krutonlar",
+      "title": "Dovğa ve Krutonlar",
+      "image": "assets/images/dovga-krutonlar.webp",
+      "prepTime": "10 dk",
+      "cookTime": "15 dk",
+      "servings": 6,
+      "difficulty": "Kolay",
+      "category": "Çorba",
+      "contentFile": "content/markdown/dovga-krutonlar.md",
+      "description": "Azerbaycan mutfağından geleneksel dovğa çorbası."
+    }
+  ]
 }
