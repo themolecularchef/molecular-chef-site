@@ -197,32 +197,46 @@
       "description": "Kedidili bisküvi, mascarpone krema, taze muz ve çikolata toplarıyla zenginleştirilmiş nefis tiramisu."
     },
     {
-  "id": "baharatli-firin-kanat-yogurtlu-dip",
-  "title": "Baharatlı Fırın Kanat & Yoğurtlu Dip Sos",
-  "image": "assets/images/baharatli-firin-kanat-yogurtlu-dip.webp",
-  "prepTime": "15 dk (marine hariç)",
-  "cookTime": "45 dk",
-  "totalTime": "180 dk (marine dahil)",
-  "servings": 2,
-  "difficulty": "Orta",
-  "category": "Tavuk Yemekleri",
-  "tags": ["tavuk", "kanat", "fırın", "yoğurt", "marine", "dip sos", "baharatlı"],
-  "contentFile": "content/markdown/baharatli-firin-kanat-yogurtlu-dip.md",
-  "description": "Yoğurt ve baharatlarla marine edilmiş, fırında gevrek kıvamlı kanatlar, ferahlatıcı yoğurtlu dip sosla servis edilir."
+      "id": "baharatli-firin-kanat-yogurtlu-dip",
+      "title": "Baharatlı Fırın Kanat & Yoğurtlu Dip Sos",
+      "image": "assets/images/baharatli-firin-kanat-yogurtlu-dip.webp",
+      "prepTime": "15 dk (marine hariç)",
+      "cookTime": "45 dk",
+      "totalTime": "180 dk (marine dahil)",
+      "servings": 2,
+      "difficulty": "Orta",
+      "category": "Tavuk Yemekleri",
+      "tags": ["tavuk", "kanat", "fırın", "yoğurt", "marine", "dip sos", "baharatlı"],
+      "contentFile": "content/markdown/baharatli-firin-kanat-yogurtlu-dip.md",
+      "description": "Yoğurt ve baharatlarla marine edilmiş, fırında gevrek kıvamlı kanatlar, ferahlatıcı yoğurtlu dip sosla servis edilir."
     },
     {
-  "id": "domates-kapya-biberli-fusilli-cig-sarimsak",
-  "title": "Domates-Kapya Biberli Fusilli & Çiğ Sarımsak",
-  "image": "assets/images/domates-kapya-biberli-fusilli-cig-sarimsak.webp",
-  "prepTime": "15 dk",
-  "cookTime": "25 dk",
-  "totalTime": "40 dk",
-  "servings": 2,
-  "difficulty": "Kolay",
-  "category": "Makarna",
-  "tags": ["makarna", "fusilli", "domates", "kapya biberi", "sarımsak", "italyan", "vejeteryan"],
-  "contentFile": "content/markdown/domates-kapya-biberli-fusilli-cig-sarimsak.md",
-  "description": "Taze domates ve kırmızı kapya biberiyle hazırlanan, üzerine çiğ sarımsak dilimleriyle süslenmiş burgu makarna."
+      "id": "domates-kapya-biberli-fusilli-cig-sarimsak",
+      "title": "Domates-Kapya Biberli Fusilli & Çiğ Sarımsak",
+      "image": "assets/images/domates-kapya-biberli-fusilli-cig-sarimsak.webp",
+      "prepTime": "15 dk",
+      "cookTime": "25 dk",
+      "totalTime": "40 dk",
+      "servings": 2,
+      "difficulty": "Kolay",
+      "category": "Makarna",
+      "tags": ["makarna", "fusilli", "domates", "kapya biberi", "sarımsak", "italyan", "vejeteryan"],
+      "contentFile": "content/markdown/domates-kapya-biberli-fusilli-cig-sarimsak.md",
+      "description": "Taze domates ve kırmızı kapya biberiyle hazırlanan, üzerine çiğ sarımsak dilimleriyle süslenmiş burgu makarna."
+    },
+    {
+      "id": "marineli-bonfile-kavurma-baharatli-soganli-ekmek-arasi",
+      "title": "Marineli Bonfile Kavurma & Baharatlı Soğanlı Ekmek Arası",
+      "image": "assets/images/marineli-bonfile-kavurma-baharatli-soganli-ekmek-arasi.webp",
+      "prepTime": "20 dk (marine hariç)",
+      "cookTime": "90 dk",
+      "totalTime": "6 saat (marine dahil)",
+      "servings": 3,
+      "difficulty": "Orta",
+      "category": "Et Yemekleri",
+      "tags": ["bonfile", "kavurma", "ekmek arası", "sokak lezzeti", "biber", "marine"],
+      "contentFile": "content/markdown/marineli-bonfile-kavurma-baharatli-soganli-ekmek-arasi.md",
+      "description": "Sebzeli marineyle tatlandırılmış, yavaş pişirilmiş bonfile kavurma, ramazan pidesi arası sunum ve baharatlı çiğ soğan ile."
     }
-  ]
+  ]   
 }
