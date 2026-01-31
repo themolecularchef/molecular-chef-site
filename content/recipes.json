@@ -1,0 +1,88 @@
+{
+  "recipes": [
+    {
+      "id": "dovga-krutonlar",
+      "title": "Azerbaycan Usulü Dovğa & Fırında Baharatlı Krutonlar",
+      "image": "assets/images/dovga-krutonlar.webp",
+      "prepTime": "20 dk",
+      "cookTime": "45 dk",
+      "totalTime": "65 dk",
+      "servings": 4,
+      "difficulty": "Orta",
+      "category": "Çorba",
+      "tags": ["azerbaycan", "çorba", "yoğurt", "kruton"],
+      "contentFile": "content/markdown/dovga-krutonlar.md",
+      "description": "Ekşi mayalı yoğurtla hazırlanan geleneksel Azerbaycan çorbası, sumaklı baharatlı krutonlarla servis edilir."
+    },
+    {
+      "id": "iskender-kebap",
+      "title": "Evde İskender Kebap & Tane Pilav",
+      "image": "assets/images/iskender-kebap.webp",
+      "prepTime": "30 dk",
+      "cookTime": "40 dk",
+      "totalTime": "70 dk",
+      "servings": 2,
+      "difficulty": "Orta",
+      "category": "Et Yemekleri",
+      "tags": ["iskender", "kebap", "pilav", "türk mutfağı"],
+      "contentFile": "content/markdown/iskender-kebap.md",
+      "description": "Evde yapılabilen nefis İskender kebap, tereyağlı salça sosu ve tane tane pilavıyla."
+    },
+    {
+      "id": "elma-dilim-patates",
+      "title": "Fırında Elma Dilim Patates & Nar Ekşili Mayonezli Sos",
+      "image": "assets/images/elma-dilim-patates.webp",
+      "prepTime": "40 dk",
+      "cookTime": "45 dk",
+      "totalTime": "85 dk",
+      "servings": 4,
+      "difficulty": "Kolay",
+      "category": "Meze",
+      "tags": ["patates", "fırın", "meze", "nar ekşisi"],
+      "contentFile": "content/markdown/elma-dilim-patates.md",
+      "description": "Dışı çıtır içi yumuşak fırın patates, nar ekşili mayonezli sosla buluşuyor."
+    },
+    {
+      "id": "tavuk-but-lahana",
+      "title": "Haşlama-Fırınlama Tekniği ile Tavuk But & Lahana Turşulu Tabak",
+      "image": "assets/images/tavuk-but-lahana.webp",
+      "prepTime": "20 dk",
+      "cookTime": "90 dk",
+      "totalTime": "110 dk",
+      "servings": 2,
+      "difficulty": "Orta",
+      "category": "Tavuk Yemekleri",
+      "tags": ["tavuk", "haşlama", "fırın", "turşu"],
+      "contentFile": "content/markdown/tavuk-but-lahana.md",
+      "description": "Lokum gibi yumuşak tavuk but, lahana turşusu ve taze nane ile."
+    },
+    {
+      "id": "sucuk-spagetti",
+      "title": "Kızarmış Sucuk & Sarımsaklı Spagetti",
+      "image": "assets/images/sucuk-spagetti.webp",
+      "prepTime": "15 dk",
+      "cookTime": "25 dk",
+      "totalTime": "40 dk",
+      "servings": 2,
+      "difficulty": "Kolay",
+      "category": "Makarna",
+      "tags": ["sucuk", "spagetti", "makarna", "sarımsak"],
+      "contentFile": "content/markdown/sucuk-spagetti.md",
+      "description": "Kızarmış sucuk dilimleri ve sarımsaklı salça soslu nefis spagetti."
+    },
+    {
+      "id": "lavas-durum",
+      "title": "Tavada Gevrek Lavaşlı Et Dürüm & Közlenmiş Biber",
+      "image": "assets/images/lavas-durum.webp",
+      "prepTime": "20 dk",
+      "cookTime": "80 dk",
+      "totalTime": "100 dk",
+      "servings": 2,
+      "difficulty": "Orta",
+      "category": "Et Yemekleri",
+      "tags": ["dürüm", "lavaş", "et", "közbiber"],
+      "contentFile": "content/markdown/lavas-durum.md",
+      "description": "Tel tel yumuşak et, gevrek lavaş ve közlenmiş biberin mükemmel uyumu."
+    }
+  ]
+}
