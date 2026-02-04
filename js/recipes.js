@@ -47,8 +47,9 @@ const Recipes = {
     },
     
     getRecipeById(id) {
-        return this.data ? this.data.find(r => r.id === id) : null;
-    },
+    // Hem gelen id'yi hem de verideki id'yi string'e çevirip karşılaştır
+    return this.data ? this.data.find(r => r.id.toString() === id.toString()) : null;
+},
 
     // ============================================
     // RECIPE GRID - GÜNCELLENMİŞ LİSTE SİSTEMİ
