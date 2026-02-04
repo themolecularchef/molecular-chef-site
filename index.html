@@ -39,7 +39,7 @@
 </head>
 <body>
     <!-- GİRİŞ EKRANI (İlk Başlangıç) -->
-    <div id="authScreen" style="position: fixed; inset: 0; z-index: 9999; background: linear-gradient(135deg, var(--color-bg) 0%, var(--color-bg-secondary) 100%); min-height: 100vh; display: flex; flex-direction: column;">
+    <div id="authScreen" style="position: fixed; inset: 0; z-index: 9999; background: linear-gradient(135deg, var(--color-bg) 0%, var(--color-bg-secondary) 100%); min-height: 100vh; display: none; flex-direction: column;">
         <!-- Navigation -->
         <nav class="nav nav-transparent">
             <div class="nav-container">
@@ -235,55 +235,55 @@
     <!-- Main Logic -->
     <script>
         // Auth state ve UI kontrolü
-        firebase.auth().onAuthStateChanged((user) => {
-            const authScreen = document.getElementById('authScreen');
-            const mainWebsite = document.getElementById('mainWebsite');
-            const navAuth = document.getElementById('navAuth');
-            const navUser = document.getElementById('navUser');
-            const navUserName = document.getElementById('navUserName');
-            const navLists = document.getElementById('navLists');
-            const mobileAuth = document.getElementById('mobileAuth');
-            const mobileUser = document.getElementById('mobileUser');
-            const mobileUserName = document.getElementById('mobileUserName');
-            const mobileLists = document.getElementById('mobileLists');
+firebase.auth().onAuthStateChanged((user) => {
+    const authScreen = document.getElementById('authScreen');
+    const mainWebsite = document.getElementById('mainWebsite');
+    const navAuth = document.getElementById('navAuth');
+    const navUser = document.getElementById('navUser');
+    const navUserName = document.getElementById('navUserName');
+    const navLists = document.getElementById('navLists');
+    const mobileAuth = document.getElementById('mobileAuth');
+    const mobileUser = document.getElementById('mobileUser');
+    const mobileUserName = document.getElementById('mobileUserName');
+    const mobileLists = document.getElementById('mobileLists');
 
-            if (user) {
-                // Giriş yapılmışsa ana sayfayı göster
-                authScreen.style.display = 'none';
-                mainWebsite.style.display = 'block';
-                document.body.style.overflow = 'auto';
-                
-                // Navigasyonu güncelle
-                if (navAuth) navAuth.classList.add('hidden');
-                if (navUser) navUser.classList.remove('hidden');
-                if (navUserName) navUserName.textContent = user.displayName || user.email;
-                if (navLists) navLists.classList.remove('hidden');
-                
-                if (mobileAuth) mobileAuth.classList.add('hidden');
-                if (mobileUser) mobileUser.classList.remove('hidden');
-                if (mobileUserName) mobileUserName.textContent = user.displayName || user.email;
-                if (mobileLists) mobileLists.classList.remove('hidden');
-            } else {
-                // Giriş yapılmamışsa kontrol et
-                const hasSkipped = localStorage.getItem('skipAuth');
-                if (hasSkipped) {
-                    authScreen.style.display = 'none';
-                    mainWebsite.style.display = 'block';
-                    document.body.style.overflow = 'auto';
-                } else {
-                    authScreen.style.display = 'flex';
-                    mainWebsite.style.display = 'none';
-                    document.body.style.overflow = 'hidden';
-                }
-                
-                if (navAuth) navAuth.classList.remove('hidden');
-                if (navUser) navUser.classList.add('hidden');
-                if (navLists) navLists.classList.add('hidden');
-                if (mobileAuth) mobileAuth.classList.remove('hidden');
-                if (mobileUser) mobileUser.classList.add('hidden');
-                if (mobileLists) mobileLists.classList.add('hidden');
-            }
-        });
+    if (user) {
+        // Giriş yapılmışsa - auth screen'i gizle, ana sayfayı göster
+        authScreen.style.display = 'none';
+        mainWebsite.style.display = 'block';
+        document.body.style.overflow = 'auto';
+        
+        // Navigasyonu güncelle
+        if (navAuth) navAuth.classList.add('hidden');
+        if (navUser) navUser.classList.remove('hidden');
+        if (navUserName) navUserName.textContent = user.displayName || user.email;
+        if (navLists) navLists.classList.remove('hidden');
+        
+        if (mobileAuth) mobileAuth.classList.add('hidden');
+        if (mobileUser) mobileUser.classList.remove('hidden');
+        if (mobileUserName) mobileUserName.textContent = user.displayName || user.email;
+        if (mobileLists) mobileLists.classList.remove('hidden');
+    } else {
+        // Giriş yapılmamışsa kontrol et
+        const hasSkipped = localStorage.getItem('skipAuth');
+        if (hasSkipped) {
+            authScreen.style.display = 'none';
+            mainWebsite.style.display = 'block';
+            document.body.style.overflow = 'auto';
+        } else {
+            authScreen.style.display = 'flex';
+            mainWebsite.style.display = 'none';
+            document.body.style.overflow = 'hidden';
+        }
+        
+        if (navAuth) navAuth.classList.remove('hidden');
+        if (navUser) navUser.classList.add('hidden');
+        if (navLists) navLists.classList.add('hidden');
+        if (mobileAuth) mobileAuth.classList.remove('hidden');
+        if (mobileUser) mobileUser.classList.add('hidden');
+        if (mobileLists) mobileLists.classList.add('hidden');
+    }
+});
 
         // Auth Screen Logic
         document.addEventListener('DOMContentLoaded', () => {
