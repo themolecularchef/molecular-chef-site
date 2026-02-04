@@ -85,8 +85,9 @@
                 <h1 class="dashboard-title" style="font-family: var(--font-heading); font-size: clamp(1.75rem, 4vw, 2.5rem); font-weight: 600; margin-bottom: var(--space-sm);">
                     Merhaba, <span id="userName">Misafir</span> 👋
                 </h1>
-                <p class="dashboard-subtitle" style="font-size: 1rem; color: var(--color-text-secondary);">Favori tariflerinizi görüntüleyin</p>
+                <p class="dashboard-subtitle" style="font-size: 1rem; color: var(--color-text-secondary);">Favori tariflerinizi ve listelerinizi görüntüleyin</p>
             </div>
+            
             <!-- Create List Button -->
             <div style="margin-bottom: var(--space-xl);">
                 <button id="createListBtn" class="btn btn-primary" style="display: flex; align-items: center; gap: var(--space-sm);">
@@ -114,6 +115,29 @@
                 </div>
             </div>
 
+            <!-- Liste Detay Modalı (YENİ) -->
+            <div class="modal" id="listDetailModal">
+                <div class="modal-backdrop"></div>
+                <div class="modal-content modal-lg">
+                    <button class="modal-close" onclick="Modal.close('listDetailModal')">×</button>
+                    <div class="modal-header">
+                        <h3 class="modal-title" id="listDetailTitle">Liste Adı</h3>
+                        <p class="modal-subtitle" id="listDetailCount">0 tarif</p>
+                    </div>
+                    <div class="modal-body">
+                        <div id="listRecipesGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: var(--space-lg);">
+                            <!-- Tarifler buraya yüklenecek -->
+                        </div>
+                        <div id="emptyListDetail" style="text-align: center; padding: var(--space-3xl); display: none;">
+                            <div style="font-size: 4rem; margin-bottom: var(--space-lg); opacity: 0.5;">📋</div>
+                            <h4 style="font-family: var(--font-heading); font-size: 1.25rem; margin-bottom: var(--space-sm);">Liste boş</h4>
+                            <p style="color: var(--color-text-secondary); margin-bottom: var(--space-lg);">Bu listeye henüz tarif eklenmemiş.</p>
+                            <a href="index.html" class="btn btn-primary btn-sm">Tariflere Göz At</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Lists Section -->
             <div class="lists-section">
                 <div class="lists-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-xl);">
@@ -132,8 +156,9 @@
                     <p style="color: var(--color-text-secondary); margin-bottom: var(--space-lg);">İlk listenizi oluşturmak için "Yeni Liste" butonuna tıklayın.</p>
                 </div>
             </div>
+            
             <!-- Favorites Section -->
-            <div class="lists-section">
+            <div class="lists-section" style="margin-top: var(--space-3xl);">
                 <div class="lists-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-xl);">
                     <h2 class="section-title" style="font-family: var(--font-heading); font-size: 1.5rem; font-weight: 600;">Favorilerim</h2>
                 </div>
@@ -179,8 +204,11 @@
     </footer>
 
     <!-- Scripts -->
-       <script>
-        // Modal fonksiyonları (app.js'den bağımsız)
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="js/app.js"></script>
+    
+    <script>
+        // Modal fonksiyonları
         const Modal = {
             open(modalId) {
                 const modal = document.getElementById(modalId);
@@ -209,6 +237,9 @@
             }
         }
 
+        // Tarif verilerini global olarak sakla
+        let allRecipes = [];
+
         // Auth kontrolü ve veri yükleme
         firebase.auth().onAuthStateChanged(async (user) => {
             if (!user) {
@@ -220,10 +251,25 @@
             document.getElementById('userName').textContent = user.displayName || user.email;
             document.getElementById('navUserName').textContent = user.displayName || user.email;
             
-            // Listeleri ve favorileri yükle
+            // Önce tarifleri yükle
+            await loadAllRecipes();
+            
+            // Sonra listeleri ve favorileri yükle
             await loadLists();
             await loadFavorites();
         });
+
+        // Tüm tarifleri yükle
+        async function loadAllRecipes() {
+            try {
+                const response = await fetch('content/recipes.json');
+                const data = await response.json();
+                allRecipes = data.recipes || [];
+            } catch (error) {
+                console.error("Tarifler yüklenemedi:", error);
+                allRecipes = [];
+            }
+        }
 
         // Listeleri yükle
         async function loadLists() {
@@ -252,15 +298,30 @@
                                       recipeCount === 1 ? '1 tarif' : 
                                       `${recipeCount} tarif`;
                     
+                    // İlk tarifin görselini al (varsa)
+                    let coverImage = '';
+                    if (list.recipes && list.recipes.length > 0 && allRecipes.length > 0) {
+                        const firstRecipe = allRecipes.find(r => r.id === list.recipes[0]);
+                        if (firstRecipe) {
+                            coverImage = `<img src="${firstRecipe.image}" alt="${list.name}" style="width: 100%; height: 100%; object-fit: cover;">`;
+                        }
+                    }
+                    
                     return `
-                        <div class="list-card" style="background: var(--color-surface); border-radius: var(--radius-xl); overflow: hidden; box-shadow: var(--shadow-sm); cursor: pointer;" onclick="viewList('${list.id}')">
-                            <div class="list-card-image" style="aspect-ratio: 16/10; background: var(--color-bg-secondary); display: flex; align-items: center; justify-content: center; font-size: 3rem;">
-                                📋
+                        <div class="list-card" style="background: var(--color-surface); border-radius: var(--radius-xl); overflow: hidden; box-shadow: var(--shadow-sm); cursor: pointer; transition: transform 0.2s;" 
+                             onmouseover="this.style.transform='translateY(-4px)'" 
+                             onmouseout="this.style.transform='translateY(0)'"
+                             onclick="openListDetail('${list.id}')">
+                            <div class="list-card-image" style="aspect-ratio: 16/10; background: var(--color-bg-secondary); display: flex; align-items: center; justify-content: center; font-size: 3rem; overflow: hidden;">
+                                ${coverImage || '📋'}
                             </div>
                             <div class="list-card-content" style="padding: var(--space-lg);">
                                 <h3 style="font-family: var(--font-heading); font-size: 1.125rem; font-weight: 600; margin-bottom: var(--space-xs);">${list.name}</h3>
                                 <p style="font-size: 0.875rem; color: var(--color-text-secondary);">${recipeText}</p>
-                                <button onclick="event.stopPropagation(); deleteList('${list.id}')" class="btn btn-ghost btn-sm" style="margin-top: var(--space-md); color: var(--color-error);">Sil</button>
+                                <div style="display: flex; gap: var(--space-sm); margin-top: var(--space-md);">
+                                    <button onclick="event.stopPropagation(); openListDetail('${list.id}')" class="btn btn-primary btn-sm" style="flex: 1;">Görüntüle</button>
+                                    <button onclick="event.stopPropagation(); deleteList('${list.id}')" class="btn btn-ghost btn-sm" style="color: var(--color-error);">Sil</button>
+                                </div>
                             </div>
                         </div>
                     `;
@@ -268,6 +329,102 @@
                 
             } catch (error) {
                 console.error("Listeler yüklenemedi:", error);
+            }
+        }
+
+        // Liste detayını aç
+        async function openListDetail(listId) {
+            const user = firebase.auth().currentUser;
+            if (!user) return;
+            
+            try {
+                const doc = await db.collection('users').doc(user.uid).get();
+                if (!doc.exists) return;
+                
+                const lists = doc.data().lists || [];
+                const list = lists.find(l => l.id === listId);
+                
+                if (!list) return;
+                
+                // Modal başlığını güncelle
+                document.getElementById('listDetailTitle').textContent = list.name;
+                
+                const recipeCount = list.recipes ? list.recipes.length : 0;
+                document.getElementById('listDetailCount').textContent = 
+                    recipeCount === 0 ? 'Henüz tarif yok' : 
+                    recipeCount === 1 ? '1 tarif' : 
+                    `${recipeCount} tarif`;
+                
+                const grid = document.getElementById('listRecipesGrid');
+                const emptyState = document.getElementById('emptyListDetail');
+                
+                if (recipeCount === 0) {
+                    grid.style.display = 'none';
+                    emptyState.style.display = 'block';
+                } else {
+                    grid.style.display = 'grid';
+                    emptyState.style.display = 'none';
+                    
+                    // Tarifleri render et
+                    grid.innerHTML = list.recipes.map(recipeId => {
+                        const recipe = allRecipes.find(r => r.id === recipeId);
+                        if (!recipe) return '';
+                        
+                        return `
+                            <div class="recipe-card" style="background: var(--color-surface); border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-sm);">
+                                <div style="position: relative; aspect-ratio: 4/3; overflow: hidden;">
+                                    <img src="${recipe.image}" alt="${recipe.title}" style="width: 100%; height: 100%; object-fit: cover;">
+                                    <button onclick="removeFromList('${listId}', '${recipeId}')" 
+                                            style="position: absolute; top: var(--space-sm); right: var(--space-sm); 
+                                                   width: 32px; height: 32px; border-radius: 50%; 
+                                                   background: rgba(255,255,255,0.95); border: none; 
+                                                   cursor: pointer; font-size: 1rem; color: var(--color-error);">
+                                        ×
+                                    </button>
+                                </div>
+                                <div style="padding: var(--space-md);">
+                                    <span style="font-size: 0.6875rem; font-weight: 600; text-transform: uppercase; color: var(--color-accent);">${recipe.category}</span>
+                                    <h4 style="font-family: var(--font-heading); font-size: 1rem; margin-top: var(--space-xs);">
+                                        <a href="recipe.html?id=${recipe.id}" style="color: inherit;">${recipe.title}</a>
+                                    </h4>
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
+                }
+                
+                Modal.open('listDetailModal');
+                
+            } catch (error) {
+                console.error("Liste detayı yüklenemedi:", error);
+            }
+        }
+
+        // Listeden tarif çıkar
+        async function removeFromList(listId, recipeId) {
+            const user = firebase.auth().currentUser;
+            if (!user) return;
+            
+            try {
+                const userRef = db.collection('users').doc(user.uid);
+                const doc = await userRef.get();
+                
+                if (doc.exists) {
+                    const lists = doc.data().lists || [];
+                    const listIndex = lists.findIndex(l => l.id === listId);
+                    
+                    if (listIndex !== -1) {
+                        lists[listIndex].recipes = lists[listIndex].recipes.filter(id => id !== recipeId);
+                        await userRef.update({ lists: lists });
+                        
+                        showToast('Listeden çıkarıldı');
+                        openListDetail(listId); // Modalı yenile
+                        loadLists(); // Listeleri yenile
+                    }
+                }
+            } catch (error) {
+                console.error("Tarif listeden çıkarılamadı:", error);
+                showToast('İşlem yapılamadı', 'error');
             }
         }
 
@@ -346,13 +503,7 @@
             }
         }
 
-        // Liste görüntüle (basit alert, detaylı modal eklenebilir)
-        function viewList(listId) {
-            // Buraya liste detay modalı eklenebilir
-            console.log('Liste görüntüle:', listId);
-        }
-
-        // Favorileri yükle (mevcut kodun güncellenmiş hali)
+        // Favorileri yükle
         async function loadFavorites() {
             const user = firebase.auth().currentUser;
             if (!user) return;
@@ -372,32 +523,36 @@
                 
                 emptyState.style.display = 'none';
                 
-                // Tarif verilerini çek
-                if (window.Recipes && window.Recipes.data) {
-                    grid.innerHTML = favorites.map(id => {
-                        const recipe = window.Recipes.data.find(r => r.id === id);
-                        if (!recipe) return '';
-                        
-                        return `
-                            <div class="recipe-card" data-id="${recipe.id}">
-                                <div class="recipe-card-image" style="position: relative; aspect-ratio: 4/3; overflow: hidden;">
-                                    <img src="${recipe.image}" alt="${recipe.title}" style="width: 100%; height: 100%; object-fit: cover;">
-                                    <div style="position: absolute; top: var(--space-md); right: var(--space-md);">
-                                        <button onclick="removeFavorite('${recipe.id}')" style="width: 40px; height: 40px; border-radius: var(--radius-lg); background: rgba(255, 255, 255, 0.95); border: none; cursor: pointer; font-size: 1.125rem;">❤️</button>
-                                    </div>
-                                </div>
-                                <div class="recipe-card-content" style="padding: var(--space-lg);">
-                                    <span style="font-size: 0.75rem; font-weight: 600; text-transform: uppercase; color: var(--color-accent);">${recipe.category}</span>
-                                    <h3 style="font-family: var(--font-heading); font-size: 1.25rem; margin: var(--space-xs) 0;">
-                                        <a href="recipe.html?id=${recipe.id}">${recipe.title}</a>
-                                    </h3>
+                // Tarifleri render et
+                grid.innerHTML = favorites.map(id => {
+                    const recipe = allRecipes.find(r => r.id === id);
+                    if (!recipe) return '';
+                    
+                    return `
+                        <div class="recipe-card" style="background: var(--color-surface); border-radius: var(--radius-xl); overflow: hidden; box-shadow: var(--shadow-sm);">
+                            <div class="recipe-card-image" style="position: relative; aspect-ratio: 4/3; overflow: hidden;">
+                                <img src="${recipe.image}" alt="${recipe.title}" style="width: 100%; height: 100%; object-fit: cover;">
+                                <div style="position: absolute; top: var(--space-md); right: var(--space-md);">
+                                    <button onclick="removeFavorite('${recipe.id}')" 
+                                            style="width: 40px; height: 40px; border-radius: var(--radius-lg); 
+                                                   background: rgba(255, 255, 255, 0.95); border: none; 
+                                                   cursor: pointer; font-size: 1.125rem; transition: transform 0.2s;"
+                                            onmouseover="this.style.transform='scale(1.1)'"
+                                            onmouseout="this.style.transform='scale(1)'">
+                                        ❤️
+                                    </button>
                                 </div>
                             </div>
-                        `;
-                    }).join('');
-                } else {
-                    setTimeout(loadFavorites, 500);
-                }
+                            <div class="recipe-card-content" style="padding: var(--space-lg);">
+                                <span style="font-size: 0.75rem; font-weight: 600; text-transform: uppercase; color: var(--color-accent);">${recipe.category}</span>
+                                <h3 style="font-family: var(--font-heading); font-size: 1.25rem; margin: var(--space-xs) 0;">
+                                    <a href="recipe.html?id=${recipe.id}" style="color: inherit;">${recipe.title}</a>
+                                </h3>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+                
             } catch (error) {
                 console.error("Favoriler yüklenemedi:", error);
             }
