@@ -200,6 +200,23 @@
             </div>
         </div>
 
+        <!-- Listeye Ekle Modal (YENİ) -->
+        <div class="modal" id="addToListModal">
+            <div class="modal-backdrop"></div>
+            <div class="modal-content modal-sm">
+                <button class="modal-close" onclick="closeAddToListModal()" aria-label="Kapat">×</button>
+                <div class="modal-header">
+                    <h3 class="modal-title">Nereye kaydedeyim?</h3>
+                    <p class="modal-subtitle" id="addToListRecipeName" style="font-size: 0.875rem; color: var(--color-text-secondary); margin-top: var(--space-xs);"></p>
+                </div>
+                <div class="modal-body">
+                    <div id="addToListOptions" style="display: flex; flex-direction: column; gap: var(--space-md);">
+                        <!-- Listeler buraya yüklenecek -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Toast -->
         <div class="toast" id="toast">
             <span class="toast-message" id="toastMessage"></span>
@@ -234,56 +251,56 @@
 
     <!-- Main Logic -->
     <script>
-        // Auth state ve UI kontrolü
-firebase.auth().onAuthStateChanged((user) => {
-    const authScreen = document.getElementById('authScreen');
-    const mainWebsite = document.getElementById('mainWebsite');
-    const navAuth = document.getElementById('navAuth');
-    const navUser = document.getElementById('navUser');
-    const navUserName = document.getElementById('navUserName');
-    const navLists = document.getElementById('navLists');
-    const mobileAuth = document.getElementById('mobileAuth');
-    const mobileUser = document.getElementById('mobileUser');
-    const mobileUserName = document.getElementById('mobileUserName');
-    const mobileLists = document.getElementById('mobileLists');
+        // Global değişkenler
+        let currentRecipeForList = null;
 
-    if (user) {
-        // Giriş yapılmışsa - auth screen'i gizle, ana sayfayı göster
-        authScreen.style.display = 'none';
-        mainWebsite.style.display = 'block';
-        document.body.style.overflow = 'auto';
-        
-        // Navigasyonu güncelle
-        if (navAuth) navAuth.classList.add('hidden');
-        if (navUser) navUser.classList.remove('hidden');
-        if (navUserName) navUserName.textContent = user.displayName || user.email;
-        if (navLists) navLists.classList.remove('hidden');
-        
-        if (mobileAuth) mobileAuth.classList.add('hidden');
-        if (mobileUser) mobileUser.classList.remove('hidden');
-        if (mobileUserName) mobileUserName.textContent = user.displayName || user.email;
-        if (mobileLists) mobileLists.classList.remove('hidden');
-    } else {
-        // Giriş yapılmamışsa kontrol et
-        const hasSkipped = localStorage.getItem('skipAuth');
-        if (hasSkipped) {
-            authScreen.style.display = 'none';
-            mainWebsite.style.display = 'block';
-            document.body.style.overflow = 'auto';
-        } else {
-            authScreen.style.display = 'flex';
-            mainWebsite.style.display = 'none';
-            document.body.style.overflow = 'hidden';
-        }
-        
-        if (navAuth) navAuth.classList.remove('hidden');
-        if (navUser) navUser.classList.add('hidden');
-        if (navLists) navLists.classList.add('hidden');
-        if (mobileAuth) mobileAuth.classList.remove('hidden');
-        if (mobileUser) mobileUser.classList.add('hidden');
-        if (mobileLists) mobileLists.classList.add('hidden');
-    }
-});
+        // Auth state ve UI kontrolü
+        firebase.auth().onAuthStateChanged((user) => {
+            const authScreen = document.getElementById('authScreen');
+            const mainWebsite = document.getElementById('mainWebsite');
+            const navAuth = document.getElementById('navAuth');
+            const navUser = document.getElementById('navUser');
+            const navUserName = document.getElementById('navUserName');
+            const navLists = document.getElementById('navLists');
+            const mobileAuth = document.getElementById('mobileAuth');
+            const mobileUser = document.getElementById('mobileUser');
+            const mobileUserName = document.getElementById('mobileUserName');
+            const mobileLists = document.getElementById('mobileLists');
+
+            if (user) {
+                authScreen.style.display = 'none';
+                mainWebsite.style.display = 'block';
+                document.body.style.overflow = 'auto';
+                
+                if (navAuth) navAuth.classList.add('hidden');
+                if (navUser) navUser.classList.remove('hidden');
+                if (navUserName) navUserName.textContent = user.displayName || user.email;
+                if (navLists) navLists.classList.remove('hidden');
+                
+                if (mobileAuth) mobileAuth.classList.add('hidden');
+                if (mobileUser) mobileUser.classList.remove('hidden');
+                if (mobileUserName) mobileUserName.textContent = user.displayName || user.email;
+                if (mobileLists) mobileLists.classList.remove('hidden');
+            } else {
+                const hasSkipped = localStorage.getItem('skipAuth');
+                if (hasSkipped) {
+                    authScreen.style.display = 'none';
+                    mainWebsite.style.display = 'block';
+                    document.body.style.overflow = 'auto';
+                } else {
+                    authScreen.style.display = 'flex';
+                    mainWebsite.style.display = 'none';
+                    document.body.style.overflow = 'hidden';
+                }
+                
+                if (navAuth) navAuth.classList.remove('hidden');
+                if (navUser) navUser.classList.add('hidden');
+                if (navLists) navLists.classList.add('hidden');
+                if (mobileAuth) mobileAuth.classList.remove('hidden');
+                if (mobileUser) mobileUser.classList.add('hidden');
+                if (mobileLists) mobileLists.classList.add('hidden');
+            }
+        });
 
         // Auth Screen Logic
         document.addEventListener('DOMContentLoaded', () => {
@@ -291,7 +308,6 @@ firebase.auth().onAuthStateChanged((user) => {
             const toggleBtn = document.getElementById('authToggleBtn');
             const form = document.getElementById('authForm');
             
-            // Skip Auth
             if (skipBtn) {
                 skipBtn.addEventListener('click', () => {
                     localStorage.setItem('skipAuth', 'true');
@@ -301,7 +317,6 @@ firebase.auth().onAuthStateChanged((user) => {
                 });
             }
             
-            // Toggle Login/Register
             let isLoginMode = true;
             if (toggleBtn) {
                 toggleBtn.addEventListener('click', () => {
@@ -316,19 +331,15 @@ firebase.auth().onAuthStateChanged((user) => {
                 });
             }
             
-            // Form Submit
             if (form) {
                 form.addEventListener('submit', async (e) => {
                     e.preventDefault();
                     const email = document.getElementById('email').value;
                     const password = document.getElementById('password').value;
-                    const authTitle = document.getElementById('authTitle');
                     
                     if (isLoginMode) {
-                        // Giriş yap
                         try {
                             await firebase.auth().signInWithEmailAndPassword(email, password);
-                            // Başarılı - onAuthStateChanged otomatik yönlendirecek
                         } catch (error) {
                             let msg = 'Giriş yapılamadı';
                             if (error.code === 'auth/user-not-found') msg = 'Kullanıcı bulunamadı';
@@ -336,7 +347,6 @@ firebase.auth().onAuthStateChanged((user) => {
                             alert(msg);
                         }
                     } else {
-                        // Kayıt ol
                         const name = document.getElementById('name').value;
                         const confirmPass = document.getElementById('confirmPassword').value;
                         
@@ -359,15 +369,13 @@ firebase.auth().onAuthStateChanged((user) => {
                             const result = await firebase.auth().createUserWithEmailAndPassword(email, password);
                             await result.user.updateProfile({ displayName: name });
                             
-                            // Firestore'a kullanıcı ekle
                             await db.collection('users').doc(result.user.uid).set({
                                 name: name,
                                 email: email,
                                 createdAt: new Date().toISOString(),
-                                favorites: []
+                                favorites: [],
+                                lists: []
                             });
-                            
-                            // Başarılı - onAuthStateChanged otomatik yönlendirecek
                         } catch (error) {
                             let msg = 'Kayıt yapılamadı';
                             if (error.code === 'auth/email-already-in-use') msg = 'Bu e-posta zaten kayıtlı';
@@ -378,7 +386,6 @@ firebase.auth().onAuthStateChanged((user) => {
                 });
             }
             
-            // Çıkış butonları
             const navLogout = document.getElementById('navLogout');
             const mobileLogout = document.getElementById('mobileLogout');
             
@@ -403,6 +410,219 @@ firebase.auth().onAuthStateChanged((user) => {
             localStorage.removeItem('skipAuth');
             location.reload();
         }
+
+        // ============================
+        // LİSTEYE EKLE MODAL FONKSİYONLARI
+        // ============================
+
+        // Listeye ekle modalını aç
+        async function openAddToListModal(recipeId, recipeTitle) {
+            const user = firebase.auth().currentUser;
+            if (!user) {
+                Toast.show('Listeye eklemek için giriş yapmalısınız', 'error');
+                setTimeout(() => {
+                    window.location.href = 'auth.html';
+                }, 1500);
+                return;
+            }
+
+            currentRecipeForList = recipeId;
+            document.getElementById('addToListRecipeName').textContent = recipeTitle;
+            
+            const modal = document.getElementById('addToListModal');
+            const optionsContainer = document.getElementById('addToListOptions');
+            
+            // Kullanıcının listelerini çek
+            try {
+                const userRef = db.collection('users').doc(user.uid);
+                const doc = await userRef.get();
+                
+                let html = '';
+                
+                // Favoriler seçeneği (her zaman var)
+                const favorites = doc.exists ? (doc.data().favorites || []) : [];
+                const isInFavorites = favorites.includes(recipeId);
+                
+                html += `
+                    <button onclick="addToFavorites('${recipeId}')" 
+                            class="btn ${isInFavorites ? 'btn-secondary' : 'btn-primary'} btn-full" 
+                            style="justify-content: flex-start; gap: var(--space-md); padding: var(--space-lg);">
+                        <span style="font-size: 1.5rem;">❤️</span>
+                        <div style="text-align: left;">
+                            <div style="font-weight: 600;">Favorilerim</div>
+                            <div style="font-size: 0.875rem; opacity: 0.8;">${isInFavorites ? 'Zaten favorilerde' : 'Favorilere ekle'}</div>
+                        </div>
+                    </button>
+                `;
+                
+                // Kullanıcının diğer listeleri
+                if (doc.exists) {
+                    const lists = doc.data().lists || [];
+                    
+                    if (lists.length > 0) {
+                        html += `<div style="border-top: 1px solid var(--color-border); padding-top: var(--space-md); margin-top: var(--space-sm);">
+                            <p style="font-size: 0.875rem; color: var(--color-text-secondary); margin-bottom: var(--space-md);">Listelerim:</p>`;
+                        
+                        for (const list of lists) {
+                            const isInList = list.recipes && list.recipes.includes(recipeId);
+                            html += `
+                                <button onclick="addToCustomList('${list.id}', '${recipeId}')" 
+                                        class="btn ${isInList ? 'btn-secondary' : 'btn-ghost'} btn-full" 
+                                        style="justify-content: flex-start; gap: var(--space-md); padding: var(--space-md); margin-bottom: var(--space-sm);">
+                                    <span style="font-size: 1.25rem;">📋</span>
+                                    <div style="text-align: left; flex: 1;">
+                                        <div style="font-weight: 500;">${list.name}</div>
+                                        <div style="font-size: 0.8125rem; opacity: 0.7;">${list.recipes ? list.recipes.length : 0} tarif</div>
+                                    </div>
+                                    ${isInList ? '<span style="color: var(--color-accent);">✓</span>' : ''}
+                                </button>
+                            `;
+                        }
+                        
+                        html += `</div>`;
+                    }
+                }
+                
+                // Yeni liste oluştur butonu
+                html += `
+                    <button onclick="window.location.href='dashboard.html'" 
+                            class="btn btn-ghost btn-full" 
+                            style="justify-content: center; gap: var(--space-sm); padding: var(--space-md); margin-top: var(--space-sm); border-style: dashed;">
+                        <span>+</span> Yeni Liste Oluştur
+                    </button>
+                `;
+                
+                optionsContainer.innerHTML = html;
+                modal.classList.add('active');
+                document.body.style.overflow = 'hidden';
+                
+            } catch (error) {
+                console.error("Listeler yüklenemedi:", error);
+                Toast.show('Listeler yüklenemedi', 'error');
+            }
+        }
+
+        // Modalı kapat
+        function closeAddToListModal() {
+            const modal = document.getElementById('addToListModal');
+            modal.classList.remove('active');
+            document.body.style.overflow = '';
+            currentRecipeForList = null;
+        }
+
+        // Favorilere ekle/çıkar
+        async function addToFavorites(recipeId) {
+            const user = firebase.auth().currentUser;
+            if (!user) return;
+            
+            try {
+                const userRef = db.collection('users').doc(user.uid);
+                const doc = await userRef.get();
+                
+                if (!doc.exists) {
+                    await userRef.set({ favorites: [recipeId], lists: [] });
+                    Toast.show('Favorilere eklendi!', 'success');
+                } else {
+                    const favorites = doc.data().favorites || [];
+                    
+                    if (favorites.includes(recipeId)) {
+                        // Favorilerden çıkar
+                        await userRef.update({
+                            favorites: firebase.firestore.FieldValue.arrayRemove(recipeId)
+                        });
+                        Toast.show('Favorilerden çıkarıldı');
+                    } else {
+                        // Favorilere ekle
+                        await userRef.update({
+                            favorites: firebase.firestore.FieldValue.arrayUnion(recipeId)
+                        });
+                        Toast.show('Favorilere eklendi!', 'success');
+                    }
+                }
+                
+                // Modalı yenile
+                const recipe = window.Recipes ? window.Recipes.getRecipeById(recipeId) : null;
+                openAddToListModal(recipeId, recipe ? recipe.title : '');
+                
+                // Kalp butonunu güncelle
+                updateFavoriteButtonUI(recipeId);
+                
+            } catch (error) {
+                console.error("Favori hatası:", error);
+                Toast.show('İşlem yapılamadı', 'error');
+            }
+        }
+
+        // Özel listeye ekle/çıkar
+        async function addToCustomList(listId, recipeId) {
+            const user = firebase.auth().currentUser;
+            if (!user) return;
+            
+            try {
+                const userRef = db.collection('users').doc(user.uid);
+                const doc = await userRef.get();
+                
+                if (doc.exists) {
+                    const lists = doc.data().lists || [];
+                    const listIndex = lists.findIndex(l => l.id === listId);
+                    
+                    if (listIndex !== -1) {
+                        const list = lists[listIndex];
+                        const listRecipes = list.recipes || [];
+                        
+                        if (listRecipes.includes(recipeId)) {
+                            // Listeden çıkar
+                            lists[listIndex].recipes = listRecipes.filter(id => id !== recipeId);
+                            await userRef.update({ lists: lists });
+                            Toast.show('Listeden çıkarıldı');
+                        } else {
+                            // Listeye ekle
+                            lists[listIndex].recipes = [...listRecipes, recipeId];
+                            await userRef.update({ lists: lists });
+                            Toast.show('Listeye eklendi!', 'success');
+                        }
+                        
+                        // Modalı yenile
+                        const recipe = window.Recipes ? window.Recipes.getRecipeById(recipeId) : null;
+                        openAddToListModal(recipeId, recipe ? recipe.title : '');
+                    }
+                }
+            } catch (error) {
+                console.error("Liste hatası:", error);
+                Toast.show('İşlem yapılamadı', 'error');
+            }
+        }
+
+        // Kalp butonu UI güncelle
+        function updateFavoriteButtonUI(recipeId) {
+            const btn = document.querySelector(`.favorite-btn[data-id="${recipeId}"]`);
+            if (btn) {
+                firebase.auth().onAuthStateChanged(async (user) => {
+                    if (user) {
+                        const doc = await db.collection('users').doc(user.uid).get();
+                        if (doc.exists) {
+                            const favorites = doc.data().favorites || [];
+                            const isFavorited = favorites.includes(recipeId);
+                            
+                            if (isFavorited) {
+                                btn.classList.add('active');
+                                btn.dataset.favorited = "true";
+                                btn.querySelector('span').textContent = '❤️';
+                                btn.title = 'Favorilerden Çıkar';
+                            } else {
+                                btn.classList.remove('active');
+                                btn.dataset.favorited = "false";
+                                btn.querySelector('span').textContent = '🤍';
+                                btn.title = 'Favorilere Ekle';
+                            }
+                        }
+                    }
+                });
+            }
+        }
+
+        // Backdrop tıklama ile modal kapatma
+        document.getElementById('addToListModal')?.querySelector('.modal-backdrop')?.addEventListener('click', closeAddToListModal);
     </script>
 </body>
 </html>
