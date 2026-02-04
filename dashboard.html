@@ -87,7 +87,51 @@
                 </h1>
                 <p class="dashboard-subtitle" style="font-size: 1rem; color: var(--color-text-secondary);">Favori tariflerinizi görüntüleyin</p>
             </div>
+            <!-- Create List Button -->
+            <div style="margin-bottom: var(--space-xl);">
+                <button id="createListBtn" class="btn btn-primary" style="display: flex; align-items: center; gap: var(--space-sm);">
+                    <span>+</span> Yeni Liste Oluştur
+                </button>
+            </div>
 
+            <!-- Create List Modal -->
+            <div class="modal" id="createListModal">
+                <div class="modal-backdrop"></div>
+                <div class="modal-content modal-sm">
+                    <button class="modal-close" onclick="Modal.close('createListModal')">×</button>
+                    <div class="modal-header">
+                        <h3 class="modal-title">Yeni Liste Oluştur</h3>
+                    </div>
+                    <div class="modal-body">
+                        <form id="createListForm">
+                            <div class="form-group">
+                                <label class="form-label" for="listName">Liste Adı</label>
+                                <input type="text" class="form-input" id="listName" placeholder="Örn: Hafta Sonu Menüsü" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-full">Oluştur</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Lists Section -->
+            <div class="lists-section">
+                <div class="lists-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-xl);">
+                    <h2 class="section-title" style="font-family: var(--font-heading); font-size: 1.5rem; font-weight: 600;">Listelerim</h2>
+                </div>
+
+                <!-- Lists Grid -->
+                <div class="lists-grid" id="listsGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: var(--space-lg);">
+                    <!-- Lists loaded dynamically -->
+                </div>
+                
+                <!-- Empty State -->
+                <div id="emptyLists" style="text-align: center; padding: var(--space-3xl); display: none;">
+                    <div style="font-size: 4rem; margin-bottom: var(--space-lg); opacity: 0.5;">📋</div>
+                    <h4 style="font-family: var(--font-heading); font-size: 1.5rem; margin-bottom: var(--space-sm);">Henüz listeniz yok</h4>
+                    <p style="color: var(--color-text-secondary); margin-bottom: var(--space-lg);">İlk listenizi oluşturmak için "Yeni Liste" butonuna tıklayın.</p>
+                </div>
+            </div>
             <!-- Favorites Section -->
             <div class="lists-section">
                 <div class="lists-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-xl);">
@@ -135,17 +179,39 @@
     </footer>
 
     <!-- Scripts -->
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-    <script src="js/app.js"></script>
-    <script src="js/firebase-auth.js"></script>
-    <script src="js/firebase-lists.js"></script>
-    <script src="js/recipes.js"></script>
+       <script>
+        // Modal fonksiyonları (app.js'den bağımsız)
+        const Modal = {
+            open(modalId) {
+                const modal = document.getElementById(modalId);
+                if (modal) {
+                    modal.classList.add('active');
+                    document.body.style.overflow = 'hidden';
+                }
+            },
+            close(modalId) {
+                const modal = document.getElementById(modalId);
+                if (modal) {
+                    modal.classList.remove('active');
+                    document.body.style.overflow = '';
+                }
+            }
+        };
 
-    <script>
+        // Toast fonksiyonu
+        function showToast(message, type = 'default') {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toastMessage');
+            if (toast && toastMessage) {
+                toastMessage.textContent = message;
+                toast.className = 'toast active ' + type;
+                setTimeout(() => toast.classList.remove('active'), 3000);
+            }
+        }
+
         // Auth kontrolü ve veri yükleme
         firebase.auth().onAuthStateChanged(async (user) => {
             if (!user) {
-                // Giriş yapılmamışsa ana sayfaya yönlendir
                 window.location.href = 'index.html';
                 return;
             }
@@ -154,11 +220,139 @@
             document.getElementById('userName').textContent = user.displayName || user.email;
             document.getElementById('navUserName').textContent = user.displayName || user.email;
             
-            // Favorileri yükle
+            // Listeleri ve favorileri yükle
+            await loadLists();
             await loadFavorites();
         });
-        
-        // Favorileri yükle
+
+        // Listeleri yükle
+        async function loadLists() {
+            const user = firebase.auth().currentUser;
+            if (!user) return;
+            
+            try {
+                const doc = await db.collection('users').doc(user.uid).get();
+                const lists = doc.exists ? (doc.data().lists || []) : [];
+                
+                const grid = document.getElementById('listsGrid');
+                const emptyState = document.getElementById('emptyLists');
+                
+                if (lists.length === 0) {
+                    grid.innerHTML = '';
+                    emptyState.style.display = 'block';
+                    return;
+                }
+                
+                emptyState.style.display = 'none';
+                
+                // Listeleri render et
+                grid.innerHTML = lists.map(list => {
+                    const recipeCount = list.recipes ? list.recipes.length : 0;
+                    const recipeText = recipeCount === 0 ? 'Henüz tarif yok' : 
+                                      recipeCount === 1 ? '1 tarif' : 
+                                      `${recipeCount} tarif`;
+                    
+                    return `
+                        <div class="list-card" style="background: var(--color-surface); border-radius: var(--radius-xl); overflow: hidden; box-shadow: var(--shadow-sm); cursor: pointer;" onclick="viewList('${list.id}')">
+                            <div class="list-card-image" style="aspect-ratio: 16/10; background: var(--color-bg-secondary); display: flex; align-items: center; justify-content: center; font-size: 3rem;">
+                                📋
+                            </div>
+                            <div class="list-card-content" style="padding: var(--space-lg);">
+                                <h3 style="font-family: var(--font-heading); font-size: 1.125rem; font-weight: 600; margin-bottom: var(--space-xs);">${list.name}</h3>
+                                <p style="font-size: 0.875rem; color: var(--color-text-secondary);">${recipeText}</p>
+                                <button onclick="event.stopPropagation(); deleteList('${list.id}')" class="btn btn-ghost btn-sm" style="margin-top: var(--space-md); color: var(--color-error);">Sil</button>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+                
+            } catch (error) {
+                console.error("Listeler yüklenemedi:", error);
+            }
+        }
+
+        // Yeni liste oluştur
+        document.getElementById('createListBtn')?.addEventListener('click', () => {
+            Modal.open('createListModal');
+        });
+
+        document.getElementById('createListForm')?.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const user = firebase.auth().currentUser;
+            if (!user) {
+                showToast('Giriş yapmalısınız', 'error');
+                return;
+            }
+            
+            const listName = document.getElementById('listName').value.trim();
+            if (!listName) return;
+            
+            try {
+                const userRef = db.collection('users').doc(user.uid);
+                const doc = await userRef.get();
+                
+                const newList = {
+                    id: Date.now().toString(),
+                    name: listName,
+                    recipes: [],
+                    createdAt: new Date().toISOString()
+                };
+                
+                if (doc.exists) {
+                    const currentLists = doc.data().lists || [];
+                    await userRef.update({
+                        lists: [...currentLists, newList]
+                    });
+                } else {
+                    await userRef.set({
+                        lists: [newList]
+                    });
+                }
+                
+                showToast('Liste oluşturuldu!', 'success');
+                Modal.close('createListModal');
+                document.getElementById('createListForm').reset();
+                await loadLists();
+                
+            } catch (error) {
+                console.error("Liste oluşturulamadı:", error);
+                showToast('Liste oluşturulamadı', 'error');
+            }
+        });
+
+        // Liste sil
+        async function deleteList(listId) {
+            if (!confirm('Bu listeyi silmek istediğinize emin misiniz?')) return;
+            
+            const user = firebase.auth().currentUser;
+            if (!user) return;
+            
+            try {
+                const userRef = db.collection('users').doc(user.uid);
+                const doc = await userRef.get();
+                
+                if (doc.exists) {
+                    const currentLists = doc.data().lists || [];
+                    const updatedLists = currentLists.filter(l => l.id !== listId);
+                    await userRef.update({ lists: updatedLists });
+                    
+                    showToast('Liste silindi');
+                    await loadLists();
+                }
+            } catch (error) {
+                console.error("Liste silinemedi:", error);
+                showToast('Liste silinemedi', 'error');
+            }
+        }
+
+        // Liste görüntüle (basit alert, detaylı modal eklenebilir)
+        function viewList(listId) {
+            // Buraya liste detay modalı eklenebilir
+            console.log('Liste görüntüle:', listId);
+        }
+
+        // Favorileri yükle (mevcut kodun güncellenmiş hali)
         async function loadFavorites() {
             const user = firebase.auth().currentUser;
             if (!user) return;
@@ -178,7 +372,7 @@
                 
                 emptyState.style.display = 'none';
                 
-                // Tarif verilerini çek (recipes.js'den)
+                // Tarif verilerini çek
                 if (window.Recipes && window.Recipes.data) {
                     grid.innerHTML = favorites.map(id => {
                         const recipe = window.Recipes.data.find(r => r.id === id);
@@ -202,7 +396,6 @@
                         `;
                     }).join('');
                 } else {
-                    // Recipes verisi henüz yüklenmemişse bekle
                     setTimeout(loadFavorites, 500);
                 }
             } catch (error) {
@@ -221,7 +414,7 @@
                 });
                 
                 showToast('Favorilerden çıkarıldı');
-                loadFavorites(); // Yeniden yükle
+                loadFavorites();
             } catch (error) {
                 console.error("Favori silinemedi:", error);
             }
@@ -237,13 +430,6 @@
             await firebase.auth().signOut();
             window.location.href = 'index.html';
         });
-        
-        function showToast(message) {
-            const toast = document.getElementById('toast');
-            document.getElementById('toastMessage').textContent = message;
-            toast.className = 'toast active';
-            setTimeout(() => toast.classList.remove('active'), 3000);
-        }
     </script>
 </body>
 </html>
