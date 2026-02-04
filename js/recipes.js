@@ -51,64 +51,73 @@ const Recipes = {
     },
 
     // ============================================
-    // RECIPE GRID - DÜZELTİLMİŞ FAVORİ SİSTEMİ
+    // RECIPE GRID - GÜNCELLENMİŞ LİSTE SİSTEMİ
     // ============================================
     
     async renderRecipesGrid(recipes = null) {
-    const grid = document.getElementById('recipesGrid');
-    const emptyState = document.getElementById('emptyState');
-    
-    if (!grid) return;
-    
-    const recipesToRender = recipes || this.data;
-    
-    if (!recipesToRender || recipesToRender.length === 0) {
-        grid.innerHTML = '';
-        if (emptyState) emptyState.classList.remove('hidden');
-        return;
-    }
-    
-    if (emptyState) emptyState.classList.add('hidden');
-    
-    // 1. Önce tüm kartları render et (varsayılan boş kalp 🤍)
-    grid.innerHTML = recipesToRender.map(recipe => this.createRecipeCard(recipe)).join('');
-    
-    // 2. Event listener'ları bağla
-    this.bindCardEvents();
-    
-    // 3. Firebase auth state hazır olduktan sonra favori durumlarını kontrol et
-    firebase.auth().onAuthStateChanged(async (user) => {
-        if (user) {
-            const favoriteBtns = grid.querySelectorAll('.favorite-btn');
-            
-            for (const btn of favoriteBtns) {
-                const recipeId = btn.dataset.id;
+        const grid = document.getElementById('recipesGrid');
+        const emptyState = document.getElementById('emptyState');
+        
+        if (!grid) return;
+        
+        const recipesToRender = recipes || this.data;
+        
+        if (!recipesToRender || recipesToRender.length === 0) {
+            grid.innerHTML = '';
+            if (emptyState) emptyState.classList.remove('hidden');
+            return;
+        }
+        
+        if (emptyState) emptyState.classList.add('hidden');
+        
+        // Önce tüm kartları render et
+        grid.innerHTML = recipesToRender.map(recipe => this.createRecipeCard(recipe)).join('');
+        
+        // Event listener'ları bağla
+        this.bindCardEvents();
+        
+        // Firebase auth state hazır olduktan sonra kayıtlı durumları kontrol et
+        firebase.auth().onAuthStateChanged(async (user) => {
+            if (user) {
                 try {
-                    // Firestore'dan favori durumunu kontrol et
                     const userRef = db.collection('users').doc(user.uid);
                     const doc = await userRef.get();
                     
                     if (doc.exists) {
                         const favorites = doc.data().favorites || [];
-                        const isFavorited = favorites.includes(recipeId);
+                        const lists = doc.data().lists || [];
                         
-                        if (isFavorited) {
-                            btn.classList.add('active');
-                            btn.dataset.favorited = "true";
-                            btn.querySelector('span').textContent = '❤️';
-                            btn.title = 'Favorilerden Çıkar';
-                        }
+                        // Tüm favori butonlarını güncelle
+                        const favoriteBtns = grid.querySelectorAll('.favorite-btn');
+                        favoriteBtns.forEach(btn => {
+                            const recipeId = btn.dataset.id;
+                            const isInFavorites = favorites.includes(recipeId);
+                            
+                            // Ayrıca özel listelerde de var mı kontrol et
+                            let isInAnyList = false;
+                            for (const list of lists) {
+                                if (list.recipes && list.recipes.includes(recipeId)) {
+                                    isInAnyList = true;
+                                    break;
+                                }
+                            }
+                            
+                            if (isInFavorites || isInAnyList) {
+                                btn.classList.add('active');
+                                btn.dataset.saved = "true";
+                                btn.querySelector('span').textContent = '❤️';
+                                btn.title = 'Kaydedildi - Listeleri gör';
+                            }
+                        });
                     }
                 } catch (error) {
-                    console.error("Favori kontrolü hatası:", error);
+                    console.error("Kayıtlı durum kontrolü hatası:", error);
                 }
             }
-        }
-    });
-},
+        });
+    },
     
     createRecipeCard(recipe) {
-        // Varsayılan olarak boş kalp (🤍) - durum sonradan kontrol edilecek
         return `
             <article class="recipe-card" data-id="${recipe.id}">
                 <div class="recipe-card-image">
@@ -117,8 +126,9 @@ const Recipes = {
                     <div class="recipe-card-actions">
                         <button class="recipe-card-action favorite-btn" 
                                 data-id="${recipe.id}" 
-                                data-favorited="false"
-                                title="Favorilere Ekle">
+                                data-title="${recipe.title}"
+                                data-saved="false"
+                                title="Listeye Kaydet">
                             <span>🤍</span>
                         </button>
                         <button class="recipe-card-action quick-view-btn" 
@@ -150,50 +160,21 @@ const Recipes = {
     },
     
     bindCardEvents() {
-        // Favorite buttons - Önce eski listener'ları temizle
-        document.querySelectorAll('.favorite-btn').forEach(btn => {
-            const newBtn = btn.cloneNode(true);
-            btn.parentNode.replaceChild(newBtn, btn);
-        });
-        
-        // Yeni listener'ları ekle
+        // Favorite buttons - Listeye ekle modalını aç
         document.querySelectorAll('.favorite-btn').forEach(btn => {
             btn.addEventListener('click', async (e) => {
                 e.preventDefault();
                 e.stopPropagation();
                 
-                if (!Auth.isLoggedIn || !Auth.isLoggedIn()) {
-                    Toast.show('Favorilere eklemek için giriş yapmalısınız', 'error');
-                    setTimeout(() => {
-                        window.location.href = 'auth.html';
-                    }, 1500);
-                    return;
-                }
-                
                 const recipeId = btn.dataset.id;
-                const isCurrentlyFavorited = btn.dataset.favorited === "true";
+                const recipeTitle = btn.dataset.title;
                 
-                try {
-                    if (isCurrentlyFavorited) {
-                        // Favorilerden çıkar
-                        await Lists.removeFromList('favorites', recipeId);
-                        btn.classList.remove('active');
-                        btn.dataset.favorited = "false";
-                        btn.querySelector('span').textContent = '🤍';
-                        btn.title = 'Favorilere Ekle';
-                        Toast.show('Favorilerden çıkarıldı');
-                    } else {
-                        // Favorilere ekle
-                        await Lists.addToList('favorites', recipeId);
-                        btn.classList.add('active');
-                        btn.dataset.favorited = "true";
-                        btn.querySelector('span').textContent = '❤️';
-                        btn.title = 'Favorilerden Çıkar';
-                        Toast.show('Favorilere eklendi!', 'success');
-                    }
-                } catch (error) {
-                    console.error("Favori hatası:", error);
-                    Toast.show('İşlem yapılamadı', 'error');
+                // Global fonksiyonu çağır (index.html'de tanımlı)
+                if (typeof openAddToListModal === 'function') {
+                    openAddToListModal(recipeId, recipeTitle);
+                } else {
+                    console.error('openAddToListModal fonksiyonu bulunamadı');
+                    Toast.show('Bir hata oluştu', 'error');
                 }
             });
         });
