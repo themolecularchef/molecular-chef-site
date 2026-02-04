@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Listelerim | Lezzet Yolculuğu</title>
+    
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/components.css">
+    
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyCfWLSG4d7bamB-_3rDCeZFnM5Paq4GBO4",
+            authDomain: "the-molecular-chef-17eb2.firebaseapp.com",
+            projectId: "the-molecular-chef-17eb2",
+            storageBucket: "the-molecular-chef-17eb2.firebasestorage.app",
+            messagingSenderId: "23609596807",
+            appId: "1:23609596807:web:18db592c11caeaade29122"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+    </script>
+</head>
+<body>
+    <nav class="nav">
+        <div class="nav-container">
+            <a href="index.html" class="nav-logo">
+                <span class="nav-logo-icon">🍳</span>
+                <span class="nav-logo-text">Lezzet Yolculuğu</span>
+            </a>
+            <div class="nav-links">
+                <a href="index.html" class="nav-link">Tarifler</a>
+                <a href="dashboard.html" class="nav-link active">Listelerim</a>
+            </div>
+            <div class="nav-actions">
+                <button id="logoutBtn" class="nav-link" style="color: var(--color-error); border:none; background:none; cursor:pointer;">Çıkış Yap</button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container" style="padding-top: 6rem;">
+        <div class="dashboard-header" style="margin-bottom: 2rem;">
+            <h1 style="font-size: 2rem;">Merhaba, <span id="userName">Şef</span> 👋</h1>
+            <p style="color: var(--color-text-secondary);">Favori tariflerinizi buradan yönetebilirsiniz.</p>
+        </div>
+
+        <div class="lists-section">
+            <h2 class="section-title" style="margin-bottom: 1.5rem;">❤️ Favorilerim</h2>
+            
+            <div id="favoritesGrid" class="lists-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem;">
+                <p>Yükleniyor...</p>
+            </div>
+        </div>
+    </main>
+
+    <script src="recipes.js?v=3"></script>
+
+    <script>
+        // Global değişken
+        let allRecipes = [];
+
+        // 1. Verileri Hazırla
+        document.addEventListener('DOMContentLoaded', async () => {
+            // recipes.js'den veriyi al (Fetch kullanmadan doğrudan değişkeni alıyoruz)
+            if (typeof recipes !== 'undefined') {
+                allRecipes = recipes;
+                console.log("Tarifler recipes.js dosyasından yüklendi:", allRecipes.length);
+            } else {
+                console.error("HATA: recipes.js yüklenemedi veya 'recipes' değişkeni bulunamadı.");
+                document.getElementById('favoritesGrid').innerHTML = '<p style="color:red">Tarif dosyası bulunamadı (recipes.js).</p>';
+                return;
+            }
+
+            // 2. Kullanıcı Girişini Bekle
+            firebase.auth().onAuthStateChanged(async (user) => {
+                if (!user) {
+                    window.location.href = 'index.html';
+                    return;
+                }
+                
+                document.getElementById('userName').textContent = user.displayName || user.email.split('@')[0];
+                await loadFavorites(user.uid);
+            });
+        });
+
+        // 3. Favorileri Getir ve Göster
+        async function loadFavorites(uid) {
+            try {
+                const doc = await db.collection('users').doc(uid).get();
+                const favIds = doc.exists ? (doc.data().favorites || []) : [];
+                const grid = document.getElementById('favoritesGrid');
+
+                console.log("Veritabanındaki Favori ID'leri:", favIds);
+
+                if (favIds.length === 0) {
+                    grid.innerHTML = '<p>Henüz favori tarifiniz yok. <a href="index.html">Tariflere git</a></p>';
+                    return;
+                }
+
+                // EŞLEŞTİRME (Metin/Sayı fark etmeksizin)
+                const favRecipes = allRecipes.filter(r => {
+                    return favIds.includes(r.id) || 
+                           favIds.includes(String(r.id)) || 
+                           favIds.includes(Number(r.id));
+                });
+
+                if (favRecipes.length === 0) {
+                    grid.innerHTML = '<p>Favoriler var ama tariflerle eşleşmedi.</p>';
+                    return;
+                }
+
+                // KARTLARI OLUŞTUR
+                grid.innerHTML = favRecipes.map(recipe => `
+                    <div class="recipe-card" style="border: 1px solid var(--color-border); border-radius: 12px; overflow: hidden; background: var(--color-surface);">
+                        <div style="position: relative; aspect-ratio: 4/3;">
+                            <img src="${recipe.image}" alt="${recipe.title}" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.src='https://via.placeholder.com/300?text=Resim+Yok'">
+                        </div>
+                        <div style="padding: 1rem;">
+                            <h3 style="font-size: 1.1rem; margin-bottom: 0.5rem;">${recipe.title}</h3>
+                            <div style="display:flex; gap:0.5rem;">
+                                <a href="recipe.html?id=${recipe.id}" class="btn btn-primary" style="flex:1; text-align:center; text-decoration:none; padding:0.5rem;">Tarife Git</a>
+                                <button onclick="removeFavorite('${recipe.id}')" style="background:red; color:white; border:none; border-radius:4px; cursor:pointer; padding:0 0.5rem;">🗑️</button>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+
+            } catch (error) {
+                console.error("Hata:", error);
+                document.getElementById('favoritesGrid').innerHTML = '<p>Bir hata oluştu.</p>';
+            }
+        }
+
+        // 4. Favoriden Çıkar
+        async function removeFavorite(id) {
+            if(!confirm("Silmek istiyor musunuz?")) return;
+            const user = firebase.auth().currentUser;
+            await db.collection('users').doc(user.uid).update({
+                favorites: firebase.firestore.FieldValue.arrayRemove(id)
+            });
+            // Sayfayı yenilemeden listeyi güncelle
+            loadFavorites(user.uid);
+        }
+
+        // Çıkış
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            firebase.auth().signOut().then(() => window.location.href = 'index.html');
+        });
+    </script>
+</body>
+</html>
