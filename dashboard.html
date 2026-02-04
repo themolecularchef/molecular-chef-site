@@ -504,50 +504,60 @@
         }
 
         // Favorileri yükle
+        // Favorileri getir (GÜNCELLENMİŞ VERSİYON)
         async function loadFavorites() {
             const user = firebase.auth().currentUser;
             if (!user) return;
             
             try {
+                console.log("Favoriler yükleniyor..."); // Kontrol 1
                 const doc = await db.collection('users').doc(user.uid).get();
-                const favorites = doc.exists ? (doc.data().favorites || []) : [];
                 
-                const grid = document.getElementById('favoritesGrid');
-                const emptyState = document.getElementById('emptyFavorites');
-                
-                if (favorites.length === 0) {
-                    grid.innerHTML = '';
-                    emptyState.style.display = 'block';
+                if (!doc.exists) {
+                    console.log("Kullanıcı verisi yok.");
                     return;
                 }
                 
-                emptyState.style.display = 'none';
+                // Veritabanındaki favori ID'leri
+                const favorites = doc.data().favorites || [];
+                console.log("Bulunan Favori ID'leri:", favorites); // Kontrol 2
                 
-                // Tarifleri render et
-                grid.innerHTML = favorites.map(id => {
-                    const recipe = allRecipes.find(r => r.id.toString() === id.toString());
-                    if (!recipe) return '';
-                    
+                const grid = document.getElementById('favoritesGrid');
+                
+                if (favorites.length === 0) {
+                    grid.innerHTML = '<p class="empty-state">Henüz favori tarifiniz yok.</p>';
+                    return;
+                }
+                
+                // Tüm tarifleri getir
+                const recipes = await Recipes.loadRecipes();
+                
+                // KRİTİK DÜZELTME: Hem Metin (String) hem Sayı (Number) olarak kontrol et
+                const favRecipes = recipes.filter(r => {
+                    return favorites.includes(r.id) || 
+                           favorites.includes(String(r.id)) || 
+                           favorites.includes(Number(r.id));
+                });
+                
+                console.log("Eşleşen Tarifler:", favRecipes); // Kontrol 3
+                
+                if (favRecipes.length === 0) {
+                     grid.innerHTML = '<p class="empty-state">Favoriler var ama tarif dosyasıyla eşleşmedi. ID sorunu olabilir.</p>';
+                     return;
+                }
+
+                grid.innerHTML = favRecipes.map(recipe => {
                     return `
-                        <div class="recipe-card" style="background: var(--color-surface); border-radius: var(--radius-xl); overflow: hidden; box-shadow: var(--shadow-sm);">
-                            <div class="recipe-card-image" style="position: relative; aspect-ratio: 4/3; overflow: hidden;">
-                                <img src="${recipe.image}" alt="${recipe.title}" style="width: 100%; height: 100%; object-fit: cover;">
-                                <div style="position: absolute; top: var(--space-md); right: var(--space-md);">
-                                    <button onclick="removeFavorite('${recipe.id}')" 
-                                            style="width: 40px; height: 40px; border-radius: var(--radius-lg); 
-                                                   background: rgba(255, 255, 255, 0.95); border: none; 
-                                                   cursor: pointer; font-size: 1.125rem; transition: transform 0.2s;"
-                                            onmouseover="this.style.transform='scale(1.1)'"
-                                            onmouseout="this.style.transform='scale(1)'">
-                                        ❤️
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="recipe-card-content" style="padding: var(--space-lg);">
-                                <span style="font-size: 0.75rem; font-weight: 600; text-transform: uppercase; color: var(--color-accent);">${recipe.category}</span>
-                                <h3 style="font-family: var(--font-heading); font-size: 1.25rem; margin: var(--space-xs) 0;">
+                        <div class="recipe-card">
+                             <img src="${recipe.image}" alt="${recipe.title}" loading="lazy" onerror="this.src='https://via.placeholder.com/300x200?text=Lezzet'">
+                            <div class="card-content">
+                                <span class="category">${recipe.category || 'Genel'}</span>
+                                <h3 style="font-size: 1.25rem; margin: var(--space-xs) 0;">
                                     <a href="recipe.html?id=${recipe.id}" style="color: inherit;">${recipe.title}</a>
                                 </h3>
+                                <button onclick="removeFavorite('${recipe.id}')" style="color: red; border: 1px solid red; padding: 5px; margin-top: 10px; cursor: pointer;">
+                                    Favorilerden Çıkar
+                                </button>
                             </div>
                         </div>
                     `;
@@ -555,6 +565,7 @@
                 
             } catch (error) {
                 console.error("Favoriler yüklenemedi:", error);
+                document.getElementById('favoritesGrid').innerHTML = '<p style="color:red">Bir hata oluştu: ' + error.message + '</p>';
             }
         }
         
