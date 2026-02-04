@@ -55,49 +55,57 @@ const Recipes = {
     // ============================================
     
     async renderRecipesGrid(recipes = null) {
-        const grid = document.getElementById('recipesGrid');
-        const emptyState = document.getElementById('emptyState');
-        
-        if (!grid) return;
-        
-        const recipesToRender = recipes || this.data;
-        
-        if (!recipesToRender || recipesToRender.length === 0) {
-            grid.innerHTML = '';
-            if (emptyState) emptyState.classList.remove('hidden');
-            return;
-        }
-        
-        if (emptyState) emptyState.classList.add('hidden');
-        
-        // 1. Önce tüm kartları render et (varsayılan boş kalp 🤍)
-        grid.innerHTML = recipesToRender.map(recipe => this.createRecipeCard(recipe)).join('');
-        
-        // 2. Event listener'ları bağla
-        this.bindCardEvents();
-        
-        // 3. Eğer giriş yapılmışsa, async olarak favori durumlarını kontrol et ve güncelle
-        if (Auth.isLoggedIn && Auth.isLoggedIn()) {
+    const grid = document.getElementById('recipesGrid');
+    const emptyState = document.getElementById('emptyState');
+    
+    if (!grid) return;
+    
+    const recipesToRender = recipes || this.data;
+    
+    if (!recipesToRender || recipesToRender.length === 0) {
+        grid.innerHTML = '';
+        if (emptyState) emptyState.classList.remove('hidden');
+        return;
+    }
+    
+    if (emptyState) emptyState.classList.add('hidden');
+    
+    // 1. Önce tüm kartları render et (varsayılan boş kalp 🤍)
+    grid.innerHTML = recipesToRender.map(recipe => this.createRecipeCard(recipe)).join('');
+    
+    // 2. Event listener'ları bağla
+    this.bindCardEvents();
+    
+    // 3. Firebase auth state hazır olduktan sonra favori durumlarını kontrol et
+    firebase.auth().onAuthStateChanged(async (user) => {
+        if (user) {
             const favoriteBtns = grid.querySelectorAll('.favorite-btn');
             
             for (const btn of favoriteBtns) {
                 const recipeId = btn.dataset.id;
                 try {
-                    // Lists.isFavorited async olduğu için await kullan
-                    const isFavorited = await Lists.isFavorited(recipeId);
+                    // Firestore'dan favori durumunu kontrol et
+                    const userRef = db.collection('users').doc(user.uid);
+                    const doc = await userRef.get();
                     
-                    if (isFavorited) {
-                        btn.classList.add('active');
-                        btn.dataset.favorited = "true";
-                        btn.querySelector('span').textContent = '❤️';
-                        btn.title = 'Favorilerden Çıkar';
+                    if (doc.exists) {
+                        const favorites = doc.data().favorites || [];
+                        const isFavorited = favorites.includes(recipeId);
+                        
+                        if (isFavorited) {
+                            btn.classList.add('active');
+                            btn.dataset.favorited = "true";
+                            btn.querySelector('span').textContent = '❤️';
+                            btn.title = 'Favorilerden Çıkar';
+                        }
                     }
                 } catch (error) {
                     console.error("Favori kontrolü hatası:", error);
                 }
             }
         }
-    },
+    });
+},
     
     createRecipeCard(recipe) {
         // Varsayılan olarak boş kalp (🤍) - durum sonradan kontrol edilecek
