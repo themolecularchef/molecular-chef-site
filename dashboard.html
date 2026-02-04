@@ -301,7 +301,7 @@
                     // İlk tarifin görselini al (varsa)
                     let coverImage = '';
                     if (list.recipes && list.recipes.length > 0 && allRecipes.length > 0) {
-                        const firstRecipe = allRecipes.find(r => r.id === list.recipes[0]);
+                        const firstRecipe = allRecipes.find(r => r.id.toString() === list.recipes[0].toString());
                         if (firstRecipe) {
                             coverImage = `<img src="${firstRecipe.image}" alt="${list.name}" style="width: 100%; height: 100%; object-fit: cover;">`;
                         }
@@ -367,7 +367,7 @@
                     
                     // Tarifleri render et
                     grid.innerHTML = list.recipes.map(recipeId => {
-                        const recipe = allRecipes.find(r => r.id === recipeId);
+                        const recipe = allRecipes.find(r => r.id.toString() === recipeId.toString());
                         if (!recipe) return '';
                         
                         return `
@@ -525,7 +525,7 @@
                 
                 // Tarifleri render et
                 grid.innerHTML = favorites.map(id => {
-                    const recipe = allRecipes.find(r => r.id === id);
+                    const recipe = allRecipes.find(r => r.id.toString() === id.toString());
                     if (!recipe) return '';
                     
                     return `
