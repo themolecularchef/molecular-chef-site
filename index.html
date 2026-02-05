@@ -53,7 +53,7 @@
         <nav class="nav nav-transparent">
             <div class="nav-container">
                 <a href="#" class="nav-logo">
-                    <img src="assets/images/logo.png" alt="Lezzet Yolculuğu" style="width: 32px; height: 32px; object-fit: contain;">
+                    <span class="nav-logo-icon">🍳</span>
                     <span class="nav-logo-text">Lezzet Yolculuğu</span>
                 </a>
                 <button class="theme-toggle" id="themeToggleAuth" aria-label="Karanlık moda geç">
@@ -138,7 +138,7 @@
         <nav class="nav" id="nav">
             <div class="nav-container">
                 <a href="index.html" class="nav-logo">
-                    <img src="assets/images/logo.png" alt="Lezzet Yolculuğu" style="width: 32px; height: 32px; object-fit: contain;">
+                    <span class="nav-logo-icon">🍳</span>
                     <span class="nav-logo-text">Lezzet Yolculuğu</span>
                 </a>
 
@@ -180,8 +180,11 @@
 
         <!-- Hero Section -->
         <section class="hero">
-            <div class="hero-bg">
-                <img src="assets/images/iskender-kebap.webp" alt="Yemek arka plan" loading="eager">
+            <div class="hero-bg" id="heroSlider">
+                <img src="assets/images/iskender-kebap.webp" class="slide active" alt="Tarif 1">
+                <img src="assets/images/dovga-krutonlar.webp" class="slide" alt="Tarif 2">
+                <img src="assets/images/elma-dilim-patates.webp" class="slide" alt="Tarif 3">
+                <img src="assets/images/lavas-durum.webp" class="slide" alt="Tarif 4">
                 <div class="hero-overlay"></div>
             </div>
             <div class="hero-content">
@@ -653,6 +656,16 @@
 
         // Backdrop tıklama ile modal kapatma
         document.getElementById('addToListModal')?.querySelector('.modal-backdrop')?.addEventListener('click', closeAddToListModal);
+    </script>
+    <script>
+        const slides = document.querySelectorAll('.hero-bg .slide');
+        let current = 0;
+
+        setInterval(() => {
+            slides[current].classList.remove('active');
+            current = (current + 1) % slides.length;
+            slides[current].classList.add('active');
+        }, 5000); // 5 saniyede bir değiş
     </script>
 </body>
 
