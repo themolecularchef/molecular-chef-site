@@ -1,4 +1,3 @@
-[sucuk-spagetti.md](https://github.com/user-attachments/files/24979371/sucuk-spagetti.md)
 # Kızarmış Sucuk & Sarımsaklı Spagetti
 
 ## Malzemeler (2 kişilik)
