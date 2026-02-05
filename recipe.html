@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="tr">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,9 +8,7 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/components.css">
@@ -32,7 +29,10 @@
             messagingSenderId: "23609596807",
             appId: "1:23609596807:web:18db592c11caeaade29122"
         };
-        firebase.initializeApp(firebaseConfig);
+        
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
         const db = firebase.firestore();
     </script>
 </head>
@@ -208,8 +208,6 @@
 
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script src="js/app.js"></script>
-    <script src="js/firebase-auth.js"></script>
-    <script src="js/firebase-lists.js"></script>
     <script src="js/recipes.js"></script>
 
     <script>
@@ -293,7 +291,7 @@
         document.getElementById('addToFavoritesBtn')?.addEventListener('click', async () => {
             const user = firebase.auth().currentUser;
             if (!user) {
-                showToast('Favorilere eklemek için giriş yapmalısınız', 'error');
+                Toast.show('Favorilere eklemek için giriş yapmalısınız', 'error');
                 setTimeout(() => window.location.href = 'auth.html', 1500);
                 return;
             }
@@ -309,7 +307,7 @@
                         email: user.email
                     });
                     updateFavoriteButton(true);
-                    showToast('Favorilere eklendi!', 'success');
+                    Toast.show('Favorilere eklendi!', 'success');
                     return;
                 }
                 const currentFavorites = userDoc.data().favorites || [];
@@ -318,26 +316,19 @@
                         favorites: firebase.firestore.FieldValue.arrayRemove(recipeId)
                     });
                     updateFavoriteButton(false);
-                    showToast('Favorilerden çıkarıldı');
+                    Toast.show('Favorilerden çıkarıldı');
                 } else {
                     await userRef.update({
                         favorites: firebase.firestore.FieldValue.arrayUnion(recipeId)
                     });
                     updateFavoriteButton(true);
-                    showToast('Favorilere eklendi!', 'success');
+                    Toast.show('Favorilere eklendi!', 'success');
                 }
             } catch (error) {
                 console.error("Favori hatası:", error);
-                showToast('İşlem yapılamadı', 'error');
+                Toast.show('İşlem yapılamadı', 'error');
             }
         });
-
-        function showToast(message, type = 'default') {
-            const toast = document.getElementById('toast');
-            document.getElementById('toastMessage').textContent = message;
-            toast.className = 'toast active ' + type;
-            setTimeout(() => toast.classList.remove('active'), 3000);
-        }
 
         // Porsiyon ve Malzeme Yönetimi
         let currentServings = 4;
@@ -346,13 +337,27 @@
 
         async function loadRecipeDetail() {
             const recipeId = new URLSearchParams(window.location.search).get('id');
-            if (!recipeId) return;
-            if (!window.Recipes || !window.Recipes.data) await window.Recipes.loadRecipes();
-            const recipe = window.Recipes.data.find(r => r.id.toString() === recipeId.toString());
-            if (!recipe) {
-                showToast('Tarif bulunamadı', 'error');
+            if (!recipeId) {
+                Toast.show('Tarif ID bulunamadı', 'error');
                 return;
             }
+            
+            if (!window.Recipes || !window.Recipes.data) {
+                try {
+                    await window.Recipes.loadRecipes();
+                } catch (e) {
+                    console.error("Tarifler yüklenemedi:", e);
+                    Toast.show('Tarifler yüklenemedi', 'error');
+                    return;
+                }
+            }
+            
+            const recipe = window.Recipes.data.find(r => r.id.toString() === recipeId.toString());
+            if (!recipe) {
+                Toast.show('Tarif bulunamadı', 'error');
+                return;
+            }
+            
             document.getElementById('recipeHeroImage').src = recipe.image;
             document.getElementById('recipeCategory').textContent = recipe.category;
             document.getElementById('recipeTitle').textContent = recipe.title;
@@ -360,38 +365,79 @@
             document.getElementById('recipeCookTime').textContent = recipe.cookTime;
             document.getElementById('recipeServings').textContent = recipe.servings + ' kişilik';
             document.getElementById('recipeDifficulty').textContent = recipe.difficulty;
+            
             baseServings = recipe.servings || 4;
             currentServings = baseServings;
             document.getElementById('servingsCount').textContent = currentServings;
-            const contentHtml = await window.Recipes.loadRecipeContent(recipe.contentFile);
-            document.getElementById('instructionsContent').innerHTML = contentHtml;
-            parseIngredients(contentHtml);
+            
+            try {
+                const contentHtml = await window.Recipes.loadRecipeContent(recipe.contentFile);
+                document.getElementById('instructionsContent').innerHTML = contentHtml;
+                parseIngredients(contentHtml);
+            } catch (e) {
+                console.error("Tarif içeriği yüklenemedi:", e);
+                document.getElementById('instructionsContent').innerHTML = '<p>Tarif içeriği yüklenemedi.</p>';
+            }
         }
 
         function parseIngredients(htmlContent) {
             const tempDiv = document.createElement('div');
             tempDiv.innerHTML = htmlContent;
-            const lists = tempDiv.querySelectorAll('ul li, ol li');
+            
+            // Malzeme listelerini bul (Genellikle h2 "Malzemeler" sonrası ul/ol)
+            const headings = tempDiv.querySelectorAll('h2, h3');
             ingredientsList = [];
-            lists.forEach(li => {
-                const text = li.textContent.trim();
-                if (text && (text.includes('su bardağı') || text.includes('yemek kaşığı') || text.includes('tatlı kaşığı') || text.includes('kg') || text.includes('gr') || text.includes('adet'))) {
-                    ingredientsList.push(text);
+            
+            headings.forEach(heading => {
+                if (heading.textContent.toLowerCase().includes('malzeme')) {
+                    let nextEl = heading.nextElementSibling;
+                    while (nextEl && (nextEl.tagName === 'UL' || nextEl.tagName === 'OL')) {
+                        const items = nextEl.querySelectorAll('li');
+                        items.forEach(li => {
+                            const text = li.textContent.trim();
+                            if (text && containsMeasurement(text)) {
+                                ingredientsList.push(text);
+                            }
+                        });
+                        nextEl = nextEl.nextElementSibling;
+                    }
                 }
             });
+            
             renderIngredients();
+        }
+
+        function containsMeasurement(text) {
+            // Ölçü birimi içeren satırları tespit et
+            const measurements = ['su bardağı', 'çay bardağı', 'yemek kaşığı', 'tatlı kaşığı', 'çay kaşığı', 
+                                'kg', 'gr', 'g ', 'ml', 'cl', 'litre', 'adet', 'paket', 'demet', 'diş'];
+            return measurements.some(m => text.toLowerCase().includes(m)) || /\d/.test(text);
         }
 
         function renderIngredients() {
             const container = document.getElementById('ingredientsList');
-            if (!container || ingredientsList.length === 0) return;
+            if (!container || ingredientsList.length === 0) {
+                if (container) container.innerHTML = '<p>Malzemeler yüklenemedi.</p>';
+                return;
+            }
+            
             const ratio = currentServings / baseServings;
             container.innerHTML = ingredientsList.map((ing) => {
                 let displayText = ing;
                 if (ratio !== 1) {
-                    displayText = ing.replace(/(\d+\.?\d*)/g, (match) => {
-                        const num = parseFloat(match);
-                        return (num * ratio).toFixed(1).replace(/\.0$/, '');
+                    // Sayıları bul ve çarp
+                    displayText = ing.replace(/(\d+(?:[.,]\d+)?|\d+\/\d+)/g, (match) => {
+                        let num;
+                        if (match.includes('/')) {
+                            const [a, b] = match.split('/');
+                            num = parseFloat(a) / parseFloat(b);
+                        } else {
+                            num = parseFloat(match.replace(',', '.'));
+                        }
+                        if (isNaN(num)) return match;
+                        const scaled = num * ratio;
+                        // Yuvarlama
+                        return scaled.toFixed(1).replace(/\.0$/, '');
                     });
                 }
                 return `
@@ -424,9 +470,7 @@
 
         // Paylaşım Fonksiyonları
         document.getElementById('shareBtn')?.addEventListener('click', () => {
-            const modal = document.getElementById('shareModal');
-            modal.classList.add('active');
-            document.body.style.overflow = 'hidden';
+            Modal.open('shareModal');
         });
 
         document.getElementById('shareNative')?.addEventListener('click', async () => {
@@ -438,25 +482,20 @@
             } catch (err) {
                 console.log('Paylaşım iptal edildi');
             }
-            document.getElementById('shareModal').classList.remove('active');
+            Modal.close('shareModal');
         });
 
         document.getElementById('shareWhatsApp')?.addEventListener('click', () => {
             const url = encodeURIComponent(window.location.href);
             const text = encodeURIComponent(document.getElementById('recipeTitle').textContent);
             window.open(`https://wa.me/?text=${text}%20${url}`, '_blank');
-            document.getElementById('shareModal').classList.remove('active');
+            Modal.close('shareModal');
         });
 
         document.getElementById('shareCopy')?.addEventListener('click', () => {
             navigator.clipboard.writeText(window.location.href);
-            showToast('Link kopyalandı!', 'success');
-            document.getElementById('shareModal').classList.remove('active');
-        });
-
-        document.querySelector('#shareModal .modal-backdrop')?.addEventListener('click', () => {
-            document.getElementById('shareModal').classList.remove('active');
-            document.body.style.overflow = '';
+            Toast.show('Link kopyalandı!', 'success');
+            Modal.close('shareModal');
         });
 
         document.getElementById('printBtn')?.addEventListener('click', () => {
