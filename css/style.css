@@ -677,6 +677,7 @@ textarea {
 .hero-bg .slide.active {
     opacity: 1;
 }
+
 /* Hero Slider */
 .hero-bg {
     position: absolute;
@@ -699,9 +700,15 @@ textarea {
 }
 
 @keyframes heroZoom {
-    from { transform: scale(1.1); }
-    to { transform: scale(1); }
+    from {
+        transform: scale(1.1);
+    }
+
+    to {
+        transform: scale(1);
+    }
 }
+
 /* Hero Slider */
 .hero-bg {
     position: absolute;
@@ -725,6 +732,11 @@ textarea {
 }
 
 @keyframes heroZoom {
-    from { transform: scale(1.1); }
-    to { transform: scale(1); }
+    from {
+        transform: scale(1.1);
+    }
+
+    to {
+        transform: scale(1);
+    }
 }
