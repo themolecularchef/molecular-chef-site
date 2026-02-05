@@ -717,6 +717,7 @@ textarea {
     opacity: 0;
     transition: opacity 1.5s ease-in-out;
     animation: heroZoom 20s ease-out forwards;
+    z-index: -1;
 }
 
 .hero-bg .slide.active {
