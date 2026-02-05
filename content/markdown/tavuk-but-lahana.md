@@ -1,4 +1,3 @@
-[tavuk-but-lahana.md](https://github.com/user-attachments/files/24979374/tavuk-but-lahana.md)
 # Haşlama-Fırınlama Tekniği ile Tavuk But & Lahana Turşulu Tabak
 
 ## Malzemeler (2 kişilik)
