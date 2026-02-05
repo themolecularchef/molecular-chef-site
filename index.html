@@ -138,7 +138,7 @@
         <nav class="nav" id="nav">
             <div class="nav-container">
                 <a href="index.html" class="nav-logo">
-                    <img src="assets/images/Logo.png" alt="Logo" style="height: 40px; width: 40px; object-fit: cover; border-radius: 50%;">
+                    <img src="assets/images/Logo.png" alt="Logo" style="height: 40px; width: auto;">
                     <span class="nav-logo-text">Lezzet Yolculuğu</span>
                 </a>
 
@@ -660,31 +660,17 @@
 
         // Backdrop tıklama ile modal kapatma
         document.getElementById('addToListModal')?.querySelector('.modal-backdrop')?.addEventListener('click', closeAddToListModal);
-    </script>
-
+        </script>
+    
     <!-- ARAMA MOTORU -->
     <script>
-        document.getElementById('heroSearchInput')?.addEventListener('input', function (e) {
+        document.getElementById('heroSearchInput')?.addEventListener('input', function(e) {
             const term = e.target.value.toLowerCase();
             document.querySelectorAll('.recipe-card').forEach(card => {
                 card.style.display = card.textContent.toLowerCase().includes(term) ? '' : 'none';
             });
         });
     </script>
-    <script>
-        // Slider Script
-        document.addEventListener('DOMContentLoaded', () => {
-            const slides = document.querySelectorAll('.hero-bg .slide');
-            if (slides.length === 0) return;
-
-            let current = 0;
-            setInterval(() => {
-                slides[current].classList.remove('active');
-                current = (current + 1) % slides.length;
-                slides[current].classList.add('active');
-            }, 5000);
-        });
-    </script>
+    
 </body>
-
 </html>
