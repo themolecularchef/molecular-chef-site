@@ -1,250 +1,362 @@
-const Recipes = {
-    data: null,
-    currentRecipe: null,
-    servingsMultiplier: 1,
-    originalServings: 4,
-    originalIngredients: [],
-
-    init() {
-        this.loadRecipes().then(() => {
-            this.renderRecipesGrid();
-            this.bindFilterEvents();
-        });
-        if (document.querySelector('.recipe-hero')) {
-            this.loadRecipeDetail();
-        }
+{
+  "recipes": [
+    {
+      "id": "dovga-krutonlar",
+      "title": "Azerbaycan Usulü Dovğa & Fırında Baharatlı Krutonlar",
+      "image": "assets/images/dovga-krutonlar.webp",
+      "prepTime": "20 dk",
+      "cookTime": "45 dk",
+      "totalTime": "65 dk",
+      "servings": 4,
+      "difficulty": "Orta",
+      "category": "Çorba",
+      "tags": [
+        "azerbaycan",
+        "çorba",
+        "yoğurt",
+        "kruton"
+      ],
+      "contentFile": "content/markdown/dovga-krutonlar.md",
+      "description": "Ekşi mayalı yoğurtla hazırlanan geleneksel Azerbaycan çorbası, sumaklı baharatlı krutonlarla servis edilir."
     },
-
-    async loadRecipes() {
-        try {
-            const response = await fetch('content/recipes.json');
-            const data = await response.json();
-            this.data = data.recipes || [];
-            window.recipesData = this.data;
-        } catch (error) {
-            console.error('Hata:', error);
-            this.data = [];
-        }
+    {
+      "id": "iskender-kebap",
+      "title": "Evde İskender Kebap & Tane Pilav",
+      "image": "assets/images/iskender-kebap.webp",
+      "prepTime": "30 dk",
+      "cookTime": "40 dk",
+      "totalTime": "70 dk",
+      "servings": 2,
+      "difficulty": "Orta",
+      "category": "Et Yemekleri",
+      "tags": [
+        "iskender",
+        "kebap",
+        "pilav",
+        "türk mutfağı"
+      ],
+      "contentFile": "content/markdown/iskender-kebap.md",
+      "description": "Evde yapılabilen nefis İskender kebap, tereyağlı salça sosu ve tane tane pilavıyla."
     },
-
-    async loadRecipeContent(contentFile) {
-        try {
-            const response = await fetch(contentFile);
-            const markdown = await response.text();
-            return marked.parse(markdown);
-        } catch (error) {
-            return '<p>Hata</p>';
-        }
+    {
+      "id": "elma-dilim-patates",
+      "title": "Fırında Elma Dilim Patates & Nar Ekşili Mayonezli Sos",
+      "image": "assets/images/elma-dilim-patates.webp",
+      "prepTime": "40 dk",
+      "cookTime": "45 dk",
+      "totalTime": "85 dk",
+      "servings": 4,
+      "difficulty": "Kolay",
+      "category": "Meze",
+      "tags": [
+        "patates",
+        "fırın",
+        "meze",
+        "nar ekşisi"
+      ],
+      "contentFile": "content/markdown/elma-dilim-patates.md",
+      "description": "Dışı çıtır içi yumuşak fırın patates, nar ekşili mayonezli sosla buluşuyor."
     },
-
-    getRecipeById(id) {
-        return this.data ? this.data.find(r => r.id.toString() === id.toString()) : null;
+    {
+      "id": "tavuk-but-lahana",
+      "title": "Haşlama-Fırınlama Tekniği ile Tavuk But & Lahana Turşulu Tabak",
+      "image": "assets/images/tavuk-but-lahana.webp",
+      "prepTime": "20 dk",
+      "cookTime": "90 dk",
+      "totalTime": "110 dk",
+      "servings": 2,
+      "difficulty": "Orta",
+      "category": "Tavuk Yemekleri",
+      "tags": [
+        "tavuk",
+        "haşlama",
+        "fırın",
+        "turşu"
+      ],
+      "contentFile": "content/markdown/tavuk-but-lahana.md",
+      "description": "Lokum gibi yumuşak tavuk but, lahana turşusu ve taze nane ile."
     },
-
-    async renderRecipesGrid(recipes = null) {
-        const grid = document.getElementById('recipesGrid');
-        const emptyState = document.getElementById('emptyState');
-        if (!grid) return;
-        
-        const recipesToRender = recipes || this.data;
-        if (!recipesToRender || recipesToRender.length === 0) {
-            grid.innerHTML = '';
-            if (emptyState) emptyState.classList.remove('hidden');
-            return;
-        }
-        
-        if (emptyState) emptyState.classList.add('hidden');
-        
-        grid.innerHTML = recipesToRender.map(recipe => `
-            <article class="recipe-card" data-id="${recipe.id}">
-                <div class="recipe-card-image">
-                    <img src="${recipe.image}" alt="${recipe.title}" loading="lazy">
-                    <div class="recipe-card-overlay"></div>
-                    <div class="recipe-card-actions">
-                        <button class="recipe-card-action favorite-btn" 
-                                data-id="${recipe.id}" 
-                                data-title="${recipe.title}"
-                                onclick="openAddToListModal('${recipe.id}', '${recipe.title}')">
-                            <span>🤍</span>
-                        </button>
-                        <button class="recipe-card-action quick-view-btn" 
-                                data-id="${recipe.id}">
-                            <span>👁️</span>
-                        </button>
-                    </div>
-                </div>
-                <div class="recipe-card-content">
-                    <span class="recipe-card-category">${recipe.category}</span>
-                    <h3 class="recipe-card-title">
-                        <a href="recipe.html?id=${recipe.id}">${recipe.title}</a>
-                    </h3>
-                    <div class="recipe-card-meta">
-                        <span>⏱️ ${recipe.prepTime}</span>
-                        <span>🔥 ${recipe.cookTime}</span>
-                        <span>📊 ${recipe.difficulty}</span>
-                    </div>
-                </div>
-            </article>
-        `).join('');
-        
-        this.bindCardEvents();
+    {
+      "id": "sucuk-spagetti",
+      "title": "Kızarmış Sucuk & Sarımsaklı Spagetti",
+      "image": "assets/images/sucuk-spagetti.webp",
+      "prepTime": "15 dk",
+      "cookTime": "25 dk",
+      "totalTime": "40 dk",
+      "servings": 2,
+      "difficulty": "Kolay",
+      "category": "Makarna",
+      "tags": [
+        "sucuk",
+        "spagetti",
+        "makarna",
+        "sarımsak"
+      ],
+      "contentFile": "content/markdown/sucuk-spagetti.md",
+      "description": "Kızarmış sucuk dilimleri ve sarımsaklı salça soslu nefis spagetti."
     },
-
-    bindCardEvents() {
-        document.querySelectorAll('.quick-view-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                this.showQuickView(btn.dataset.id);
-            });
-        });
+    {
+      "id": "lavas-durum",
+      "title": "Tavada Gevrek Lavaşlı Et Dürüm & Közlenmiş Biber",
+      "image": "assets/images/lavas-durum.webp",
+      "prepTime": "20 dk",
+      "cookTime": "80 dk",
+      "totalTime": "100 dk",
+      "servings": 2,
+      "difficulty": "Orta",
+      "category": "Et Yemekleri",
+      "tags": [
+        "dürüm",
+        "lavaş",
+        "et",
+        "közbiber"
+      ],
+      "contentFile": "content/markdown/lavas-durum.md",
+      "description": "Tel tel yumuşak et, gevrek lavaş ve közlenmiş biberin mükemmel uyumu."
     },
-
-    bindFilterEvents() {
-        document.querySelectorAll('.filter-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                const filter = btn.dataset.filter;
-                if (filter === 'all') {
-                    this.renderRecipesGrid(this.data);
-                } else {
-                    const filtered = this.data.filter(r => r.category === filter);
-                    this.renderRecipesGrid(filtered);
-                }
-            });
-        });
+    {
+      "id": "penne-sigara-boregi",
+      "title": "Bol Salçalı Penne & Yanında Sigara Böreği Tabak",
+      "image": "assets/images/penne-sigara-boregi.webp",
+      "prepTime": "20 dk",
+      "cookTime": "25 dk",
+      "totalTime": "45 dk",
+      "servings": 2,
+      "difficulty": "Kolay",
+      "category": "Makarna",
+      "tags": [
+        "makarna",
+        "penne",
+        "sigara böreği",
+        "salça",
+        "hızlı yemek"
+      ],
+      "contentFile": "content/markdown/penne-sigara-boregi.md",
+      "description": "Bol salçalı, krema ile yumuşatılmış penne makarna, yanında çıtır sigara böreği ve çanak peyniriyle."
     },
-
-    async showQuickView(recipeId) {
-        const recipe = this.getRecipeById(recipeId);
-        if (!recipe) return;
-        const modalBody = document.getElementById('quickViewBody');
-        if (!modalBody) return;
-        modalBody.innerHTML = `
-            <div class="quick-view">
-                <img src="${recipe.image}" alt="${recipe.title}">
-                <div class="quick-view-content">
-                    <span>${recipe.category}</span>
-                    <h2>${recipe.title}</h2>
-                    <p>${recipe.description}</p>
-                    <a href="recipe.html?id=${recipe.id}" class="btn btn-primary">Tarifi Görüntüle</a>
-                </div>
-            </div>
-        `;
-        Modal.open('quickViewModal');
+    {
+      "id": "defne-aromali-dana-kavurma",
+      "title": "Defne Aromalı Dana Kavurma - Mühürle & Haşla Tekniği",
+      "image": "assets/images/defne-aromali-dana-kavurma.webp",
+      "prepTime": "20 dk",
+      "cookTime": "80 dk",
+      "totalTime": "160 dk",
+      "servings": 4,
+      "difficulty": "Orta",
+      "category": "Et Yemekleri",
+      "tags": [
+        "dana",
+        "kavurma",
+        "defne",
+        "yavaş pişirme",
+        "mühürleme"
+      ],
+      "contentFile": "content/markdown/defne-aromali-dana-kavurma.md",
+      "description": "Defne aromasıyla marine edilmiş, önce mühürlenip sonra kısık ateşte lokum gibi pişen dana kavurma."
     },
-
-    renderIngredients(recipe, markdownHtml) {
-        const ingredientsList = document.getElementById('ingredientsList');
-        const servingsCount = document.getElementById('servingsCount');
-        if (servingsCount) servingsCount.textContent = recipe.servings || 4;
-
-        let ingredients = null;
-        if (recipe.ingredients && Array.isArray(recipe.ingredients)) {
-            ingredients = recipe.ingredients;
-        } else if (markdownHtml) {
-            ingredients = this.extractFromMarkdown(markdownHtml);
-        }
-
-        if (ingredients && ingredients.length > 0) {
-            this.originalIngredients = ingredients;
-            if (ingredientsList) {
-                ingredientsList.innerHTML = ingredients.map(text => `
-                    <div class="ingredient-item">
-                        <div class="ingredient-checkbox" onclick="this.classList.toggle('checked'); this.nextElementSibling.classList.toggle('checked')"></div>
-                        <span class="ingredient-text" data-original="${text}">${text}</span>
-                    </div>
-                `).join('');
-            }
-        } else {
-            if (ingredientsList) {
-                ingredientsList.innerHTML = '<div class="ingredient-item"><span>Malzeme bulunamadı</span></div>';
-            }
-        }
+    {
+      "id": "firin-kanat-kozlenmis-biber",
+      "title": "Fırın Kanat & Elektrikli Ocakta Közlenmiş Biber Tabağı",
+      "image": "assets/images/firin-kanat-kozlenmis-biber.webp",
+      "prepTime": "25 dk",
+      "cookTime": "50 dk",
+      "totalTime": "75 dk",
+      "servings": 2,
+      "difficulty": "Orta",
+      "category": "Tavuk Yemekleri",
+      "tags": [
+        "tavuk kanat",
+        "közbiber",
+        "fırın",
+        "sarımsak"
+      ],
+      "contentFile": "content/markdown/firin-kanat-kozlenmis-biber.md",
+      "description": "Çıtır derili fırın kanat, elektrikli ocakta közlenmiş biber ve kavrulmuş sarımsakla."
     },
-
-    extractFromMarkdown(html) {
-        const temp = document.createElement('div');
-        temp.innerHTML = html;
-        const headings = temp.querySelectorAll('h2, h3');
-        for (let h of headings) {
-            if (h.textContent.toLowerCase().includes('malzemeler')) {
-                let list = h.nextElementSibling;
-                while (list && list.tagName !== 'UL' && list.tagName !== 'OL') {
-                    list = list.nextElementSibling;
-                }
-                if (list) {
-                    return Array.from(list.querySelectorAll('li')).map(li => li.textContent.trim());
-                }
-            }
-        }
-        return null;
+    {
+      "id": "firinda-baharatli-tavuk-but",
+      "title": "Fırında Baharatlı Tavuk But & Çiğ Garnitür Tabağı",
+      "image": "assets/images/firinda-baharatli-tavuk-but.webp",
+      "prepTime": "35 dk",
+      "cookTime": "65 dk",
+      "totalTime": "100 dk",
+      "servings": 3,
+      "difficulty": "Orta",
+      "category": "Tavuk Yemekleri",
+      "tags": [
+        "tavuk but",
+        "fırın",
+        "yoğurt marine",
+        "çiğ sarımsak"
+      ],
+      "contentFile": "content/markdown/firinda-baharatli-tavuk-but.md",
+      "description": "Yoğurt ve baharatlarla marine edilmiş, gevrek derili fırın tavuk but, çiğ garnitürlerle."
     },
-
-    updateServings() {
-        const count = document.getElementById('servingsCount');
-        if (count) {
-            count.textContent = Math.round(this.originalServings * this.servingsMultiplier * 10) / 10 + ' kişilik';
-        }
-        document.querySelectorAll('.ingredient-text').forEach((item, index) => {
-            const original = this.originalIngredients[index];
-            if (original) {
-                item.textContent = original.replace(/(\d+(?:[.,]\d+)?)/g, (match) => {
-                    const num = parseFloat(match.replace(',', '.'));
-                    if (isNaN(num)) return match;
-                    const newNum = num * this.servingsMultiplier;
-                    return Number.isInteger(newNum) ? newNum : newNum.toFixed(1).replace('.', ',');
-                });
-            }
-        });
+    {
+      "id": "firinda-salcali-tavuk-mantar",
+      "title": "Fırında Salçalı Tavuk & Mantar Tabağı",
+      "image": "assets/images/firinda-salcali-tavuk-mantar.webp",
+      "prepTime": "20 dk",
+      "cookTime": "30 dk",
+      "totalTime": "50 dk",
+      "servings": 2,
+      "difficulty": "Kolay",
+      "category": "Tavuk Yemekleri",
+      "tags": [
+        "tavuk göğüs",
+        "mantar",
+        "salça",
+        "kruton"
+      ],
+      "contentFile": "content/markdown/firinda-salcali-tavuk-mantar.md",
+      "description": "Salçalı soslu fırın tavuk göğüs, tereyağlı mantar, kruton ve çikolata toplarıyla süslenmiş."
     },
-
-    bindButtons() {
-        document.getElementById('increaseServings')?.addEventListener('click', () => {
-            if (this.servingsMultiplier < 3) {
-                this.servingsMultiplier += 0.5;
-                this.updateServings();
-            }
-        });
-        document.getElementById('decreaseServings')?.addEventListener('click', () => {
-            if (this.servingsMultiplier > 0.5) {
-                this.servingsMultiplier -= 0.5;
-                this.updateServings();
-            }
-        });
+    {
+      "id": "kabuklarinda-firinlanmis-antrikot",
+      "title": "Kabuklarında Fırınlanmış Antrikot & Şerit Biber",
+      "image": "assets/images/kabuklarinda-firinlanmis-antrikot.webp",
+      "prepTime": "30 dk",
+      "cookTime": "240 dk",
+      "totalTime": "270 dk",
+      "servings": 3,
+      "difficulty": "Orta",
+      "category": "Et Yemekleri",
+      "tags": [
+        "antrikot",
+        "kabuklu pişirme",
+        "soğan",
+        "sarımsak",
+        "uzun pişirme"
+      ],
+      "contentFile": "content/markdown/kabuklarinda-firinlanmis-antrikot.md",
+      "description": "Kabuklarında pişirilmiş antrikot, soğan ve sarımsak püresiyle, şerit biber ve taze üzümle."
     },
-
-    async loadRecipeDetail() {
-        const recipeId = new URLSearchParams(window.location.search).get('id');
-        if (!recipeId) return;
-        if (!this.data) await this.loadRecipes();
-        const recipe = this.getRecipeById(recipeId);
-        if (!recipe) {
-            Toast.show('Tarif bulunamadı', 'error');
-            return;
-        }
-        this.currentRecipe = recipe;
-        this.servingsMultiplier = 1;
-        this.originalServings = recipe.servings || 4;
-        document.title = `${recipe.title} | Lezzet Yolculuğu`;
-        
-        document.getElementById('recipeHeroImage').src = recipe.image;
-        document.getElementById('recipeCategory').textContent = recipe.category;
-        document.getElementById('recipeTitle').textContent = recipe.title;
-        document.getElementById('recipePrepTime').textContent = recipe.prepTime;
-        document.getElementById('recipeCookTime').textContent = recipe.cookTime;
-        document.getElementById('recipeServings').textContent = recipe.servings + ' kişilik';
-        document.getElementById('recipeDifficulty').textContent = recipe.difficulty;
-        
-        const html = await this.loadRecipeContent(recipe.contentFile);
-        document.getElementById('instructionsContent').innerHTML = html;
-        this.renderIngredients(recipe, html);
-        this.bindButtons();
+    {
+      "id": "kisik-ateste-lokum-bonfile",
+      "title": "Kısık Ateşte Lokum Bonfile & Tereyağlı Patates Püresi",
+      "image": "assets/images/kisik-ateste-lokum-bonfile.webp",
+      "prepTime": "20 dk",
+      "cookTime": "115 dk",
+      "totalTime": "135 dk",
+      "servings": 6,
+      "difficulty": "Orta",
+      "category": "Et Yemekleri",
+      "tags": [
+        "bonfile",
+        "kavurma",
+        "patates püresi",
+        "lokum kıvamı"
+      ],
+      "contentFile": "content/markdown/kisik-ateste-lokum-bonfile.md",
+      "description": "Kısık ateşte lokum gibi yumuşayan bonfile kavurma, kremamsı tereyağlı patates püresi üzerinde."
+    },
+    {
+      "id": "muzlu-tiramisu-cikolata",
+      "title": "Muzlu Tiramisu & Çikolata Topları",
+      "image": "assets/images/muzlu-tiramisu-cikolata.webp",
+      "prepTime": "40 dk",
+      "cookTime": "0 dk",
+      "totalTime": "300 dk",
+      "servings": 10,
+      "difficulty": "Orta",
+      "category": "Tatlı",
+      "tags": [
+        "tiramisu",
+        "muz",
+        "çikolata",
+        "italyan",
+        "soğuk tatlı"
+      ],
+      "contentFile": "content/markdown/muzlu-tiramisu-cikolata.md",
+      "description": "Kedidili bisküvi, mascarpone krema, taze muz ve çikolata toplarıyla zenginleştirilmiş nefis tiramisu."
+    },
+    {
+      "id": "baharatli-firin-kanat-yogurtlu-dip",
+      "title": "Baharatlı Fırın Kanat & Yoğurtlu Dip Sos",
+      "image": "assets/images/baharatli-firin-kanat-yogurtlu-dip.webp",
+      "prepTime": "15 dk (marine hariç)",
+      "cookTime": "45 dk",
+      "totalTime": "180 dk (marine dahil)",
+      "servings": 2,
+      "difficulty": "Orta",
+      "category": "Tavuk Yemekleri",
+      "tags": [
+        "tavuk",
+        "kanat",
+        "fırın",
+        "yoğurt",
+        "marine",
+        "dip sos",
+        "baharatlı"
+      ],
+      "contentFile": "content/markdown/baharatli-firin-kanat-yogurtlu-dip.md",
+      "description": "Yoğurt ve baharatlarla marine edilmiş, fırında gevrek kıvamlı kanatlar, ferahlatıcı yoğurtlu dip sosla servis edilir."
+    },
+    {
+      "id": "domates-kapya-biberli-fusilli-cig-sarimsak",
+      "title": "Domates-Kapya Biberli Fusilli & Çiğ Sarımsak",
+      "image": "assets/images/domates-kapya-biberli-fusilli-cig-sarimsak.webp",
+      "prepTime": "15 dk",
+      "cookTime": "25 dk",
+      "totalTime": "40 dk",
+      "servings": 2,
+      "difficulty": "Kolay",
+      "category": "Makarna",
+      "tags": [
+        "makarna",
+        "fusilli",
+        "domates",
+        "kapya biberi",
+        "sarımsak",
+        "italyan",
+        "vejeteryan"
+      ],
+      "contentFile": "content/markdown/domates-kapya-biberli-fusilli-cig-sarimsak.md",
+      "description": "Taze domates ve kırmızı kapya biberiyle hazırlanan, üzerine çiğ sarımsak dilimleriyle süslenmiş burgu makarna."
+    },
+    {
+      "id": "marineli-bonfile-kavurma-baharatli-soganli-ekmek-arasi",
+      "title": "Marineli Bonfile Kavurma & Baharatlı Soğanlı Ekmek Arası",
+      "image": "assets/images/marineli-bonfile-kavurma-baharatli-soganli-ekmek-arasi.webp",
+      "prepTime": "20 dk (marine hariç)",
+      "cookTime": "90 dk",
+      "totalTime": "6 saat (marine dahil)",
+      "servings": 3,
+      "difficulty": "Orta",
+      "category": "Et Yemekleri",
+      "tags": [
+        "bonfile",
+        "kavurma",
+        "ekmek arası",
+        "sokak lezzeti",
+        "biber",
+        "marine"
+      ],
+      "contentFile": "content/markdown/marineli-bonfile-kavurma-baharatli-soganli-ekmek-arasi.md",
+      "description": "Sebzeli marineyle tatlandırılmış, yavaş pişirilmiş bonfile kavurma, ramazan pidesi arası sunum ve baharatlı çiğ soğan ile."
+    },
+    {
+      "id": "baharat-bombasi-firin-tavuk-but-sade-elma-dilim-patates",
+      "title": "Baharat Bombası Fırın Tavuk Butu & Sade Elma Dilim Patates",
+      "image": "assets/images/baharat-bombasi-firin-tavuk-but-sade-elma-dilim-patates.webp",
+      "prepTime": "20 dk (marine hariç)",
+      "cookTime": "50 dk",
+      "totalTime": "3 saat (marine dahil)",
+      "servings": 4,
+      "difficulty": "Orta",
+      "category": "Tavuk Yemekleri",
+      "tags": [
+        "tavuk",
+        "but",
+        "incik",
+        "patates",
+        "fırın",
+        "marine",
+        "baharat",
+        "elma dilim"
+      ],
+      "contentFile": "content/markdown/baharat-bombasi-firin-tavuk-but-sade-elma-dilim-patates.md",
+      "description": "Yoğun baharat karışımıyla marine edilmiş, çıtır derili fırın tavuk butları ve sade baharatlı elma dilim patates."
     }
-};
-
-document.addEventListener('DOMContentLoaded', () => {
-    Recipes.init();
-});
-
-window.Recipes = Recipes;
+  ]
+}
