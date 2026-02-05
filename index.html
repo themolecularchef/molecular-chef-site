@@ -1,28 +1,21 @@
 <!DOCTYPE html>
 <html lang="tr">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description"
-        content="Lezzetli yemek tarifleri, adım adım anlatımlar ve püf noktaları. Evde profesyonel sonuçlar için tariflerimizi keşfedin.">
+    <meta name="description" content="Lezzetli yemek tarifleri, adım adım anlatımlar ve püf noktaları. Evde profesyonel sonuçlar için tariflerimizi keşfedin.">
+    <meta name="theme-color" content="#059669">
     <title>Lezzet Yolculuğu | Yemek Tarifleri</title>
 
-    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 
-    <!-- CSS -->
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/components.css">
 
-    <!-- Favicon -->
     <link rel="icon" type="image/png" href="assets/images/Logo.png">
 
-    <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
@@ -40,16 +33,13 @@
         const db = firebase.firestore();
     </script>
 </head>
-
 <body>
-    <!-- GİRİŞ EKRANI -->
-    <div id="authScreen"
-        style="position: fixed; inset: 0; z-index: 9999; background: linear-gradient(135deg, var(--color-bg) 0%, var(--color-bg-secondary) 100%); min-height: 100vh; display: none; flex-direction: column;">
+    <!-- Auth Screen Overlay -->
+    <div id="authScreen" style="position: fixed; inset: 0; z-index: 9999; background: linear-gradient(135deg, var(--color-bg) 0%, var(--color-bg-secondary) 100%); display: none; flex-direction: column;">
         <nav class="nav nav-transparent">
             <div class="nav-container">
-                <a href="index.html" class="nav-logo">
-                    <img src="assets/images/Logo.png" alt="Lezzet Yolculuğu"
-                        style="height: 40px; width: 40px; object-fit: cover; border-radius: 50%; border: 2px solid white;">
+                <a href="#" class="nav-logo" onclick="return false;">
+                    <img src="assets/images/Logo.png" alt="Lezzet Yolculuğu" style="height: 40px; width: 40px; object-fit: cover; border-radius: 50%; border: 2px solid white;">
                     <span class="nav-logo-text">Lezzet Yolculuğu</span>
                 </a>
                 <button class="theme-toggle" id="themeToggleAuth" aria-label="Tema değiştir">
@@ -60,8 +50,7 @@
         </nav>
 
         <main style="flex: 1; display: flex; align-items: center; justify-content: center; padding: 2rem;">
-            <div
-                style="width: 100%; max-width: 420px; background: var(--color-surface); border-radius: 16px; padding: 2.5rem; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);">
+            <div style="width: 100%; max-width: 420px; background: var(--color-surface); border-radius: 16px; padding: 2.5rem; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);">
                 <div style="text-align: center; margin-bottom: 2rem;">
                     <h1 id="authTitle" style="font-family: var(--font-heading); font-size: 1.75rem; font-weight: 600; margin-bottom: 0.5rem;">
                         Giriş Yap
@@ -74,30 +63,25 @@
                 <form id="authForm" style="margin-bottom: 1.5rem;">
                     <div id="nameGroup" style="display: none; margin-bottom: 1.5rem;">
                         <label style="display: block; font-size: 0.875rem; font-weight: 500; margin-bottom: 0.5rem;">İsim</label>
-                        <input type="text" id="name" placeholder="İsminizi girin"
-                            style="width: 100%; padding: 0.75rem; border: 1px solid var(--color-border); border-radius: 8px; background: var(--color-bg);">
+                        <input type="text" id="name" placeholder="İsminizi girin" style="width: 100%; padding: 0.75rem; border: 1px solid var(--color-border); border-radius: 8px; background: var(--color-bg);">
                     </div>
 
                     <div style="margin-bottom: 1.5rem;">
                         <label style="display: block; font-size: 0.875rem; font-weight: 500; margin-bottom: 0.5rem;">E-posta</label>
-                        <input type="email" id="email" placeholder="ornek@email.com" required
-                            style="width: 100%; padding: 0.75rem; border: 1px solid var(--color-border); border-radius: 8px; background: var(--color-bg);">
+                        <input type="email" id="email" placeholder="ornek@email.com" required style="width: 100%; padding: 0.75rem; border: 1px solid var(--color-border); border-radius: 8px; background: var(--color-bg);">
                     </div>
 
                     <div style="margin-bottom: 1.5rem;">
                         <label style="display: block; font-size: 0.875rem; font-weight: 500; margin-bottom: 0.5rem;">Şifre</label>
-                        <input type="password" id="password" placeholder="••••••••" required
-                            style="width: 100%; padding: 0.75rem; border: 1px solid var(--color-border); border-radius: 8px; background: var(--color-bg);">
+                        <input type="password" id="password" placeholder="••••••••" required style="width: 100%; padding: 0.75rem; border: 1px solid var(--color-border); border-radius: 8px; background: var(--color-bg);">
                     </div>
 
                     <div id="confirmPasswordGroup" style="display: none; margin-bottom: 1.5rem;">
                         <label style="display: block; font-size: 0.875rem; font-weight: 500; margin-bottom: 0.5rem;">Şifre Tekrar</label>
-                        <input type="password" id="confirmPassword" placeholder="••••••••"
-                            style="width: 100%; padding: 0.75rem; border: 1px solid var(--color-border); border-radius: 8px; background: var(--color-bg);">
+                        <input type="password" id="confirmPassword" placeholder="••••••••" style="width: 100%; padding: 0.75rem; border: 1px solid var(--color-border); border-radius: 8px; background: var(--color-bg);">
                     </div>
 
-                    <button type="submit" id="authSubmit"
-                        style="width: 100%; padding: 0.75rem; background: var(--color-accent); color: white; border: none; border-radius: 8px; font-weight: 500; cursor: pointer; font-size: 1rem;">
+                    <button type="submit" id="authSubmit" style="width: 100%; padding: 0.75rem; background: var(--color-accent); color: white; border: none; border-radius: 8px; font-weight: 500; cursor: pointer; font-size: 1rem;">
                         Giriş Yap
                     </button>
                 </form>
@@ -108,15 +92,13 @@
                     <span style="flex: 1; height: 1px; background: var(--color-border);"></span>
                 </div>
 
-                <button id="skipAuthBtn"
-                    style="width: 100%; padding: 0.75rem; background: transparent; border: 1px solid var(--color-border); border-radius: 8px; font-weight: 500; cursor: pointer; color: var(--color-text-secondary); margin-bottom: 1.5rem;">
+                <button id="skipAuthBtn" style="width: 100%; padding: 0.75rem; background: transparent; border: 1px solid var(--color-border); border-radius: 8px; font-weight: 500; cursor: pointer; color: var(--color-text-secondary); margin-bottom: 1.5rem;">
                     Üye Olmadan Devam Et
                 </button>
 
                 <div style="text-align: center; font-size: 0.9375rem; color: var(--color-text-secondary);">
                     <span id="authToggleText">Hesabınız yok mu?</span>
-                    <button id="authToggleBtn"
-                        style="background: none; border: none; color: var(--color-accent); font-weight: 500; cursor: pointer; margin-left: 0.25rem;">
+                    <button id="authToggleBtn" style="background: none; border: none; color: var(--color-accent); font-weight: 500; cursor: pointer; margin-left: 0.25rem;">
                         Kayıt Ol
                     </button>
                 </div>
@@ -124,9 +106,8 @@
         </main>
     </div>
 
-    <!-- ANA WEB SİTESİ -->
-    <div id="mainWebsite" style="display: none;">
-        <!-- Navigation -->
+    <!-- Main Website -->
+    <div id="mainWebsite">
         <nav class="nav" id="nav">
             <div class="nav-container">
                 <a href="index.html" class="nav-logo">
@@ -159,7 +140,6 @@
             </div>
         </nav>
 
-        <!-- Mobile Menu -->
         <div class="mobile-menu" id="mobileMenu">
             <a href="index.html" class="mobile-link active">Tarifler</a>
             <a href="dashboard.html" class="mobile-link mobile-link-lists hidden" id="mobileLists">Listelerim</a>
@@ -170,7 +150,6 @@
             </div>
         </div>
 
-        <!-- Hero Section -->
         <section class="hero">
             <div class="hero-bg" id="heroSlider">
                 <img src="assets/images/iskender-kebap.webp" class="slide active" alt="Tarif 1">
@@ -190,10 +169,8 @@
             </div>
         </section>
 
-        <!-- Main Content -->
         <main class="main">
             <div class="container">
-                <!-- Filters -->
                 <div class="filters">
                     <button class="filter-btn active" data-filter="all">Tümü</button>
                     <button class="filter-btn" data-filter="Et Yemekleri">Et</button>
@@ -203,10 +180,8 @@
                     <button class="filter-btn" data-filter="Meze">Meze</button>
                 </div>
 
-                <!-- Recipes Grid -->
                 <div class="recipes-grid" id="recipesGrid"></div>
 
-                <!-- Empty State -->
                 <div class="empty-state hidden" id="emptyState">
                     <div class="empty-state-icon">🔍</div>
                     <h3 class="empty-state-title">Sonuç bulunamadı</h3>
@@ -215,7 +190,6 @@
             </div>
         </main>
 
-        <!-- Quick View Modal -->
         <div class="modal" id="quickViewModal">
             <div class="modal-backdrop"></div>
             <div class="modal-content">
@@ -224,31 +198,24 @@
             </div>
         </div>
 
-        <!-- Listeye Ekle Modal -->
         <div class="modal" id="addToListModal">
             <div class="modal-backdrop"></div>
             <div class="modal-content modal-sm">
                 <button class="modal-close" onclick="closeAddToListModal()" aria-label="Kapat">×</button>
                 <div class="modal-header">
                     <h3 class="modal-title">Nereye kaydedeyim?</h3>
-                    <p class="modal-subtitle" id="addToListRecipeName"
-                        style="font-size: 0.875rem; color: var(--color-text-secondary); margin-top: var(--space-xs);">
-                    </p>
+                    <p class="modal-subtitle" id="addToListRecipeName" style="font-size: 0.875rem; color: var(--color-text-secondary); margin-top: var(--space-xs);"></p>
                 </div>
                 <div class="modal-body">
-                    <div id="addToListOptions" style="display: flex; flex-direction: column; gap: var(--space-md);">
-                        <!-- Listeler buraya yüklenecek -->
-                    </div>
+                    <div id="addToListOptions" style="display: flex; flex-direction: column; gap: var(--space-md);"></div>
                 </div>
             </div>
         </div>
 
-        <!-- Toast -->
         <div class="toast" id="toast">
             <span class="toast-message" id="toastMessage"></span>
         </div>
 
-        <!-- Footer -->
         <footer class="footer">
             <div class="container">
                 <div class="footer-content">
@@ -271,18 +238,15 @@
         </footer>
     </div>
 
-    <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script src="js/app.js"></script>
-    <script src="js/firebase-auth.js"></script>
-    <script src="js/firebase-lists.js"></script>
     <script src="js/recipes.js"></script>
 
-    <!-- Main Logic -->
     <script>
         let currentRecipeForList = null;
+        let isLoginMode = true;
 
-        // Auth state ve UI kontrolü
+        // Auth State Management
         firebase.auth().onAuthStateChanged((user) => {
             const authScreen = document.getElementById('authScreen');
             const mainWebsite = document.getElementById('mainWebsite');
@@ -309,6 +273,8 @@
                 if (mobileUser) mobileUser.classList.remove('hidden');
                 if (mobileUserName) mobileUserName.textContent = user.displayName || user.email;
                 if (mobileLists) mobileLists.classList.remove('hidden');
+                
+                updateFavoriteButtons();
             } else {
                 const hasSkipped = localStorage.getItem('skipAuth');
                 if (hasSkipped) {
@@ -332,130 +298,131 @@
 
         // Auth Screen Logic
         document.addEventListener('DOMContentLoaded', () => {
-            const skipBtn = document.getElementById('skipAuthBtn');
-            const toggleBtn = document.getElementById('authToggleBtn');
-            const form = document.getElementById('authForm');
+            // Skip Auth
+            document.getElementById('skipAuthBtn')?.addEventListener('click', () => {
+                localStorage.setItem('skipAuth', 'true');
+                document.getElementById('authScreen').style.display = 'none';
+                document.getElementById('mainWebsite').style.display = 'block';
+                document.body.style.overflow = 'auto';
+            });
 
-            if (skipBtn) {
-                skipBtn.addEventListener('click', () => {
-                    localStorage.setItem('skipAuth', 'true');
-                    document.getElementById('authScreen').style.display = 'none';
-                    document.getElementById('mainWebsite').style.display = 'block';
-                    document.body.style.overflow = 'auto';
-                });
-            }
+            // Toggle Login/Register
+            document.getElementById('authToggleBtn')?.addEventListener('click', toggleAuthMode);
 
-            let isLoginMode = true;
-            if (toggleBtn) {
-                toggleBtn.addEventListener('click', () => {
-                    isLoginMode = !isLoginMode;
-                    document.getElementById('authTitle').textContent = isLoginMode ? 'Giriş Yap' : 'Kayıt Ol';
-                    document.getElementById('authSubtitle').textContent = isLoginMode ? 'Hesabınıza giriş yaparak tariflerinizi kaydedin' : 'Yeni bir hesap oluşturun';
-                    document.getElementById('authSubmit').textContent = isLoginMode ? 'Giriş Yap' : 'Kayıt Ol';
-                    document.getElementById('nameGroup').style.display = isLoginMode ? 'none' : 'block';
-                    document.getElementById('confirmPasswordGroup').style.display = isLoginMode ? 'none' : 'block';
-                    document.getElementById('authToggleText').textContent = isLoginMode ? 'Hesabınız yok mu?' : 'Zaten hesabınız var mı?';
-                    toggleBtn.textContent = isLoginMode ? 'Kayıt Ol' : 'Giriş Yap';
-                });
-            }
+            // Auth Form Submit
+            document.getElementById('authForm')?.addEventListener('submit', handleAuthSubmit);
 
-            if (form) {
-                form.addEventListener('submit', async (e) => {
-                    e.preventDefault();
-                    const email = document.getElementById('email').value;
-                    const password = document.getElementById('password').value;
+            // Logout Buttons
+            document.getElementById('navLogout')?.addEventListener('click', handleLogout);
+            document.getElementById('mobileLogout')?.addEventListener('click', handleLogout);
 
-                    if (isLoginMode) {
-                        try {
-                            await firebase.auth().signInWithEmailAndPassword(email, password);
-                        } catch (error) {
-                            let msg = 'Giriş yapılamadı';
-                            if (error.code === 'auth/user-not-found') msg = 'Kullanıcı bulunamadı';
-                            if (error.code === 'auth/wrong-password') msg = 'Şifre hatalı';
-                            alert(msg);
-                        }
-                    } else {
-                        const name = document.getElementById('name').value;
-                        const confirmPass = document.getElementById('confirmPassword').value;
-
-                        if (!name.trim()) {
-                            alert('Lütfen isminizi girin');
-                            return;
-                        }
-
-                        if (password !== confirmPass) {
-                            alert('Şifreler eşleşmiyor');
-                            return;
-                        }
-
-                        if (password.length < 6) {
-                            alert('Şifre en az 6 karakter olmalı');
-                            return;
-                        }
-
-                        try {
-                            const result = await firebase.auth().createUserWithEmailAndPassword(email, password);
-                            await result.user.updateProfile({ displayName: name });
-
-                            await db.collection('users').doc(result.user.uid).set({
-                                name: name,
-                                email: email,
-                                createdAt: new Date().toISOString(),
-                                favorites: [],
-                                lists: []
-                            });
-                        } catch (error) {
-                            let msg = 'Kayıt yapılamadı';
-                            if (error.code === 'auth/email-already-in-use') msg = 'Bu e-posta zaten kayıtlı';
-                            if (error.code === 'auth/weak-password') msg = 'Şifre çok zayıf';
-                            alert(msg);
-                        }
-                    }
-                });
-            }
-
-            const navLogout = document.getElementById('navLogout');
-            const mobileLogout = document.getElementById('mobileLogout');
-
-            if (navLogout) {
-                navLogout.addEventListener('click', async () => {
-                    await firebase.auth().signOut();
-                    localStorage.removeItem('skipAuth');
-                    location.reload();
-                });
-            }
-
-            if (mobileLogout) {
-                mobileLogout.addEventListener('click', async () => {
-                    await firebase.auth().signOut();
-                    localStorage.removeItem('skipAuth');
-                    location.reload();
-                });
-            }
+            // Theme Toggle for Auth Screen
+            document.getElementById('themeToggleAuth')?.addEventListener('click', () => {
+                ThemeManager.toggle();
+            });
 
             // Hero Slider
+            initHeroSlider();
+        });
+
+        function toggleAuthMode() {
+            isLoginMode = !isLoginMode;
+            document.getElementById('authTitle').textContent = isLoginMode ? 'Giriş Yap' : 'Kayıt Ol';
+            document.getElementById('authSubtitle').textContent = isLoginMode ? 'Hesabınıza giriş yaparak tariflerinizi kaydedin' : 'Yeni bir hesap oluşturun';
+            document.getElementById('authSubmit').textContent = isLoginMode ? 'Giriş Yap' : 'Kayıt Ol';
+            document.getElementById('nameGroup').style.display = isLoginMode ? 'none' : 'block';
+            document.getElementById('confirmPasswordGroup').style.display = isLoginMode ? 'none' : 'block';
+            document.getElementById('authToggleText').textContent = isLoginMode ? 'Hesabınız yok mu?' : 'Zaten hesabınız var mı?';
+            document.getElementById('authToggleBtn').textContent = isLoginMode ? 'Kayıt Ol' : 'Giriş Yap';
+        }
+
+        async function handleAuthSubmit(e) {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            if (isLoginMode) {
+                try {
+                    await firebase.auth().signInWithEmailAndPassword(email, password);
+                    Toast.show('Giriş başarılı!', 'success');
+                } catch (error) {
+                    let msg = 'Giriş yapılamadı';
+                    if (error.code === 'auth/user-not-found') msg = 'Kullanıcı bulunamadı';
+                    if (error.code === 'auth/wrong-password') msg = 'Şifre hatalı';
+                    Toast.show(msg, 'error');
+                }
+            } else {
+                const name = document.getElementById('name').value;
+                const confirmPass = document.getElementById('confirmPassword').value;
+
+                if (!name.trim()) {
+                    Toast.show('Lütfen isminizi girin', 'error');
+                    return;
+                }
+                if (password !== confirmPass) {
+                    Toast.show('Şifreler eşleşmiyor', 'error');
+                    return;
+                }
+                if (password.length < 6) {
+                    Toast.show('Şifre en az 6 karakter olmalı', 'error');
+                    return;
+                }
+
+                try {
+                    const result = await firebase.auth().createUserWithEmailAndPassword(email, password);
+                    await result.user.updateProfile({ displayName: name });
+                    await db.collection('users').doc(result.user.uid).set({
+                        name: name,
+                        email: email,
+                        createdAt: new Date().toISOString(),
+                        favorites: [],
+                        lists: []
+                    });
+                    Toast.show('Kayıt başarılı!', 'success');
+                } catch (error) {
+                    let msg = 'Kayıt yapılamadı';
+                    if (error.code === 'auth/email-already-in-use') msg = 'Bu e-posta zaten kayıtlı';
+                    if (error.code === 'auth/weak-password') msg = 'Şifre çok zayıf';
+                    Toast.show(msg, 'error');
+                }
+            }
+        }
+
+        async function handleLogout() {
+            await firebase.auth().signOut();
+            localStorage.removeItem('skipAuth');
+            window.location.reload();
+        }
+
+        function showAuthScreen() {
+            localStorage.removeItem('skipAuth');
+            const authScreen = document.getElementById('authScreen');
+            const mainWebsite = document.getElementById('mainWebsite');
+            if (authScreen && mainWebsite) {
+                authScreen.style.display = 'flex';
+                mainWebsite.style.display = 'none';
+                document.body.style.overflow = 'hidden';
+            }
+        }
+
+        function initHeroSlider() {
             const slides = document.querySelectorAll('.hero-bg .slide');
+            if (slides.length === 0) return;
+            
             let currentSlide = 0;
             setInterval(() => {
                 slides[currentSlide].classList.remove('active');
                 currentSlide = (currentSlide + 1) % slides.length;
                 slides[currentSlide].classList.add('active');
             }, 5000);
-        });
-
-        function showAuthScreen() {
-            localStorage.removeItem('skipAuth');
-            location.reload();
         }
 
-        // Listeye Ekle Modal Fonksiyonları
-        async function openAddToListModal(recipeId, recipeTitle) {
+        // Global function for recipes.js
+        window.openAddToListModal = async function(recipeId, recipeTitle) {
             const user = firebase.auth().currentUser;
             if (!user) {
                 Toast.show('Listeye eklemek için giriş yapmalısınız', 'error');
-                setTimeout(() => {
-                    window.location.href = 'auth.html';
-                }, 1500);
+                setTimeout(() => showAuthScreen(), 1500);
                 return;
             }
 
@@ -518,22 +485,19 @@
                 `;
 
                 optionsContainer.innerHTML = html;
-                modal.classList.add('active');
-                document.body.style.overflow = 'hidden';
+                Modal.open('addToListModal');
             } catch (error) {
                 console.error("Listeler yüklenemedi:", error);
                 Toast.show('Listeler yüklenemedi', 'error');
             }
-        }
+        };
 
-        function closeAddToListModal() {
-            const modal = document.getElementById('addToListModal');
-            modal.classList.remove('active');
-            document.body.style.overflow = '';
+        window.closeAddToListModal = function() {
+            Modal.close('addToListModal');
             currentRecipeForList = null;
-        }
+        };
 
-        async function addToFavorites(recipeId) {
+        window.addToFavorites = async function(recipeId) {
             const user = firebase.auth().currentUser;
             if (!user) return;
 
@@ -558,16 +522,20 @@
                         Toast.show('Favorilere eklendi!', 'success');
                     }
                 }
-                const recipe = window.Recipes ? window.Recipes.getRecipeById(recipeId) : null;
-                openAddToListModal(recipeId, recipe ? recipe.title : '');
-                updateFavoriteButtonUI(recipeId);
+                
+                // Refresh modal if open
+                if (currentRecipeForList) {
+                    const recipe = window.Recipes ? window.Recipes.getRecipeById(recipeId) : null;
+                    window.openAddToListModal(recipeId, recipe ? recipe.title : '');
+                }
+                updateFavoriteButtons();
             } catch (error) {
                 console.error("Favori hatası:", error);
                 Toast.show('İşlem yapılamadı', 'error');
             }
-        }
+        };
 
-        async function addToCustomList(listId, recipeId) {
+        window.addToCustomList = async function(listId, recipeId) {
             const user = firebase.auth().currentUser;
             if (!user) return;
 
@@ -591,42 +559,38 @@
                             Toast.show('Listeye eklendi!', 'success');
                         }
                         const recipe = window.Recipes ? window.Recipes.getRecipeById(recipeId) : null;
-                        openAddToListModal(recipeId, recipe ? recipe.title : '');
+                        window.openAddToListModal(recipeId, recipe ? recipe.title : '');
                     }
                 }
             } catch (error) {
                 console.error("Liste hatası:", error);
                 Toast.show('İşlem yapılamadı', 'error');
             }
-        }
+        };
 
-        function updateFavoriteButtonUI(recipeId) {
-            const btn = document.querySelector(`.favorite-btn[data-id="${recipeId}"]`);
-            if (btn) {
-                firebase.auth().onAuthStateChanged(async (user) => {
-                    if (user) {
-                        const doc = await db.collection('users').doc(user.uid).get();
-                        if (doc.exists) {
-                            const favorites = doc.data().favorites || [];
-                            const isFavorited = favorites.includes(recipeId);
-                            if (isFavorited) {
-                                btn.classList.add('active');
-                                btn.dataset.favorited = "true";
-                                btn.querySelector('span').textContent = '❤️';
-                                btn.title = 'Favorilerden Çıkar';
-                            } else {
-                                btn.classList.remove('active');
-                                btn.dataset.favorited = "false";
-                                btn.querySelector('span').textContent = '🤍';
-                                btn.title = 'Favorilere Ekle';
-                            }
-                        }
+        async function updateFavoriteButtons() {
+            const user = firebase.auth().currentUser;
+            if (!user) return;
+            
+            try {
+                const doc = await db.collection('users').doc(user.uid).get();
+                if (!doc.exists) return;
+                
+                const favorites = doc.data().favorites || [];
+                document.querySelectorAll('.favorite-btn').forEach(btn => {
+                    const recipeId = btn.dataset.id;
+                    if (favorites.includes(recipeId)) {
+                        btn.classList.add('active');
+                        btn.querySelector('span').textContent = '❤️';
+                    } else {
+                        btn.classList.remove('active');
+                        btn.querySelector('span').textContent = '🤍';
                     }
                 });
+            } catch (e) {
+                console.error("Favori butonları güncellenemedi:", e);
             }
         }
-
-        document.getElementById('addToListModal')?.querySelector('.modal-backdrop')?.addEventListener('click', closeAddToListModal);
     </script>
 </body>
 </html>
