@@ -147,6 +147,76 @@ const Recipes = {
         Modal.open('quickViewModal');
     },
 
+    // ============================================
+    // MALZEME FONKSİYONLARI (YENİ EKLENEN)
+    // ============================================
+
+    renderIngredients(recipe) {
+        const ingredientsList = document.getElementById('ingredientsList');
+        const servingsCount = document.getElementById('servingsCount');
+
+        if (servingsCount) servingsCount.textContent = recipe.servings;
+        
+        if (recipe.ingredients && Array.isArray(recipe.ingredients) && recipe.ingredients.length > 0) {
+            this.originalIngredients = recipe.ingredients;
+            
+            if (ingredientsList) {
+                ingredientsList.innerHTML = recipe.ingredients.map(text => `
+                    <div class="ingredient-item">
+                        <div class="ingredient-checkbox" onclick="this.classList.toggle('checked'); this.nextElementSibling.classList.toggle('checked')"></div>
+                        <span class="ingredient-text" data-original="${text}">${text}</span>
+                    </div>
+                `).join('');
+            }
+        } else {
+            if (ingredientsList) {
+                ingredientsList.innerHTML = '<div class="ingredient-item"><span>Malzeme listesi bulunamadı</span></div>';
+            }
+        }
+    },
+
+    updateServingsDisplay() {
+        const servingsCount = document.getElementById('servingsCount');
+        if (servingsCount) {
+            const newServings = Math.round(this.originalServings * this.servingsMultiplier * 10) / 10;
+            servingsCount.textContent = newServings + ' kişilik';
+        }
+
+        const ingredientItems = document.querySelectorAll('.ingredient-text');
+        ingredientItems.forEach((item, index) => {
+            const originalText = this.originalIngredients[index];
+            if (originalText) {
+                item.textContent = this.scaleIngredient(originalText, this.servingsMultiplier);
+            }
+        });
+    },
+
+    scaleIngredient(text, multiplier) {
+        return text.replace(/(\d+(?:[.,]\d+)?)/g, (match) => {
+            const num = parseFloat(match.replace(',', '.'));
+            if (isNaN(num)) return match;
+            
+            const newNum = num * multiplier;
+            return Number.isInteger(newNum) ? newNum : newNum.toFixed(1).replace('.', ',');
+        });
+    },
+
+    bindServingsButtons() {
+        document.getElementById('increaseServings')?.addEventListener('click', () => {
+            if (this.servingsMultiplier < 3) {
+                this.servingsMultiplier += 0.5;
+                this.updateServingsDisplay();
+            }
+        });
+        
+        document.getElementById('decreaseServings')?.addEventListener('click', () => {
+            if (this.servingsMultiplier > 0.5) {
+                this.servingsMultiplier -= 0.5;
+                this.updateServingsDisplay();
+            }
+        });
+    },
+
     async loadRecipeDetail() {
         const recipeId = new URLSearchParams(window.location.search).get('id');
         if (!recipeId) return;
@@ -160,6 +230,8 @@ const Recipes = {
         }
         
         this.currentRecipe = recipe;
+        this.servingsMultiplier = 1;
+        this.originalServings = recipe.servings || 4;
         document.title = `${recipe.title} | Lezzet Yolculuğu`;
         
         document.getElementById('recipeHeroImage').src = recipe.image;
@@ -169,6 +241,12 @@ const Recipes = {
         document.getElementById('recipeCookTime').textContent = recipe.cookTime;
         document.getElementById('recipeServings').textContent = recipe.servings + ' kişilik';
         document.getElementById('recipeDifficulty').textContent = recipe.difficulty;
+        
+        // Malzemeleri göster
+        this.renderIngredients(recipe);
+        
+        // + ve - butonlarını aktifleştir
+        this.bindServingsButtons();
         
         const contentHtml = await this.loadRecipeContent(recipe.contentFile);
         document.getElementById('instructionsContent').innerHTML = contentHtml;
