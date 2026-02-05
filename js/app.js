@@ -1,11 +1,6 @@
 /**
  * Lezzet Yolculuğu - Main App
- * Core functionality and utilities
  */
-
-// ============================================
-// THEME MANAGEMENT
-// ============================================
 
 const ThemeManager = {
     init() {
@@ -36,10 +31,6 @@ const ThemeManager = {
     }
 };
 
-// ============================================
-// MOBILE NAVIGATION
-// ============================================
-
 const MobileNav = {
     init() {
         this.toggle = document.getElementById('navMobileToggle');
@@ -53,7 +44,6 @@ const MobileNav = {
     bindEvents() {
         this.toggle.addEventListener('click', () => this.toggleMenu());
 
-        // Close on outside click
         document.addEventListener('click', (e) => {
             if (!this.toggle.contains(e.target) && !this.menu.contains(e.target)) {
                 this.close();
@@ -72,10 +62,6 @@ const MobileNav = {
     }
 };
 
-// ============================================
-// TOAST NOTIFICATIONS
-// ============================================
-
 const Toast = {
     show(message, type = 'default', duration = 3000) {
         const toast = document.getElementById('toast');
@@ -92,10 +78,6 @@ const Toast = {
     }
 };
 
-// ============================================
-// MODAL MANAGEMENT
-// ============================================
-
 const Modal = {
     open(modalId) {
         const modal = document.getElementById(modalId);
@@ -103,7 +85,6 @@ const Modal = {
             modal.classList.add('active');
             document.body.style.overflow = 'hidden';
 
-            // Bind close events
             const closeBtn = modal.querySelector('.modal-close');
             const backdrop = modal.querySelector('.modal-backdrop');
 
@@ -132,17 +113,11 @@ const Modal = {
     }
 };
 
-// ============================================
-// UTILITY FUNCTIONS
-// ============================================
-
 const Utils = {
-    // Generate unique ID
     generateId() {
         return Date.now().toString(36) + Math.random().toString(36).substr(2);
     },
 
-    // Simple encoding for passwords (not secure, just obfuscation)
     encode(str) {
         return btoa(str);
     },
@@ -151,7 +126,6 @@ const Utils = {
         return atob(str);
     },
 
-    // Format time
     formatTime(minutes) {
         if (minutes < 60) return `${minutes} dk`;
         const hours = Math.floor(minutes / 60);
@@ -159,7 +133,6 @@ const Utils = {
         return mins > 0 ? `${hours} sa ${mins} dk` : `${hours} sa`;
     },
 
-    // Debounce function
     debounce(func, wait) {
         let timeout;
         return function executedFunction(...args) {
@@ -172,21 +145,15 @@ const Utils = {
         };
     },
 
-    // Get URL parameter
     getUrlParam(param) {
         const urlParams = new URLSearchParams(window.location.search);
         return urlParams.get(param);
     },
 
-    // Share URL
     getShareUrl(recipeId) {
         return `${window.location.origin}/recipe.html?id=${recipeId}`;
     }
 };
-
-// ============================================
-// LAZY LOADING IMAGES
-// ============================================
 
 const LazyLoader = {
     init() {
@@ -206,7 +173,6 @@ const LazyLoader = {
                 imageObserver.observe(img);
             });
         } else {
-            // Fallback for older browsers
             document.querySelectorAll('img[data-src]').forEach(img => {
                 img.src = img.dataset.src;
             });
@@ -214,51 +180,43 @@ const LazyLoader = {
     }
 };
 
-// ============================================
-// INITIALIZATION
-// ============================================
-
 document.addEventListener('DOMContentLoaded', () => {
     ThemeManager.init();
     MobileNav.init();
     LazyLoader.init();
 });
 
-// Export for other modules
 window.ThemeManager = ThemeManager;
 window.MobileNav = MobileNav;
 window.Toast = Toast;
 window.Modal = Modal;
 window.Utils = Utils;
 window.LazyLoader = LazyLoader;
-// ARAMA FONKSİYONU
+
+// Arama Fonksiyonu
 document.addEventListener('DOMContentLoaded', () => {
     const searchInput = document.getElementById('heroSearchInput');
     const searchBtn = document.getElementById('heroSearchBtn');
     
     if (!searchInput) return;
 
-    // Enter tuşu ile arama
     searchInput.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') {
             performSearch(searchInput.value);
         }
     });
 
-    // Buton ile arama
     if (searchBtn) {
         searchBtn.addEventListener('click', () => {
             performSearch(searchInput.value);
         });
     }
 
-    // Anlık arama (yazarken filtrele)
     searchInput.addEventListener('input', (e) => {
         performSearch(e.target.value);
     });
 });
 
-// Arama fonksiyonu
 function performSearch(query) {
     const recipesGrid = document.getElementById('recipesGrid');
     const emptyState = document.getElementById('emptyState');
@@ -285,63 +243,8 @@ function performSearch(query) {
     } else {
         if (emptyState) emptyState.classList.add('hidden');
         
-        // recipes.js içindeki render fonksiyonunu kullan
         if (window.Recipes && window.Recipes.renderRecipesGrid) {
             window.Recipes.renderRecipesGrid(filtered);
-        } else {
-            renderRecipes(filtered); // fallback
         }
     }
-}
-    
-    // Tüm tarifleri filtrele
-    const filtered = window.recipesData.filter(recipe => {
-        const title = recipe.title?.toLowerCase() || '';
-        const category = recipe.category?.toLowerCase() || '';
-        const description = recipe.description?.toLowerCase() || '';
-        const ingredients = Array.isArray(recipe.ingredients) 
-            ? recipe.ingredients.join(' ').toLowerCase() 
-            : '';
-        
-        return title.includes(searchTerm) || 
-               category.includes(searchTerm) || 
-               description.includes(searchTerm) ||
-               ingredients.includes(searchTerm);
-    });
-
-    // Sonuçları göster
-    if (filtered.length === 0) {
-        recipesGrid.innerHTML = '';
-        if (emptyState) emptyState.classList.remove('hidden');
-    } else {
-        if (emptyState) emptyState.classList.add('hidden');
-        renderRecipes(filtered);
-    }
-}
-
-// Tarifleri render et (Eğer bu fonksiyon yoksa)
-function renderRecipes(recipes) {
-    const grid = document.getElementById('recipesGrid');
-    if (!grid) return;
-    
-    grid.innerHTML = recipes.map(recipe => `
-        <article class="recipe-card" data-id="${recipe.id}">
-            <div class="card-image">
-                <img src="${recipe.image}" alt="${recipe.title}" loading="lazy">
-                <button class="favorite-btn" data-id="${recipe.id}" onclick="openAddToListModal('${recipe.id}', '${recipe.title}')">
-                    <span>🤍</span>
-                </button>
-            </div>
-            <div class="card-content">
-                <span class="card-category">${recipe.category}</span>
-                <h3 class="card-title">
-                    <a href="recipe.html?id=${recipe.id}">${recipe.title}</a>
-                </h3>
-                <div class="card-meta">
-                    <span>⏱️ ${recipe.prepTime || '20 dk'}</span>
-                    <span>🔥 ${recipe.difficulty || 'Orta'}</span>
-                </div>
-            </div>
-        </article>
-    `).join('');
 }
