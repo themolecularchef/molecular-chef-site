@@ -144,7 +144,9 @@
                             <span class="servings-count"><span id="servingsCount">4</span> kişilik</span>
                             <button class="servings-btn" id="increaseServings">+</button>
                         </div>
-                        <div class="ingredients-list" id="ingredientsList"></div>
+                        <div class="ingredients-list" id="ingredientsList">
+                            <p style="color: var(--color-text-secondary); font-style: italic;">Malzemeler yükleniyor...</p>
+                        </div>
                     </div>
                 </aside>
 
@@ -334,6 +336,7 @@
         let currentServings = 4;
         let baseServings = 4;
         let ingredientsList = [];
+        let originalMarkdownContent = '';
 
         async function loadRecipeDetail() {
             const recipeId = new URLSearchParams(window.location.search).get('id');
@@ -359,6 +362,7 @@
             }
             
             document.getElementById('recipeHeroImage').src = recipe.image;
+            document.getElementById('recipeHeroImage').alt = recipe.title;
             document.getElementById('recipeCategory').textContent = recipe.category;
             document.getElementById('recipeTitle').textContent = recipe.title;
             document.getElementById('recipePrepTime').textContent = recipe.prepTime;
@@ -371,75 +375,224 @@
             document.getElementById('servingsCount').textContent = currentServings;
             
             try {
-                const contentHtml = await window.Recipes.loadRecipeContent(recipe.contentFile);
-                document.getElementById('instructionsContent').innerHTML = contentHtml;
-                parseIngredients(contentHtml);
+                const markdown = await fetchRecipeMarkdown(recipe.contentFile);
+                originalMarkdownContent = markdown;
+                
+                // Markdown içeriğini işle
+                const processedContent = processMarkdownForDisplay(markdown);
+                
+                // Malzemeleri çıkar (işlenmemiş ham markdown'dan)
+                ingredientsList = extractIngredientsFromMarkdown(markdown);
+                renderIngredients();
+                
+                // Malzemeler bölümünü içerikten kaldır ve göster
+                document.getElementById('instructionsContent').innerHTML = processedContent;
+                
             } catch (e) {
                 console.error("Tarif içeriği yüklenemedi:", e);
                 document.getElementById('instructionsContent').innerHTML = '<p>Tarif içeriği yüklenemedi.</p>';
+                document.getElementById('ingredientsList').innerHTML = '<p>Malzemeler yüklenemedi.</p>';
             }
         }
 
-        function parseIngredients(htmlContent) {
-            const tempDiv = document.createElement('div');
-            tempDiv.innerHTML = htmlContent;
+        async function fetchRecipeMarkdown(contentFile) {
+            if (!contentFile) throw new Error('Content file belirtilmemiş');
+            const response = await fetch(contentFile);
+            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+            return await response.text();
+        }
+
+        function processMarkdownForDisplay(markdown) {
+            // Frontmatter'ı temizle (--- ile başlayan kısım)
+            let content = removeFrontmatter(markdown);
             
-            // Malzeme listelerini bul (Genellikle h2 "Malzemeler" sonrası ul/ol)
-            const headings = tempDiv.querySelectorAll('h2, h3');
-            ingredientsList = [];
+            // İlk başlığı (tarif adını) kaldır çünkü zaten hero'da var
+            content = removeFirstTitle(content);
             
-            headings.forEach(heading => {
-                if (heading.textContent.toLowerCase().includes('malzeme')) {
-                    let nextEl = heading.nextElementSibling;
-                    while (nextEl && (nextEl.tagName === 'UL' || nextEl.tagName === 'OL')) {
-                        const items = nextEl.querySelectorAll('li');
-                        items.forEach(li => {
-                            const text = li.textContent.trim();
-                            if (text && containsMeasurement(text)) {
-                                ingredientsList.push(text);
-                            }
-                        });
-                        nextEl = nextEl.nextElementSibling;
+            // Malzemeler bölümünü kaldır (soldaki kartta zaten var)
+            content = removeIngredientsSection(content);
+            
+            // Markdown'ı HTML'e çevir
+            if (typeof marked !== 'undefined') {
+                return marked.parse(content);
+            }
+            return content;
+        }
+
+        function removeFrontmatter(markdown) {
+            // --- ile başlayan ve biten kısmı kaldır
+            const frontmatterRegex = /^---\s*\n[\s\S]*?\n---\s*\n?/;
+            return markdown.replace(frontmatterRegex, '');
+        }
+
+        function removeFirstTitle(markdown) {
+            // İlk # ile başlayan satırı kaldır
+            const lines = markdown.split('\n');
+            let startIndex = 0;
+            
+            for (let i = 0; i < lines.length; i++) {
+                if (lines[i].trim().startsWith('# ')) {
+                    startIndex = i + 1;
+                    break;
+                }
+            }
+            
+            return lines.slice(startIndex).join('\n').trim();
+        }
+
+        function removeIngredientsSection(markdown) {
+            // "Malzemeler" veya "## Malzemeler" başlığını ve sonraki listeyi kaldır
+            const lines = markdown.split('\n');
+            let result = [];
+            let skipMode = false;
+            let inIngredients = false;
+            
+            for (let i = 0; i < lines.length; i++) {
+                const line = lines[i].trim();
+                
+                // Malzemeler başlığını tespit et
+                if (/^#{1,3}\s*Malzemeler/i.test(line) || 
+                    /^Malzemeler\s*$/i.test(line)) {
+                    skipMode = true;
+                    inIngredients = true;
+                    continue;
+                }
+                
+                // Malzemeler listesi bitince (yeni başlık veya boş satırlar sonrası içerik)
+                if (skipMode) {
+                    // Eğer liste elemanı değilse ve boş satır değilse
+                    if (line && !line.startsWith('-') && !line.startsWith('*') && 
+                        !/^\d+\./.test(line) && !line.startsWith('>')) {
+                        // Yeni bir başlık mı?
+                        if (line.startsWith('#')) {
+                            skipMode = false;
+                            inIngredients = false;
+                        } else if (line && !inIngredients) {
+                            skipMode = false;
+                        }
+                    }
+                    
+                    // Liste elemanı veya boş satır ise atla
+                    if (skipMode && (line.startsWith('-') || line.startsWith('*') || 
+                        /^\d+\./.test(line) || line === '' || 
+                        line.startsWith('[') || line.startsWith('!'))) {
+                        continue;
+                    }
+                    
+                    // 3 boş satır sonra içerik gelirse durdur
+                    if (line === '' && i < lines.length - 1) {
+                        let nextNonEmpty = i + 1;
+                        while (nextNonEmpty < lines.length && lines[nextNonEmpty].trim() === '') {
+                            nextNonEmpty++;
+                        }
+                        if (nextNonEmpty < lines.length && !lines[nextNonEmpty].trim().startsWith('-') && 
+                            !lines[nextNonEmpty].trim().startsWith('*')) {
+                            skipMode = false;
+                            inIngredients = false;
+                        }
                     }
                 }
-            });
+                
+                if (!skipMode) {
+                    result.push(lines[i]);
+                }
+            }
             
-            renderIngredients();
+            return result.join('\n');
+        }
+
+        function extractIngredientsFromMarkdown(markdown) {
+            const ingredients = [];
+            const lines = markdown.split('\n');
+            let inIngredientsSection = false;
+            let foundIngredients = false;
+            
+            for (let i = 0; i < lines.length; i++) {
+                const line = lines[i].trim();
+                
+                // Malzemeler başlığını bul
+                if (/^#{1,3}\s*Malzemeler/i.test(line) || 
+                    /^Malzemeler\s*$/i.test(line)) {
+                    inIngredientsSection = true;
+                    foundIngredients = true;
+                    continue;
+                }
+                
+                // Yeni bir başlık bulursak ve malzemelerdeysek çık
+                if (inIngredientsSection && line.startsWith('#') && 
+                    !/^#{1,3}\s*Malzemeler/i.test(line)) {
+                    break;
+                }
+                
+                // Malzemeler bölümündeysek ve liste elemanı görürsek al
+                if (inIngredientsSection) {
+                    // Liste elemanı mı?
+                    if (line.startsWith('- ') || line.startsWith('* ')) {
+                        ingredients.push(line.substring(2).trim());
+                    } else if (/^\d+\.\s/.test(line)) {
+                        ingredients.push(line.replace(/^\d+\.\s/, '').trim());
+                    } else if (line === '' && ingredients.length > 0) {
+                        // Boş satır varsa devam et ama çok fazla boş satırsa dur
+                        let nextNonEmpty = i + 1;
+                        while (nextNonEmpty < lines.length && lines[nextNonEmpty].trim() === '') {
+                            nextNonEmpty++;
+                        }
+                        if (nextNonEmpty < lines.length && 
+                            (lines[nextNonEmpty].trim().startsWith('-') || 
+                             lines[nextNonEmpty].trim().startsWith('*'))) {
+                            i = nextNonEmpty - 1;
+                            continue;
+                        } else {
+                            break;
+                        }
+                    } else if (line && !line.startsWith('-') && !line.startsWith('*') && 
+                               !/^\d+\./.test(line) && ingredients.length > 0) {
+                        // Malzeme değil, normal metin (açıklama olabilir)
+                        if (line.length > 50) break; // Uzun metinler talimat bölümü olabilir
+                    }
+                }
+            }
+            
+            // Eğer bulunamadıysa alternatif yöntem dene
+            if (ingredients.length === 0 && foundIngredients) {
+                // Tüm listeyi ara
+                for (let line of lines) {
+                    line = line.trim();
+                    if (line.startsWith('- ') || line.startsWith('* ')) {
+                        const item = line.substring(2).trim();
+                        if (containsMeasurement(item)) {
+                            ingredients.push(item);
+                        }
+                    }
+                }
+            }
+            
+            return ingredients;
         }
 
         function containsMeasurement(text) {
-            // Ölçü birimi içeren satırları tespit et
+            // Ölçü birimi veya sayı içeren satırları tespit et
             const measurements = ['su bardağı', 'çay bardağı', 'yemek kaşığı', 'tatlı kaşığı', 'çay kaşığı', 
-                                'kg', 'gr', 'g ', 'ml', 'cl', 'litre', 'adet', 'paket', 'demet', 'diş'];
-            return measurements.some(m => text.toLowerCase().includes(m)) || /\d/.test(text);
+                                'kg', 'gr', 'g ', 'ml', 'cl', 'litre', 'adet', 'paket', 'demet', 'diş', 
+                                'gram', 'kilogram', 'litre', 'ml', 'cc', 'tutam', 'avuç', 'çimdik'];
+            const hasMeasurement = measurements.some(m => text.toLowerCase().includes(m));
+            const hasNumber = /\d/.test(text);
+            return hasMeasurement || hasNumber;
         }
 
         function renderIngredients() {
             const container = document.getElementById('ingredientsList');
-            if (!container || ingredientsList.length === 0) {
-                if (container) container.innerHTML = '<p>Malzemeler yüklenemedi.</p>';
+            if (!container) return;
+            
+            if (ingredientsList.length === 0) {
+                container.innerHTML = '<p style="color: var(--color-text-muted); font-style: italic;">Bu tarif için malzeme listesi bulunamadı.</p>';
                 return;
             }
             
             const ratio = currentServings / baseServings;
+            
             container.innerHTML = ingredientsList.map((ing) => {
-                let displayText = ing;
-                if (ratio !== 1) {
-                    // Sayıları bul ve çarp
-                    displayText = ing.replace(/(\d+(?:[.,]\d+)?|\d+\/\d+)/g, (match) => {
-                        let num;
-                        if (match.includes('/')) {
-                            const [a, b] = match.split('/');
-                            num = parseFloat(a) / parseFloat(b);
-                        } else {
-                            num = parseFloat(match.replace(',', '.'));
-                        }
-                        if (isNaN(num)) return match;
-                        const scaled = num * ratio;
-                        // Yuvarlama
-                        return scaled.toFixed(1).replace(/\.0$/, '');
-                    });
-                }
+                let displayText = scaleIngredient(ing, ratio);
                 return `
                     <div class="ingredient-item">
                         <div class="ingredient-checkbox" onclick="toggleIngredient(this)"></div>
@@ -449,15 +602,62 @@
             }).join('');
         }
 
+        function scaleIngredient(ingredient, ratio) {
+            if (ratio === 1) return ingredient;
+            
+            // Sayıları ve kesirleri bul
+            return ingredient.replace(/(\d+(?:[.,]\d+)?|\d+\/\d+|½|¼|¾|⅓|⅔|⅛|⅜|⅝|⅞)/g, (match) => {
+                let num;
+                
+                // Unicode kesirler
+                const unicodeFractions = {
+                    '½': 0.5, '¼': 0.25, '¾': 0.75,
+                    '⅓': 0.333, '⅔': 0.667,
+                    '⅛': 0.125, '⅜': 0.375, '⅝': 0.625, '⅞': 0.875
+                };
+                
+                if (unicodeFractions[match]) {
+                    num = unicodeFractions[match];
+                } else if (match.includes('/')) {
+                    const [a, b] = match.split('/');
+                    num = parseFloat(a) / parseFloat(b);
+                } else {
+                    num = parseFloat(match.replace(',', '.'));
+                }
+                
+                if (isNaN(num)) return match;
+                
+                const scaled = num * ratio;
+                
+                // Akıllı yuvarlama
+                if (scaled < 0.25) return '¼';
+                if (scaled < 0.4) return '⅓';
+                if (scaled < 0.6) return '½';
+                if (scaled < 0.7) return '⅔';
+                if (scaled < 0.9) return '¾';
+                
+                if (scaled === Math.floor(scaled)) {
+                    return scaled.toFixed(0);
+                }
+                if (scaled % 0.5 === 0) {
+                    return scaled.toFixed(1).replace('.0', '');
+                }
+                return scaled.toFixed(1).replace('.0', '');
+            });
+        }
+
         function toggleIngredient(checkbox) {
             checkbox.classList.toggle('checked');
-            checkbox.nextElementSibling.classList.toggle('checked');
+            const text = checkbox.nextElementSibling;
+            if (text) text.classList.toggle('checked');
         }
 
         document.getElementById('increaseServings')?.addEventListener('click', () => {
-            currentServings++;
-            document.getElementById('servingsCount').textContent = currentServings;
-            renderIngredients();
+            if (currentServings < 20) {
+                currentServings++;
+                document.getElementById('servingsCount').textContent = currentServings;
+                renderIngredients();
+            }
         });
 
         document.getElementById('decreaseServings')?.addEventListener('click', () => {
