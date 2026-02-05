@@ -676,3 +676,28 @@ textarea {
 .hero-bg .slide.active {
     opacity: 1;
 }
+/* Hero Slider */
+.hero-bg {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+}
+
+.hero-bg .slide {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0;
+    transition: opacity 1.5s ease-in-out;
+    animation: heroZoom 20s ease-out forwards;
+}
+
+.hero-bg .slide.active {
+    opacity: 1;
+}
+
+@keyframes heroZoom {
+    from { transform: scale(1.1); }
+    to { transform: scale(1); }
+}
