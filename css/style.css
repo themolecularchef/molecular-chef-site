@@ -17,11 +17,11 @@
     --color-accent-light: #d1fae5;
     --color-error: #dc2626;
     --color-error-light: #fee2e2;
-    
+
     /* Typography */
     --font-heading: 'Playfair Display', Georgia, serif;
     --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-    
+
     /* Spacing */
     --space-xs: 0.25rem;
     --space-sm: 0.5rem;
@@ -30,24 +30,24 @@
     --space-xl: 2rem;
     --space-2xl: 3rem;
     --space-3xl: 4rem;
-    
+
     /* Layout */
     --container-max: 1200px;
     --container-narrow: 800px;
     --nav-height: 72px;
-    
+
     /* Border Radius */
     --radius-sm: 4px;
     --radius-md: 8px;
     --radius-lg: 12px;
     --radius-xl: 16px;
-    
+
     /* Shadows */
     --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
     --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
     --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
     --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
-    
+
     /* Transitions */
     --transition-fast: 150ms ease;
     --transition-base: 250ms ease;
@@ -69,7 +69,9 @@
 }
 
 /* Base Reset */
-*, *::before, *::after {
+*,
+*::before,
+*::after {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
@@ -109,7 +111,8 @@ button {
     background: none;
 }
 
-input, textarea {
+input,
+textarea {
     font-family: inherit;
     font-size: inherit;
 }
@@ -386,6 +389,7 @@ input, textarea {
     from {
         transform: scale(1.1);
     }
+
     to {
         transform: scale(1);
     }
@@ -394,11 +398,9 @@ input, textarea {
 .hero-overlay {
     position: absolute;
     inset: 0;
-    background: linear-gradient(
-        to bottom,
-        rgba(0, 0, 0, 0.3) 0%,
-        rgba(0, 0, 0, 0.5) 100%
-    );
+    background: linear-gradient(to bottom,
+            rgba(0, 0, 0, 0.3) 0%,
+            rgba(0, 0, 0, 0.5) 100%);
 }
 
 .hero-content {
@@ -472,6 +474,7 @@ input, textarea {
         opacity: 0;
         transform: translateY(20px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -606,36 +609,36 @@ input, textarea {
     :root {
         --nav-height: 64px;
     }
-    
+
     .nav-links,
     .nav-actions .nav-auth,
     .nav-actions .nav-user {
         display: none;
     }
-    
+
     .nav-mobile-toggle {
         display: flex;
     }
-    
+
     .hero {
         height: 60vh;
         min-height: 400px;
     }
-    
+
     .hero-content {
         padding: var(--space-lg);
     }
-    
+
     .recipes-grid {
         grid-template-columns: 1fr;
     }
-    
+
     .footer-content {
         flex-direction: column;
         gap: var(--space-lg);
         text-align: center;
     }
-    
+
     .footer-links {
         justify-content: center;
     }
@@ -645,13 +648,31 @@ input, textarea {
     .container {
         padding: 0 var(--space-md);
     }
-    
+
     .filters {
         gap: var(--space-xs);
     }
-    
+
     .filter-btn {
         padding: var(--space-xs) var(--space-sm);
         font-size: 0.8125rem;
     }
+}
+
+.hero-bg {
+    position: absolute;
+    inset: 0;
+}
+
+.hero-bg .slide {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0;
+    transition: opacity 1s ease;
+}
+
+.hero-bg .slide.active {
+    opacity: 1;
 }
