@@ -147,60 +147,22 @@ const Recipes = {
         Modal.open('quickViewModal');
     },
 
-    // ============================================
-    // MALZEME FONKSİYONLARI (YENİ)
-    // ============================================
-
-    // Markdown'dan malzemeleri çek (JSON'da yoksa)
-    extractIngredientsFromMarkdown(html) {
-        const temp = document.createElement('div');
-        temp.innerHTML = html;
-        
-        // "Malzemeler" başlığını bul (h2, h3, strong olabilir)
-        const headings = temp.querySelectorAll('h2, h3, strong');
-        let ingredientsList = null;
-        
-        for (let heading of headings) {
-            if (heading.textContent.toLowerCase().includes('malzemeler')) {
-                // Başlıktan sonraki ilk ul/ol listeyi al
-                let nextEl = heading.nextElementSibling;
-                while (nextEl) {
-                    if (nextEl.tagName === 'UL' || nextEl.tagName === 'OL') {
-                        ingredientsList = nextEl;
-                        break;
-                    }
-                    nextEl = nextEl.nextElementSibling;
-                }
-                break;
-            }
-        }
-        
-        if (ingredientsList) {
-            return Array.from(ingredientsList.querySelectorAll('li')).map(li => li.textContent.trim());
-        }
-        return null;
-    },
-
-    renderIngredients(recipe, markdownHtml = null) {
+    renderIngredients(recipe, markdownHtml) {
         const ingredientsList = document.getElementById('ingredientsList');
         const servingsCount = document.getElementById('servingsCount');
 
-        if (servingsCount) servingsCount.textContent = recipe.servings;
+        if (servingsCount) servingsCount.textContent = recipe.servings || 4;
 
         let ingredients = null;
 
-        // 1. Önce JSON'dan dene
-        if (recipe.ingredients && Array.isArray(recipe.ingredients) && recipe.ingredients.length > 0) {
+        if (recipe.ingredients && Array.isArray(recipe.ingredients)) {
             ingredients = recipe.ingredients;
-        } 
-        // 2. Yoksa Markdown'dan çek
-        else if (markdownHtml) {
-            ingredients = this.extractIngredientsFromMarkdown(markdownHtml);
+        } else if (markdownHtml) {
+            ingredients = this.extractFromMarkdown(markdownHtml);
         }
 
         if (ingredients && ingredients.length > 0) {
             this.originalIngredients = ingredients;
-            
             if (ingredientsList) {
                 ingredientsList.innerHTML = ingredients.map(text => `
                     <div class="ingredient-item">
@@ -216,45 +178,56 @@ const Recipes = {
         }
     },
 
-    updateServingsDisplay() {
-        const servingsCount = document.getElementById('servingsCount');
-        if (servingsCount) {
-            const newServings = Math.round(this.originalServings * this.servingsMultiplier * 10) / 10;
-            servingsCount.textContent = newServings + ' kişilik';
+    extractFromMarkdown(html) {
+        const temp = document.createElement('div');
+        temp.innerHTML = html;
+        const headings = temp.querySelectorAll('h2, h3');
+        
+        for (let h of headings) {
+            if (h.textContent.toLowerCase().includes('malzemeler')) {
+                let list = h.nextElementSibling;
+                while (list && list.tagName !== 'UL' && list.tagName !== 'OL') {
+                    list = list.nextElementSibling;
+                }
+                if (list) {
+                    return Array.from(list.querySelectorAll('li')).map(li => li.textContent.trim());
+                }
+            }
+        }
+        return null;
+    },
+
+    updateServings() {
+        const count = document.getElementById('servingsCount');
+        if (count) {
+            count.textContent = Math.round(this.originalServings * this.servingsMultiplier * 10) / 10 + ' kişilik';
         }
 
-        const ingredientItems = document.querySelectorAll('.ingredient-text');
-        ingredientItems.forEach((item, index) => {
-            const originalText = this.originalIngredients[index];
-            if (originalText) {
-                item.textContent = this.scaleIngredient(originalText, this.servingsMultiplier);
+        document.querySelectorAll('.ingredient-text').forEach((item, index) => {
+            const original = this.originalIngredients[index];
+            if (original) {
+                item.textContent = original.replace(/(\d+(?:[.,]\d+)?)/g, (match) => {
+                    const num = parseFloat(match.replace(',', '.'));
+                    if (isNaN(num)) return match;
+                    const newNum = num * this.servingsMultiplier;
+                    return Number.isInteger(newNum) ? newNum : newNum.toFixed(1).replace('.', ',');
+                });
             }
         });
     },
 
-    scaleIngredient(text, multiplier) {
-        // "500 gr et" -> "750 gr et" (1.5x çarpanla)
-        return text.replace(/(\d+(?:[.,]\d+)?)/g, (match) => {
-            const num = parseFloat(match.replace(',', '.'));
-            if (isNaN(num)) return match;
-            
-            const newNum = num * multiplier;
-            return Number.isInteger(newNum) ? newNum : newNum.toFixed(1).replace('.', ',');
-        });
-    },
-
-    bindServingsButtons() {
+    bindButtons() {
         document.getElementById('increaseServings')?.addEventListener('click', () => {
             if (this.servingsMultiplier < 3) {
                 this.servingsMultiplier += 0.5;
-                this.updateServingsDisplay();
+                this.updateServings();
             }
         });
         
         document.getElementById('decreaseServings')?.addEventListener('click', () => {
             if (this.servingsMultiplier > 0.5) {
                 this.servingsMultiplier -= 0.5;
-                this.updateServingsDisplay();
+                this.updateServings();
             }
         });
     },
@@ -276,7 +249,6 @@ const Recipes = {
         this.originalServings = recipe.servings || 4;
         document.title = `${recipe.title} | Lezzet Yolculuğu`;
         
-        // Hero bilgileri
         document.getElementById('recipeHeroImage').src = recipe.image;
         document.getElementById('recipeCategory').textContent = recipe.category;
         document.getElementById('recipeTitle').textContent = recipe.title;
@@ -285,15 +257,11 @@ const Recipes = {
         document.getElementById('recipeServings').textContent = recipe.servings + ' kişilik';
         document.getElementById('recipeDifficulty').textContent = recipe.difficulty;
         
-        // Markdown içeriğini yükle
-        const contentHtml = await this.loadRecipeContent(recipe.contentFile);
-        document.getElementById('instructionsContent').innerHTML = contentHtml;
+        const html = await this.loadRecipeContent(recipe.contentFile);
+        document.getElementById('instructionsContent').innerHTML = html;
         
-        // Malzemeleri göster (önce JSON, yoksa Markdown'dan)
-        this.renderIngredients(recipe, contentHtml);
-        
-        // + ve - butonlarını aktifleştir
-        this.bindServingsButtons();
+        this.renderIngredients(recipe, html);
+        this.bindButtons();
     }
 };
 
