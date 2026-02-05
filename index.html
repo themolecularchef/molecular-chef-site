@@ -43,7 +43,67 @@
         const db = firebase.firestore();
     </script>
 </head>
+    <!-- Mevcut scriptlerin altına, </body>'den önce -->
+    <script>
+        // ARAMA MOTORU - Düzeltilmiş (Tarifler kaybolmaz)
+        (function() {
+            const searchInput = document.getElementById('heroSearchInput');
+            const searchBtn = document.getElementById('heroSearchBtn');
+            const recipesGrid = document.getElementById('recipesGrid');
+            const emptyState = document.getElementById('emptyState');
+            
+            if (!searchInput || !recipesGrid) return;
 
+            let allRecipes = [];
+            let isReady = false;
+
+            function loadRecipes() {
+                const cards = recipesGrid.querySelectorAll('.recipe-card');
+                if (cards.length === 0) return false;
+                
+                allRecipes = Array.from(cards).map(card => ({
+                    element: card,
+                    title: card.querySelector('.card-title')?.textContent?.toLowerCase() || '',
+                    category: card.querySelector('.card-category')?.textContent?.toLowerCase() || ''
+                }));
+                isReady = true;
+                return true;
+            }
+
+            function doSearch(query) {
+                if (!isReady && !loadRecipes()) return;
+                
+                const term = query.toLowerCase().trim();
+                
+                if (!term) {
+                    allRecipes.forEach(r => r.element.style.display = '');
+                    emptyState?.classList.add('hidden');
+                    return;
+                }
+
+                let found = 0;
+                allRecipes.forEach(recipe => {
+                    const match = recipe.title.includes(term) || recipe.category.includes(term);
+                    recipe.element.style.display = match ? '' : 'none';
+                    if (match) found++;
+                });
+
+                if (found === 0) {
+                    emptyState?.classList.remove('hidden');
+                } else {
+                    emptyState?.classList.add('hidden');
+                }
+            }
+
+            searchInput.addEventListener('input', (e) => doSearch(e.target.value));
+            searchBtn?.addEventListener('click', () => doSearch(searchInput.value));
+            setTimeout(loadRecipes, 1500);
+        })();
+    </script>
+    
+    <!-- Slider script'in buradaysa onun üstüne veya altına koyabilirsin -->
+</body>
+</html>
 <body>
     <!-- GİRİŞ EKRANI (İlk Başlangıç) -->
     <div id="authScreen"
