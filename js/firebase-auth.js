@@ -1,7 +1,7 @@
 // Firebase Auth Wrapper (Eski Auth ile uyumlu)
 const Auth = {
     currentUser: null,
-    
+
     init() {
         firebase.auth().onAuthStateChanged((user) => {
             this.currentUser = user;
@@ -10,12 +10,12 @@ const Auth = {
             }
         });
     },
-    
+
     async register(name, email, password) {
         try {
             const result = await firebase.auth().createUserWithEmailAndPassword(email, password);
             await result.user.updateProfile({ displayName: name });
-            
+
             // Firestore'da kullanıcı dokümanı
             await db.collection('users').doc(result.user.uid).set({
                 name: name,
@@ -23,7 +23,7 @@ const Auth = {
                 createdAt: new Date().toISOString(),
                 favorites: []
             });
-            
+
             return { success: true, message: 'Kayıt başarılı!' };
         } catch (error) {
             let msg = 'Kayıt yapılamadı';
@@ -32,7 +32,7 @@ const Auth = {
             return { success: false, message: msg };
         }
     },
-    
+
     async login(email, password) {
         try {
             await firebase.auth().signInWithEmailAndPassword(email, password);
@@ -44,17 +44,17 @@ const Auth = {
             return { success: false, message: msg };
         }
     },
-    
+
     async logout() {
         await firebase.auth().signOut();
         localStorage.removeItem('skipAuth');
         return { success: true, message: 'Çıkış yapıldı' };
     },
-    
+
     getCurrentUser() {
         return this.currentUser;
     },
-    
+
     isLoggedIn() {
         return !!this.currentUser;
     }

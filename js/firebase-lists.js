@@ -4,19 +4,19 @@ const Lists = {
     async toggleFavorite(recipeId) {
         const user = firebase.auth().currentUser;
         if (!user) return { action: 'error', message: 'Giriş yapmalısınız' };
-        
+
         try {
             const userRef = db.collection('users').doc(user.uid);
             const doc = await userRef.get();
-            
+
             // Kullanıcı yoksa oluştur
             if (!doc.exists) {
                 await userRef.set({ favorites: [recipeId], lists: [] });
                 return { action: 'added' };
             }
-            
+
             const favorites = doc.data().favorites || [];
-            
+
             if (favorites.includes(recipeId)) {
                 await userRef.update({
                     favorites: firebase.firestore.FieldValue.arrayRemove(recipeId)
