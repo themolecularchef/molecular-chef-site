@@ -1,5 +1,6 @@
 /**
  * Lezzet Yolculuğu - Recipes Module
+ * Tarif verilerini yöneten ve görüntüleyen modül
  */
 
 const Recipes = {
@@ -13,12 +14,22 @@ const Recipes = {
         this.loadRecipes().then(() => {
             this.renderRecipesGrid();
             this.bindFilterEvents();
+        }).catch(err => {
+            console.error('Tarifler yüklenirken hata:', err);
+            if (window.Toast) {
+                Toast.show('Tarifler yüklenemedi', 'error');
+            }
         });
     },
 
     async loadRecipes() {
         try {
             const response = await fetch('content/recipes.json');
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
             const data = await response.json();
             this.data = data.recipes || [];
             window.recipesData = this.data;
@@ -27,21 +38,41 @@ const Recipes = {
             console.error('Tarifler yüklenemedi:', error);
             this.data = [];
             window.recipesData = [];
+            throw error; // Hatayı yukarı ilet
         }
     },
 
     async loadRecipeContent(contentFile) {
         try {
+            if (!contentFile) {
+                throw new Error('Content file belirtilmemiş');
+            }
+            
             const response = await fetch(contentFile);
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
             const markdown = await response.text();
+            
+            // marked kütüphanesi yüklü mü kontrol et
+            if (typeof marked === 'undefined') {
+                throw new Error('Marked kütüphanesi yüklenmemiş');
+            }
+            
             return marked.parse(markdown);
         } catch (error) {
-            return '<p>Tarif içeriği yüklenemedi.</p>';
+            console.error('Tarif içeriği yüklenemedi:', error);
+            return '<p class="error-message">Tarif içeriği yüklenemedi. Lütfen daha sonra tekrar deneyin.</p>';
         }
     },
 
     getRecipeById(id) {
-        return this.data ? this.data.find(r => r.id.toString() === id.toString()) : null;
+        if (!this.data || !Array.isArray(this.data)) {
+            return null;
+        }
+        return this.data.find(r => r.id.toString() === id.toString()) || null;
     },
 
     async renderRecipesGrid(recipes = null) {
@@ -69,7 +100,7 @@ const Recipes = {
                         <button class="recipe-card-action favorite-btn" 
                                 data-id="${recipe.id}" 
                                 data-title="${recipe.title}"
-                                onclick="openAddToListModal('${recipe.id}', '${recipe.title}')">
+                                onclick="handleFavoriteClick(event, '${recipe.id}', '${recipe.title}')">
                             <span>🤍</span>
                         </button>
                         <button class="recipe-card-action quick-view-btn" 
@@ -123,7 +154,10 @@ const Recipes = {
 
     async showQuickView(recipeId) {
         const recipe = this.getRecipeById(recipeId);
-        if (!recipe) return;
+        if (!recipe) {
+            if (window.Toast) Toast.show('Tarif bulunamadı', 'error');
+            return;
+        }
         
         const modalBody = document.getElementById('quickViewBody');
         if (!modalBody) return;
@@ -140,7 +174,26 @@ const Recipes = {
             </div>
         `;
         
-        Modal.open('quickViewModal');
+        if (window.Modal) {
+            Modal.open('quickViewModal');
+        }
+    }
+};
+
+// Global fonksiyon - Favori butonu için güvenli wrapper
+window.handleFavoriteClick = function(event, recipeId, recipeTitle) {
+    event.stopPropagation();
+    
+    // openAddToListModal fonksiyonu global olarak tanımlı mı kontrol et
+    if (typeof window.openAddToListModal === 'function') {
+        window.openAddToListModal(recipeId, recipeTitle);
+    } else {
+        // Fonksiyon yoksa kullanıcıya bilgi ver
+        if (window.Toast) {
+            Toast.show('Bu özellik ana sayfada kullanılabilir', 'info');
+        } else {
+            alert('Lütfen tarifi favorilere eklemek için ana sayfaya gidin');
+        }
     }
 };
 
