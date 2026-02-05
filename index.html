@@ -660,17 +660,17 @@
 
         // Backdrop tıklama ile modal kapatma
         document.getElementById('addToListModal')?.querySelector('.modal-backdrop')?.addEventListener('click', closeAddToListModal);
-    </script>
+        </script>
+    
+    <!-- ARAMA MOTORU -->
     <script>
-        const slides = document.querySelectorAll('.hero-bg .slide');
-        let current = 0;
-
-        setInterval(() => {
-            slides[current].classList.remove('active');
-            current = (current + 1) % slides.length;
-            slides[current].classList.add('active');
-        }, 5000); // 5 saniyede bir değiş
+        document.getElementById('heroSearchInput')?.addEventListener('input', function(e) {
+            const term = e.target.value.toLowerCase();
+            document.querySelectorAll('.recipe-card').forEach(card => {
+                card.style.display = card.textContent.toLowerCase().includes(term) ? '' : 'none';
+            });
+        });
     </script>
+    
 </body>
-
 </html>
