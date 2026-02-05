@@ -22,18 +22,18 @@ const Recipes = {
         }
     },
 
-    async loadRecipes() {
-        try {
-            const response = await fetch('content/recipes.json');
-            const data = await response.json();
-            this.data = data.recipes;
-            return this.data;
-        } catch (error) {
-            console.error('Error loading recipes:', error);
-            Toast.show('Tarifler yüklenirken bir hata oluştu', 'error');
-            return [];
-        }
-    },
+async function loadRecipes() {
+    try {
+        const response = await fetch('content/recipes.json');
+        const data = await response.json();
+        window.recipesData = data.recipes || []; // Global değişkene ata
+        renderRecipes(window.recipesData); // İlk yükleme
+        return window.recipesData;
+    } catch (error) {
+        console.error('Tarifler yüklenemedi:', error);
+        window.recipesData = [];
+    }
+},
 
     async loadRecipeContent(contentFile) {
         try {
