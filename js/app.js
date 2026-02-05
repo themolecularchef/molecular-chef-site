@@ -231,3 +231,90 @@ window.Toast = Toast;
 window.Modal = Modal;
 window.Utils = Utils;
 window.LazyLoader = LazyLoader;
+// ARAMA FONKSİYONU
+document.addEventListener('DOMContentLoaded', () => {
+    const searchInput = document.getElementById('heroSearchInput');
+    const searchBtn = document.getElementById('heroSearchBtn');
+    
+    if (!searchInput) return;
+
+    // Enter tuşu ile arama
+    searchInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            performSearch(searchInput.value);
+        }
+    });
+
+    // Buton ile arama
+    if (searchBtn) {
+        searchBtn.addEventListener('click', () => {
+            performSearch(searchInput.value);
+        });
+    }
+
+    // Anlık arama (yazarken filtrele)
+    searchInput.addEventListener('input', (e) => {
+        performSearch(e.target.value);
+    });
+});
+
+// Arama fonksiyonu
+function performSearch(query) {
+    const recipesGrid = document.getElementById('recipesGrid');
+    const emptyState = document.getElementById('emptyState');
+    
+    if (!window.recipesData || !recipesGrid) return;
+
+    const searchTerm = query.toLowerCase().trim();
+    
+    // Tüm tarifleri filtrele
+    const filtered = window.recipesData.filter(recipe => {
+        const title = recipe.title?.toLowerCase() || '';
+        const category = recipe.category?.toLowerCase() || '';
+        const description = recipe.description?.toLowerCase() || '';
+        const ingredients = Array.isArray(recipe.ingredients) 
+            ? recipe.ingredients.join(' ').toLowerCase() 
+            : '';
+        
+        return title.includes(searchTerm) || 
+               category.includes(searchTerm) || 
+               description.includes(searchTerm) ||
+               ingredients.includes(searchTerm);
+    });
+
+    // Sonuçları göster
+    if (filtered.length === 0) {
+        recipesGrid.innerHTML = '';
+        if (emptyState) emptyState.classList.remove('hidden');
+    } else {
+        if (emptyState) emptyState.classList.add('hidden');
+        renderRecipes(filtered);
+    }
+}
+
+// Tarifleri render et (Eğer bu fonksiyon yoksa)
+function renderRecipes(recipes) {
+    const grid = document.getElementById('recipesGrid');
+    if (!grid) return;
+    
+    grid.innerHTML = recipes.map(recipe => `
+        <article class="recipe-card" data-id="${recipe.id}">
+            <div class="card-image">
+                <img src="${recipe.image}" alt="${recipe.title}" loading="lazy">
+                <button class="favorite-btn" data-id="${recipe.id}" onclick="openAddToListModal('${recipe.id}', '${recipe.title}')">
+                    <span>🤍</span>
+                </button>
+            </div>
+            <div class="card-content">
+                <span class="card-category">${recipe.category}</span>
+                <h3 class="card-title">
+                    <a href="recipe.html?id=${recipe.id}">${recipe.title}</a>
+                </h3>
+                <div class="card-meta">
+                    <span>⏱️ ${recipe.prepTime || '20 dk'}</span>
+                    <span>🔥 ${recipe.difficulty || 'Orta'}</span>
+                </div>
+            </div>
+        </article>
+    `).join('');
+}
