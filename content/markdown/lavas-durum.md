@@ -1,4 +1,3 @@
-[lavas-durum.md](https://github.com/user-attachments/files/24979369/lavas-durum.md)
 # Tavada Gevrek Lavaşlı Et Dürüm & Közlenmiş Biber
 
 ## Malzemeler (2 kişilik)
