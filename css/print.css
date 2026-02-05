@@ -1,9 +1,37 @@
 /* ============================================
    LEZZET YOLCULUĞU - PRINT STYLES
+   Yazdırma için optimize edilmiş stiller
    ============================================ */
 
 @media print {
-    /* Hide non-essential elements */
+    /* Sayfa ayarları */
+    @page {
+        margin: 1.5cm;
+        size: auto;
+    }
+
+    /* Temel sıfırlamalar */
+    * {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+        color-adjust: exact !important;
+        box-shadow: none !important;
+        text-shadow: none !important;
+        animation: none !important;
+        transition: none !important;
+    }
+
+    /* Arkaplan ve renk ayarları */
+    html, body {
+        background: white !important;
+        color: black !important;
+        font-size: 12pt;
+        line-height: 1.5;
+        margin: 0;
+        padding: 0;
+    }
+
+    /* Gizlenecek elementler */
     .nav,
     .nav-transparent,
     .mobile-menu,
@@ -18,166 +46,200 @@
     .ingredients-servings,
     .ingredient-checkbox,
     .list-card-actions,
-    .list-recipe-item-remove {
+    .list-recipe-item-remove,
+    #authScreen,
+    .mobile-user,
+    .mobile-logout,
+    .btn-ghost,
+    .quick-view-btn,
+    .favorite-btn,
+    .nav-auth,
+    .nav-user,
+    .nav-logout,
+    .filters,
+    .hero-search,
+    .empty-state,
+    .share-options,
+    .auth-toggle,
+    .auth-divider,
+    .mobile-link[href*="auth"] {
         display: none !important;
     }
-    
-    /* Reset body styles */
-    body {
-        background: white !important;
+
+    /* Logo ve başlık ayarları */
+    .nav-logo-text {
         color: black !important;
-        font-size: 12pt;
-        line-height: 1.5;
+        font-size: 18pt !important;
     }
-    
-    /* Remove margins and padding */
-    * {
-        box-shadow: none !important;
-        text-shadow: none !important;
-    }
-    
-    /* Recipe Hero */
+
+    /* Recipe Hero bölümü */
     .recipe-hero {
         height: auto !important;
         min-height: auto !important;
         margin-top: 0 !important;
         page-break-after: avoid;
+        position: relative !important;
     }
-    
+
     .recipe-hero-image {
         position: relative !important;
         height: 200px !important;
         page-break-inside: avoid;
     }
-    
+
     .recipe-hero-image img {
         object-fit: contain !important;
         max-height: 200px !important;
+        width: auto !important;
+        margin: 0 auto;
     }
-    
+
     .recipe-hero-overlay {
         display: none !important;
     }
-    
+
     .recipe-hero-content {
         padding: 1rem 0 !important;
         color: black !important;
+        position: static !important;
     }
-    
+
     .recipe-title {
         font-size: 24pt !important;
         color: black !important;
         text-shadow: none !important;
         margin-bottom: 0.5rem !important;
+        page-break-after: avoid;
     }
-    
+
     .recipe-category {
-        background: #ddd !important;
+        background: #eee !important;
         color: black !important;
-        print-color-adjust: exact;
-        -webkit-print-color-adjust: exact;
+        border: 1px solid #ccc;
+        font-size: 10pt !important;
+        padding: 0.25rem 0.5rem !important;
     }
-    
+
     .recipe-meta {
         display: flex !important;
         flex-wrap: wrap !important;
         gap: 1rem !important;
         margin-top: 1rem !important;
+        font-size: 10pt !important;
     }
-    
+
     .recipe-meta-item {
         flex-direction: row !important;
         align-items: center !important;
         gap: 0.25rem !important;
     }
-    
-    .recipe-meta-label {
-        font-size: 9pt !important;
-        opacity: 1 !important;
+
+    .recipe-meta-icon {
+        font-size: 12pt !important;
     }
-    
-    .recipe-meta-value {
-        font-size: 10pt !important;
-    }
-    
-    /* Main Content */
+
+    /* Ana içerik düzeni */
     .main {
-        padding: 1rem 0 !important;
+        padding: 0 !important;
     }
-    
+
     .recipe-content {
         display: block !important;
     }
-    
-    /* Ingredients */
+
+    /* Malzemeler bölümü */
     .recipe-sidebar {
         position: static !important;
         margin-bottom: 2rem !important;
         page-break-inside: avoid;
+        width: 100% !important;
     }
-    
+
     .ingredients-card {
         box-shadow: none !important;
         border: 1px solid #ddd !important;
         padding: 1rem !important;
+        background: white !important;
     }
-    
+
     .ingredients-title {
         font-size: 16pt !important;
         margin-bottom: 1rem !important;
+        color: black !important;
     }
-    
+
     .ingredients-list {
         display: block !important;
     }
-    
+
     .ingredient-item {
         padding: 0.25rem 0 !important;
         border-bottom: 1px dotted #ccc !important;
+        display: flex !important;
+        align-items: flex-start !important;
+        gap: 0.5rem !important;
     }
-    
+
     .ingredient-text {
         font-size: 11pt !important;
+        line-height: 1.4 !important;
     }
-    
-    /* Instructions */
+
+    /* Talimatlar bölümü */
     .recipe-instructions {
         max-width: none !important;
+        width: 100% !important;
     }
-    
+
     .instructions-content {
         font-size: 11pt !important;
         line-height: 1.6 !important;
+        color: black !important;
     }
-    
+
     .instructions-content h2 {
         font-size: 16pt !important;
         margin: 1.5rem 0 1rem !important;
+        padding-bottom: 0.25rem;
         border-bottom: 2px solid #333 !important;
         page-break-after: avoid;
+        color: black !important;
     }
-    
+
     .instructions-content h3 {
         font-size: 13pt !important;
         margin: 1rem 0 0.5rem !important;
         color: #333 !important;
+        page-break-after: avoid;
     }
-    
+
     .instructions-content p {
         margin-bottom: 0.75rem !important;
         text-align: justify !important;
+        orphans: 3;
+        widows: 3;
     }
-    
+
     .instructions-content ul,
     .instructions-content ol {
         margin-bottom: 1rem !important;
         padding-left: 1.5rem !important;
     }
-    
+
     .instructions-content li {
         margin-bottom: 0.5rem !important;
     }
-    
+
+    .instructions-content strong {
+        font-weight: 700 !important;
+        color: black !important;
+    }
+
+    .instructions-content em {
+        font-style: italic !important;
+        color: #444 !important;
+    }
+
     .instructions-content blockquote {
         background: #f5f5f5 !important;
         border-left: 3px solid #333 !important;
@@ -185,58 +247,77 @@
         margin: 1rem 0 !important;
         font-style: italic !important;
         page-break-inside: avoid;
+        color: #333 !important;
     }
-    
-    /* Links */
-    a {
-        color: black !important;
-        text-decoration: none !important;
+
+    /* Linkler - URL'leri göster */
+    a[href]:after {
+        content: " (" attr(href) ")";
+        font-size: 9pt;
+        font-style: italic;
+        color: #666 !important;
+        word-break: break-all;
     }
-    
-    a[href]::after {
+
+    /* Dahili linkler ve boş linkler hariç */
+    a[href^="#"]:after,
+    a[href^="javascript:"]:after,
+    a[href^="mailto:"]:after,
+    a[href^="tel:"]:after {
         content: "" !important;
     }
-    
-    /* Page breaks */
+
+    /* Temel link stili */
+    a {
+        color: #000 !important;
+        text-decoration: underline !important;
+        text-underline-offset: 2px;
+    }
+
+    /* Sayfa sonları */
     .recipe-hero,
-    .ingredients-card {
+    .ingredients-card,
+    .instructions-content h2,
+    .instructions-content h3 {
         page-break-inside: avoid;
     }
-    
+
     h2, h3 {
         page-break-after: avoid;
     }
-    
+
     p, li {
         page-break-inside: avoid;
     }
-    
-    /* Container */
+
+    /* Container ayarları */
     .container {
         max-width: none !important;
+        width: 100% !important;
         padding: 0 !important;
+        margin: 0 !important;
     }
-    
-    /* Header info */
+
+    /* Yazdırma başlığı ve altbilgisi */
     .print-header {
         text-align: center;
         border-bottom: 1px solid #ccc;
         padding-bottom: 0.5rem;
         margin-bottom: 1rem;
+        display: block !important;
     }
-    
+
     .print-header-logo {
         font-family: 'Playfair Display', Georgia, serif;
         font-size: 14pt;
         font-weight: 600;
     }
-    
+
     .print-header-url {
         font-size: 9pt;
         color: #666;
     }
-    
-    /* Footer */
+
     .print-footer {
         position: fixed;
         bottom: 0;
@@ -248,9 +329,43 @@
         border-top: 1px solid #ccc;
         padding-top: 0.5rem;
     }
+
+    /* Grid düzenlemeleri */
+    .lists-grid,
+    .recipes-grid,
+    #listRecipesGrid {
+        display: block !important;
+    }
+
+    .list-card,
+    .recipe-card {
+        break-inside: avoid;
+        margin-bottom: 1rem;
+        border: 1px solid #ddd;
+        page-break-inside: avoid;
+    }
+
+    /* Görsel optimizasyonları */
+    img {
+        max-width: 100% !important;
+        height: auto !important;
+        page-break-inside: avoid;
+    }
+
+    /* Tablo düzenlemeleri (varsa) */
+    table {
+        width: 100% !important;
+        border-collapse: collapse;
+    }
+
+    th, td {
+        border: 1px solid #ddd;
+        padding: 0.5rem;
+        text-align: left;
+    }
 }
 
-/* Print-specific utility class */
+/* Print-only utility class */
 .print-only {
     display: none;
 }
@@ -258,5 +373,9 @@
 @media print {
     .print-only {
         display: block !important;
+    }
+
+    .no-print {
+        display: none !important;
     }
 }
