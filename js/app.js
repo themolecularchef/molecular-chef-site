@@ -267,6 +267,33 @@ function performSearch(query) {
 
     const searchTerm = query.toLowerCase().trim();
     
+    const filtered = window.recipesData.filter(recipe => {
+        const title = recipe.title?.toLowerCase() || '';
+        const category = recipe.category?.toLowerCase() || '';
+        const desc = recipe.description?.toLowerCase() || '';
+        const tags = recipe.tags?.join(' ').toLowerCase() || '';
+        
+        return title.includes(searchTerm) || 
+               category.includes(searchTerm) || 
+               desc.includes(searchTerm) ||
+               tags.includes(searchTerm);
+    });
+
+    if (filtered.length === 0) {
+        recipesGrid.innerHTML = '';
+        if (emptyState) emptyState.classList.remove('hidden');
+    } else {
+        if (emptyState) emptyState.classList.add('hidden');
+        
+        // recipes.js içindeki render fonksiyonunu kullan
+        if (window.Recipes && window.Recipes.renderRecipesGrid) {
+            window.Recipes.renderRecipesGrid(filtered);
+        } else {
+            renderRecipes(filtered); // fallback
+        }
+    }
+}
+    
     // Tüm tarifleri filtrele
     const filtered = window.recipesData.filter(recipe => {
         const title = recipe.title?.toLowerCase() || '';
