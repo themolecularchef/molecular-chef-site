@@ -1,4 +1,4 @@
-// Firebase Auth Wrapper (Eski Auth ile uyumlu)
+// Firebase Auth Wrapper
 const Auth = {
     currentUser: null,
 
@@ -16,7 +16,6 @@ const Auth = {
             const result = await firebase.auth().createUserWithEmailAndPassword(email, password);
             await result.user.updateProfile({ displayName: name });
 
-            // Firestore'da kullanıcı dokümanı
             await db.collection('users').doc(result.user.uid).set({
                 name: name,
                 email: email,
@@ -60,10 +59,8 @@ const Auth = {
     }
 };
 
-// Global olarak tanımla
 window.Auth = Auth;
 
-// Başlat
 document.addEventListener('DOMContentLoaded', () => {
     Auth.init();
 });
