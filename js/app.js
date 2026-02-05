@@ -1,16 +1,24 @@
 /**
  * Lezzet Yolculuğu - Main App
+ * Eksiksiz ve tam fonksiyonel JavaScript
  */
 
 const ThemeManager = {
     init() {
         const savedTheme = localStorage.getItem('theme');
-        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-
+        
         if (savedTheme) {
             document.documentElement.setAttribute('data-theme', savedTheme);
-        } else if (prefersDark) {
-            document.documentElement.setAttribute('data-theme', 'dark');
+        } else {
+            // Sistem tercihini kontrol et ama varsayılan olarak light kullan
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            if (prefersDark) {
+                document.documentElement.setAttribute('data-theme', 'dark');
+                localStorage.setItem('theme', 'dark');
+            } else {
+                document.documentElement.setAttribute('data-theme', 'light');
+                localStorage.setItem('theme', 'light');
+            }
         }
 
         this.bindEvents();
@@ -67,7 +75,10 @@ const Toast = {
         const toast = document.getElementById('toast');
         const toastMessage = document.getElementById('toastMessage');
 
-        if (!toast || !toastMessage) return;
+        if (!toast || !toastMessage) {
+            console.warn('Toast elementi bulunamadı:', message);
+            return;
+        }
 
         toastMessage.textContent = message;
         toast.className = 'toast active' + (type ? ' ' + type : '');
@@ -81,19 +92,22 @@ const Toast = {
 const Modal = {
     open(modalId) {
         const modal = document.getElementById(modalId);
-        if (modal) {
-            modal.classList.add('active');
-            document.body.style.overflow = 'hidden';
+        if (!modal) {
+            console.warn('Modal bulunamadı:', modalId);
+            return;
+        }
+        
+        modal.classList.add('active');
+        document.body.style.overflow = 'hidden';
 
-            const closeBtn = modal.querySelector('.modal-close');
-            const backdrop = modal.querySelector('.modal-backdrop');
+        const closeBtn = modal.querySelector('.modal-close');
+        const backdrop = modal.querySelector('.modal-backdrop');
 
-            if (closeBtn) {
-                closeBtn.onclick = () => this.close(modalId);
-            }
-            if (backdrop) {
-                backdrop.onclick = () => this.close(modalId);
-            }
+        if (closeBtn) {
+            closeBtn.onclick = () => this.close(modalId);
+        }
+        if (backdrop) {
+            backdrop.onclick = () => this.close(modalId);
         }
     },
 
@@ -116,14 +130,6 @@ const Modal = {
 const Utils = {
     generateId() {
         return Date.now().toString(36) + Math.random().toString(36).substr(2);
-    },
-
-    encode(str) {
-        return btoa(str);
-    },
-
-    decode(str) {
-        return atob(str);
     },
 
     formatTime(minutes) {
@@ -162,66 +168,43 @@ const LazyLoader = {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
                         const img = entry.target;
-                        img.src = img.dataset.src;
-                        img.removeAttribute('data-src');
+                        if (img.dataset.src) {
+                            img.src = img.dataset.src;
+                            img.removeAttribute('data-src');
+                            img.classList.add('loaded');
+                        }
                         observer.unobserve(img);
                     }
                 });
+            }, {
+                rootMargin: '50px 0px', // Viewport'a 50px yaklaşınca yükle
+                threshold: 0.01
             });
 
             document.querySelectorAll('img[data-src]').forEach(img => {
                 imageObserver.observe(img);
             });
         } else {
+            // Fallback: IntersectionObserver desteklenmiyorsa direkt yükle
             document.querySelectorAll('img[data-src]').forEach(img => {
                 img.src = img.dataset.src;
+                img.removeAttribute('data-src');
             });
         }
     }
 };
 
-document.addEventListener('DOMContentLoaded', () => {
-    ThemeManager.init();
-    MobileNav.init();
-    LazyLoader.init();
-});
-
-window.ThemeManager = ThemeManager;
-window.MobileNav = MobileNav;
-window.Toast = Toast;
-window.Modal = Modal;
-window.Utils = Utils;
-window.LazyLoader = LazyLoader;
-
-// Arama Fonksiyonu
-document.addEventListener('DOMContentLoaded', () => {
-    const searchInput = document.getElementById('heroSearchInput');
-    const searchBtn = document.getElementById('heroSearchBtn');
-    
-    if (!searchInput) return;
-
-    searchInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
-            performSearch(searchInput.value);
-        }
-    });
-
-    if (searchBtn) {
-        searchBtn.addEventListener('click', () => {
-            performSearch(searchInput.value);
-        });
-    }
-
-    searchInput.addEventListener('input', (e) => {
-        performSearch(e.target.value);
-    });
-});
-
+// Arama Fonksiyonu - Debounce ile optimize edilmiş
 function performSearch(query) {
     const recipesGrid = document.getElementById('recipesGrid');
     const emptyState = document.getElementById('emptyState');
     
-    if (!window.recipesData || !recipesGrid) return;
+    if (!window.recipesData || !Array.isArray(window.recipesData)) {
+        console.warn('Tarif verisi henüz yüklenmedi');
+        return;
+    }
+
+    if (!recipesGrid) return;
 
     const searchTerm = query.toLowerCase().trim();
     
@@ -248,3 +231,46 @@ function performSearch(query) {
         }
     }
 }
+
+// Debounce'lu arama fonksiyonu
+const debouncedSearch = Utils.debounce(performSearch, 300);
+
+document.addEventListener('DOMContentLoaded', () => {
+    // Core sistemleri başlat
+    ThemeManager.init();
+    MobileNav.init();
+    LazyLoader.init();
+
+    // Arama fonksiyonelliği
+    const searchInput = document.getElementById('heroSearchInput');
+    const searchBtn = document.getElementById('heroSearchBtn');
+    
+    if (searchInput) {
+        // Input değişikliğini dinle (debounce'lu)
+        searchInput.addEventListener('input', (e) => {
+            debouncedSearch(e.target.value);
+        });
+
+        // Enter tuşu
+        searchInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                performSearch(searchInput.value);
+            }
+        });
+    }
+
+    if (searchBtn && searchInput) {
+        searchBtn.addEventListener('click', () => {
+            performSearch(searchInput.value);
+        });
+    }
+});
+
+// Global erişim için window'a ata
+window.ThemeManager = ThemeManager;
+window.MobileNav = MobileNav;
+window.Toast = Toast;
+window.Modal = Modal;
+window.Utils = Utils;
+window.LazyLoader = LazyLoader;
+window.performSearch = performSearch;
