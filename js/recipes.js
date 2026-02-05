@@ -172,7 +172,7 @@ const Recipes = {
         
         const contentHtml = await this.loadRecipeContent(recipe.contentFile);
         document.getElementById('instructionsContent').innerHTML = contentHtml;
-        this.renderIngredients(recipe, html);
+        this.renderIngredients(recipe, contentHtml);
         this.bindButtons();
     }
 };
