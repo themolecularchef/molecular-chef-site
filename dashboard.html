@@ -209,23 +209,7 @@
     
     <script>
         // Modal fonksiyonları
-        const Modal = {
-            open(modalId) {
-                const modal = document.getElementById(modalId);
-                if (modal) {
-                    modal.classList.add('active');
-                    document.body.style.overflow = 'hidden';
-                }
-            },
-            close(modalId) {
-                const modal = document.getElementById(modalId);
-                if (modal) {
-                    modal.classList.remove('active');
-                    document.body.style.overflow = '';
-                }
-            }
-        };
-
+       
         // Toast fonksiyonu
         function showToast(message, type = 'default') {
             const toast = document.getElementById('toast');
