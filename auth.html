@@ -1,18 +1,15 @@
 <!DOCTYPE html>
 <html lang="tr">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description"
-        content="Lezzet Yolculuğu'na giriş yapın veya hesap oluşturun. Favori tariflerinizi kaydedin, kişisel listeler oluşturun.">
+    <meta name="description" content="Lezzet Yolculuğu'na giriş yapın veya hesap oluşturun. Favori tariflerinizi kaydedin, kişisel listeler oluşturun.">
+    <meta name="theme-color" content="#059669">
     <title>Giriş | Lezzet Yolculuğu</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/components.css">
@@ -32,11 +29,13 @@
             messagingSenderId: "23609596807",
             appId: "1:23609596807:web:18db592c11caeaade29122"
         };
-        firebase.initializeApp(firebaseConfig);
+        
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
         const db = firebase.firestore();
     </script>
 </head>
-
 <body class="auth-page">
     <nav class="nav nav-transparent" id="nav">
         <div class="nav-container">
@@ -67,23 +66,27 @@
                 <div class="form-group">
                     <label class="form-label" for="email">E-posta</label>
                     <input type="email" class="form-input" id="email" name="email" placeholder="ornek@email.com"
-                        required>
+                        required autocomplete="email">
                 </div>
                 <div class="form-group">
                     <label class="form-label" for="password">Şifre</label>
                     <input type="password" class="form-input" id="password" name="password" placeholder="••••••••"
-                        required>
+                        required minlength="6" autocomplete="current-password">
+                    <small id="passwordHint" style="color: var(--color-text-muted); font-size: 0.75rem; margin-top: 0.25rem; display: block;">
+                        En az 6 karakter olmalıdır
+                    </small>
                 </div>
                 <div class="form-group" id="confirmPasswordGroup" style="display: none;">
                     <label class="form-label" for="confirmPassword">Şifre Tekrar</label>
                     <input type="password" class="form-input" id="confirmPassword" name="confirmPassword"
-                        placeholder="••••••••">
+                        placeholder="••••••••" autocomplete="new-password">
                 </div>
                 <button type="submit" class="btn btn-primary btn-full" id="authSubmit">Giriş Yap</button>
             </form>
 
             <div class="auth-divider"><span>veya</span></div>
-            <a href="index.html" onclick="skipAuth(event)" class="btn btn-ghost btn-full">Üye Olmadan Devam Et</a>
+            
+            <a href="index.html" id="skipAuthLink" class="btn btn-ghost btn-full">Üye Olmadan Devam Et</a>
 
             <div class="auth-toggle">
                 <p id="authToggleText">Hesabınız yok mu?</p>
@@ -97,112 +100,161 @@
     </div>
 
     <script src="js/app.js"></script>
-
+    
     <script>
-        // Theme
-        const ThemeManager = {
-            init() {
-                const savedTheme = localStorage.getItem('theme');
-                const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-                if (savedTheme) {
-                    document.documentElement.setAttribute('data-theme', savedTheme);
-                } else if (prefersDark) {
-                    document.documentElement.setAttribute('data-theme', 'dark');
-                }
-                document.getElementById('themeToggle')?.addEventListener('click', () => this.toggle());
-            },
-            toggle() {
-                const current = document.documentElement.getAttribute('data-theme');
-                const next = current === 'dark' ? 'light' : 'dark';
-                document.documentElement.setAttribute('data-theme', next);
-                localStorage.setItem('theme', next);
-            }
-        };
-        ThemeManager.init();
+        // Auth mode state
+        let isLoginMode = true;
 
-        function showToast(message, type = 'default') {
-            const toast = document.getElementById('toast');
-            document.getElementById('toastMessage').textContent = message;
-            toast.className = 'toast active ' + type;
-            setTimeout(() => toast.classList.remove('active'), 3000);
+        // Redirect if already logged in
+        firebase.auth().onAuthStateChanged((user) => {
+            if (user) {
+                window.location.href = 'index.html';
+            }
+        });
+
+        // Theme Toggle
+        document.getElementById('themeToggle')?.addEventListener('click', () => {
+            ThemeManager.toggle();
+        });
+
+        // Skip Auth
+        document.getElementById('skipAuthLink')?.addEventListener('click', (e) => {
+            e.preventDefault();
+            localStorage.setItem('skipAuth', 'true');
+            window.location.href = 'index.html';
+        });
+
+        // Toggle Login/Register
+        document.getElementById('authToggleBtn')?.addEventListener('click', toggleAuthMode);
+
+        function toggleAuthMode() {
+            isLoginMode = !isLoginMode;
+            const title = document.getElementById('authTitle');
+            const subtitle = document.getElementById('authSubtitle');
+            const submit = document.getElementById('authSubmit');
+            const nameGroup = document.getElementById('nameGroup');
+            const confirmGroup = document.getElementById('confirmPasswordGroup');
+            const toggleText = document.getElementById('authToggleText');
+            const toggleBtn = document.getElementById('authToggleBtn');
+            const passwordHint = document.getElementById('passwordHint');
+            const form = document.getElementById('authForm');
+
+            if (isLoginMode) {
+                title.textContent = 'Giriş Yap';
+                subtitle.textContent = 'Hesabınıza giriş yaparak tariflerinizi kaydedin';
+                submit.textContent = 'Giriş Yap';
+                nameGroup.style.display = 'none';
+                confirmGroup.style.display = 'none';
+                toggleText.textContent = 'Hesabınız yok mu?';
+                toggleBtn.textContent = 'Kayıt Ol';
+                passwordHint.textContent = 'En az 6 karakter olmalıdır';
+                form.reset();
+            } else {
+                title.textContent = 'Kayıt Ol';
+                subtitle.textContent = 'Yeni bir hesap oluşturun';
+                submit.textContent = 'Kayıt Ol';
+                nameGroup.style.display = 'block';
+                confirmGroup.style.display = 'block';
+                toggleText.textContent = 'Zaten hesabınız var mı?';
+                toggleBtn.textContent = 'Giriş Yap';
+                passwordHint.textContent = 'En az 6 karakter, büyük-küçük harf ve rakam içermelidir';
+            }
         }
 
-        firebase.auth().onAuthStateChanged((user) => {
-            if (user) window.location.href = 'index.html';
-        });
-
-        let isLoginMode = true;
-        const authForm = document.getElementById('authForm');
-        const toggleBtn = document.getElementById('authToggleBtn');
-
-        toggleBtn.addEventListener('click', () => {
-            isLoginMode = !isLoginMode;
-            if (isLoginMode) {
-                document.getElementById('authTitle').textContent = 'Giriş Yap';
-                document.getElementById('authSubtitle').textContent = 'Hesabınıza giriş yaparak tariflerinizi kaydedin';
-                document.getElementById('authSubmit').textContent = 'Giriş Yap';
-                document.getElementById('nameGroup').style.display = 'none';
-                document.getElementById('confirmPasswordGroup').style.display = 'none';
-                document.getElementById('authToggleText').textContent = 'Hesabınız yok mu?';
-                toggleBtn.textContent = 'Kayıt Ol';
-            } else {
-                document.getElementById('authTitle').textContent = 'Kayıt Ol';
-                document.getElementById('authSubtitle').textContent = 'Yeni bir hesap oluşturun';
-                document.getElementById('authSubmit').textContent = 'Kayıt Ol';
-                document.getElementById('nameGroup').style.display = 'block';
-                document.getElementById('confirmPasswordGroup').style.display = 'block';
-                document.getElementById('authToggleText').textContent = 'Zaten hesabınız var mı?';
-                toggleBtn.textContent = 'Giriş Yap';
-            }
-        });
-
-        authForm.addEventListener('submit', async (e) => {
+        // Form Submit
+        document.getElementById('authForm')?.addEventListener('submit', async (e) => {
             e.preventDefault();
+            
             const email = document.getElementById('email').value.trim();
             const password = document.getElementById('password').value;
+
+            // Email validasyonu
+            if (!isValidEmail(email)) {
+                Toast.show('Geçerli bir e-posta adresi girin', 'error');
+                return;
+            }
 
             if (isLoginMode) {
                 try {
                     await firebase.auth().signInWithEmailAndPassword(email, password);
-                    showToast('Giriş başarılı!', 'success');
+                    Toast.show('Giriş başarılı!', 'success');
                     setTimeout(() => window.location.href = 'index.html', 500);
                 } catch (error) {
-                    let msg = 'Giriş yapılamadı';
-                    if (error.code === 'auth/user-not-found') msg = 'Kullanıcı bulunamadı';
-                    if (error.code === 'auth/wrong-password') msg = 'Şifre hatalı';
-                    showToast(msg, 'error');
+                    handleAuthError(error);
                 }
             } else {
                 const name = document.getElementById('name').value.trim();
                 const confirmPass = document.getElementById('confirmPassword').value;
 
-                if (!name) return showToast('İsim girin', 'error');
-                if (password !== confirmPass) return showToast('Şifreler eşleşmiyor', 'error');
-                if (password.length < 6) return showToast('Şifre en az 6 karakter', 'error');
+                if (!name) {
+                    Toast.show('Lütfen isminizi girin', 'error');
+                    return;
+                }
+                
+                if (password !== confirmPass) {
+                    Toast.show('Şifreler eşleşmiyor', 'error');
+                    return;
+                }
+                
+                if (password.length < 6) {
+                    Toast.show('Şifre en az 6 karakter olmalıdır', 'error');
+                    return;
+                }
 
                 try {
                     const result = await firebase.auth().createUserWithEmailAndPassword(email, password);
                     await result.user.updateProfile({ displayName: name });
+                    
                     await db.collection('users').doc(result.user.uid).set({
                         name: name,
                         email: email,
                         createdAt: new Date().toISOString(),
-                        favorites: []
+                        favorites: [],
+                        lists: []
                     });
-                    showToast('Kayıt başarılı!', 'success');
-                    setTimeout(() => window.location.href = 'index.html', 500);
+                    
+                    Toast.show('Kayıt başarılı! Yönlendiriliyorsunuz...', 'success');
+                    setTimeout(() => window.location.href = 'index.html', 1000);
                 } catch (error) {
-                    let msg = 'Kayıt yapılamadı';
-                    if (error.code === 'auth/email-already-in-use') msg = 'E-posta kullanımda';
-                    showToast(msg, 'error');
+                    handleAuthError(error);
                 }
             }
         });
 
-        function skipAuth(e) {
-            e.preventDefault();
-            localStorage.setItem('skipAuth', 'true');
-            window.location.href = 'index.html';
+        function isValidEmail(email) {
+            const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return re.test(email);
+        }
+
+        function handleAuthError(error) {
+            console.error("Auth hatası:", error);
+            let msg = 'Bir hata oluştu. Lütfen tekrar deneyin.';
+            
+            switch(error.code) {
+                case 'auth/user-not-found':
+                    msg = 'Bu e-posta adresi ile kayıtlı kullanıcı bulunamadı';
+                    break;
+                case 'auth/wrong-password':
+                    msg = 'Şifre hatalı. Lütfen tekrar deneyin';
+                    break;
+                case 'auth/invalid-email':
+                    msg = 'Geçersiz e-posta adresi';
+                    break;
+                case 'auth/email-already-in-use':
+                    msg = 'Bu e-posta adresi zaten kullanımda';
+                    break;
+                case 'auth/weak-password':
+                    msg = 'Şifre çok zayıf. En az 6 karakter kullanın';
+                    break;
+                case 'auth/too-many-requests':
+                    msg = 'Çok fazla deneme yaptınız. Lütfen daha sonra tekrar deneyin';
+                    break;
+                case 'auth/network-request-failed':
+                    msg = 'İnternet bağlantınızı kontrol edin';
+                    break;
+            }
+            
+            Toast.show(msg, 'error');
         }
     </script>
 </body>
