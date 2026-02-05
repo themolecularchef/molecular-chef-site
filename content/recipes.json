@@ -1,6 +1,3 @@
- * Lezzet Yolculuğu - Recipes Module
- */
-
 const Recipes = {
     data: null,
     currentRecipe: null,
@@ -13,7 +10,6 @@ const Recipes = {
             this.renderRecipesGrid();
             this.bindFilterEvents();
         });
-
         if (document.querySelector('.recipe-hero')) {
             this.loadRecipeDetail();
         }
@@ -25,11 +21,9 @@ const Recipes = {
             const data = await response.json();
             this.data = data.recipes || [];
             window.recipesData = this.data;
-            return this.data;
         } catch (error) {
-            console.error('Tarifler yüklenemedi:', error);
+            console.error('Hata:', error);
             this.data = [];
-            window.recipesData = [];
         }
     },
 
@@ -39,21 +33,20 @@ const Recipes = {
             const markdown = await response.text();
             return marked.parse(markdown);
         } catch (error) {
-            return '<p>Tarif içeriği yüklenemedi.</p>';
+            return '<p>Hata</p>';
         }
     },
 
     getRecipeById(id) {
         return this.data ? this.data.find(r => r.id.toString() === id.toString()) : null;
     },
+
     async renderRecipesGrid(recipes = null) {
         const grid = document.getElementById('recipesGrid');
         const emptyState = document.getElementById('emptyState');
-        
         if (!grid) return;
         
         const recipesToRender = recipes || this.data;
-        
         if (!recipesToRender || recipesToRender.length === 0) {
             grid.innerHTML = '';
             if (emptyState) emptyState.classList.remove('hidden');
@@ -111,7 +104,6 @@ const Recipes = {
             btn.addEventListener('click', () => {
                 document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
-                
                 const filter = btn.dataset.filter;
                 if (filter === 'all') {
                     this.renderRecipesGrid(this.data);
@@ -126,10 +118,8 @@ const Recipes = {
     async showQuickView(recipeId) {
         const recipe = this.getRecipeById(recipeId);
         if (!recipe) return;
-        
         const modalBody = document.getElementById('quickViewBody');
         if (!modalBody) return;
-        
         modalBody.innerHTML = `
             <div class="quick-view">
                 <img src="${recipe.image}" alt="${recipe.title}">
@@ -141,17 +131,15 @@ const Recipes = {
                 </div>
             </div>
         `;
-        
         Modal.open('quickViewModal');
     },
+
     renderIngredients(recipe, markdownHtml) {
         const ingredientsList = document.getElementById('ingredientsList');
         const servingsCount = document.getElementById('servingsCount');
-
         if (servingsCount) servingsCount.textContent = recipe.servings || 4;
 
         let ingredients = null;
-
         if (recipe.ingredients && Array.isArray(recipe.ingredients)) {
             ingredients = recipe.ingredients;
         } else if (markdownHtml) {
@@ -170,7 +158,7 @@ const Recipes = {
             }
         } else {
             if (ingredientsList) {
-                ingredientsList.innerHTML = '<div class="ingredient-item"><span style="color: var(--color-text-secondary);">Malzeme listesi bulunamadı</span></div>';
+                ingredientsList.innerHTML = '<div class="ingredient-item"><span>Malzeme bulunamadı</span></div>';
             }
         }
     },
@@ -179,7 +167,6 @@ const Recipes = {
         const temp = document.createElement('div');
         temp.innerHTML = html;
         const headings = temp.querySelectorAll('h2, h3');
-        
         for (let h of headings) {
             if (h.textContent.toLowerCase().includes('malzemeler')) {
                 let list = h.nextElementSibling;
@@ -199,7 +186,6 @@ const Recipes = {
         if (count) {
             count.textContent = Math.round(this.originalServings * this.servingsMultiplier * 10) / 10 + ' kişilik';
         }
-
         document.querySelectorAll('.ingredient-text').forEach((item, index) => {
             const original = this.originalIngredients[index];
             if (original) {
@@ -220,7 +206,6 @@ const Recipes = {
                 this.updateServings();
             }
         });
-        
         document.getElementById('decreaseServings')?.addEventListener('click', () => {
             if (this.servingsMultiplier > 0.5) {
                 this.servingsMultiplier -= 0.5;
@@ -232,15 +217,12 @@ const Recipes = {
     async loadRecipeDetail() {
         const recipeId = new URLSearchParams(window.location.search).get('id');
         if (!recipeId) return;
-        
         if (!this.data) await this.loadRecipes();
-        
         const recipe = this.getRecipeById(recipeId);
         if (!recipe) {
             Toast.show('Tarif bulunamadı', 'error');
             return;
         }
-        
         this.currentRecipe = recipe;
         this.servingsMultiplier = 1;
         this.originalServings = recipe.servings || 4;
@@ -256,7 +238,6 @@ const Recipes = {
         
         const html = await this.loadRecipeContent(recipe.contentFile);
         document.getElementById('instructionsContent').innerHTML = html;
-        
         this.renderIngredients(recipe, html);
         this.bindButtons();
     }
