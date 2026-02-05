@@ -251,19 +251,24 @@
         });
 
         async function checkFavoriteStatus() {
-            const recipeId = new URLSearchParams(window.location.search).get('id');
-            if (!recipeId) return;
-            
-            try {
-                const user = firebase.auth().currentUser;
-                if (!user) return;
-                
-                const doc = await db.collection('users').doc(user.uid).collection('favorites').doc(recipeId).get();
-                updateFavoriteButton(doc.exists);
-            } catch (e) {
-                console.error("Favori kontrol hatası:", e);
-            }
+    const recipeId = new URLSearchParams(window.location.search).get('id');
+    if (!recipeId) return;
+    
+    try {
+        const user = firebase.auth().currentUser;
+        if (!user) return;
+        
+        const doc = await db.collection('users').doc(user.uid).get();
+        if (doc.exists) {
+            const favorites = doc.data().favorites || [];
+            updateFavoriteButton(favorites.includes(recipeId));
+        } else {
+            updateFavoriteButton(false);
         }
+    } catch (e) {
+        console.error("Favori kontrol hatası:", e);
+    }
+}
 
         function updateFavoriteButton(isFavorited) {
             const btn = document.getElementById('addToFavoritesBtn');
