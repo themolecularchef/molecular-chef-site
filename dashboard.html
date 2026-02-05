@@ -1,18 +1,14 @@
 <!DOCTYPE html>
 <html lang="tr">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description"
-        content="Kişisel tarif listenizi yönetin. Favorilerinizi kaydedin, özel listeler oluşturun.">
+    <meta name="description" content="Kişisel tarif listenizi yönetin. Favorilerinizi kaydedin, özel listeler oluşturun.">
     <title>Listelerim | Lezzet Yolculuğu</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/components.css">
@@ -33,7 +29,9 @@
             appId: "1:23609596807:web:18db592c11caeaade29122"
         };
 
-        firebase.initializeApp(firebaseConfig);
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
         const db = firebase.firestore();
     </script>
 </head>
@@ -96,6 +94,7 @@
                 </button>
             </div>
 
+            <!-- Create List Modal -->
             <div class="modal" id="createListModal">
                 <div class="modal-backdrop"></div>
                 <div class="modal-content modal-sm">
@@ -116,6 +115,7 @@
                 </div>
             </div>
 
+            <!-- List Detail Modal -->
             <div class="modal" id="listDetailModal">
                 <div class="modal-backdrop"></div>
                 <div class="modal-content modal-lg">
@@ -140,6 +140,7 @@
                 </div>
             </div>
 
+            <!-- Lists Section -->
             <div class="lists-section">
                 <div class="lists-header"
                     style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-xl);">
@@ -160,6 +161,7 @@
                 </div>
             </div>
 
+            <!-- Favorites Section -->
             <div class="lists-section" style="margin-top: var(--space-3xl);">
                 <div class="lists-header"
                     style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-xl);">
@@ -209,22 +211,13 @@
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-    <script src="js/recipes.js"></script>
     <script src="js/app.js"></script>
+    <script src="js/recipes.js"></script>
 
     <script>
-        function showToast(message, type = 'default') {
-            const toast = document.getElementById('toast');
-            const toastMessage = document.getElementById('toastMessage');
-            if (toast && toastMessage) {
-                toastMessage.textContent = message;
-                toast.className = 'toast active ' + type;
-                setTimeout(() => toast.classList.remove('active'), 3000);
-            }
-        }
-
         let allRecipes = [];
 
+        // Auth State
         firebase.auth().onAuthStateChanged(async (user) => {
             if (!user) {
                 window.location.href = 'index.html';
@@ -242,11 +235,15 @@
         async function loadAllRecipes() {
             try {
                 const response = await fetch('content/recipes.json');
+                if (!response.ok) throw new Error('Tarifler yüklenemedi');
                 const data = await response.json();
                 allRecipes = data.recipes || [];
+                window.recipesData = allRecipes;
             } catch (error) {
                 console.error("Tarifler yüklenemedi:", error);
                 allRecipes = [];
+                window.recipesData = [];
+                Toast.show('Tarifler yüklenirken hata oluştu', 'error');
             }
         }
 
@@ -304,6 +301,7 @@
 
             } catch (error) {
                 console.error("Listeler yüklenemedi:", error);
+                Toast.show('Listeler yüklenemedi', 'error');
             }
         }
 
@@ -368,6 +366,7 @@
 
             } catch (error) {
                 console.error("Liste detayı yüklenemedi:", error);
+                Toast.show('Liste detayı yüklenemedi', 'error');
             }
         }
 
@@ -387,17 +386,18 @@
                         lists[listIndex].recipes = lists[listIndex].recipes.filter(id => id !== recipeId);
                         await userRef.update({ lists: lists });
 
-                        showToast('Listeden çıkarıldı');
+                        Toast.show('Listeden çıkarıldı');
                         openListDetail(listId);
                         loadLists();
                     }
                 }
             } catch (error) {
                 console.error("Tarif listeden çıkarılamadı:", error);
-                showToast('İşlem yapılamadı', 'error');
+                Toast.show('İşlem yapılamadı', 'error');
             }
         }
 
+        // Create List
         document.getElementById('createListBtn')?.addEventListener('click', () => {
             Modal.open('createListModal');
         });
@@ -407,7 +407,7 @@
 
             const user = firebase.auth().currentUser;
             if (!user) {
-                showToast('Giriş yapmalısınız', 'error');
+                Toast.show('Giriş yapmalısınız', 'error');
                 return;
             }
 
@@ -436,14 +436,14 @@
                     });
                 }
 
-                showToast('Liste oluşturuldu!', 'success');
+                Toast.show('Liste oluşturuldu!', 'success');
                 Modal.close('createListModal');
                 document.getElementById('createListForm').reset();
                 await loadLists();
 
             } catch (error) {
                 console.error("Liste oluşturulamadı:", error);
-                showToast('Liste oluşturulamadı', 'error');
+                Toast.show('Liste oluşturulamadı', 'error');
             }
         });
 
@@ -462,12 +462,12 @@
                     const updatedLists = currentLists.filter(l => l.id !== listId);
                     await userRef.update({ lists: updatedLists });
 
-                    showToast('Liste silindi');
+                    Toast.show('Liste silindi');
                     await loadLists();
                 }
             } catch (error) {
                 console.error("Liste silinemedi:", error);
-                showToast('Liste silinemedi', 'error');
+                Toast.show('Liste silinemedi', 'error');
             }
         }
 
@@ -513,6 +513,7 @@
 
             } catch (error) {
                 console.error("Favoriler yüklenemedi:", error);
+                Toast.show('Favoriler yüklenemedi', 'error');
             }
         }
 
@@ -525,19 +526,21 @@
                     favorites: firebase.firestore.FieldValue.arrayRemove(recipeId)
                 });
 
-                showToast('Favorilerden çıkarıldı');
+                Toast.show('Favorilerden çıkarıldı');
                 loadFavorites();
             } catch (error) {
                 console.error("Favori silinemedi:", error);
+                Toast.show('Favori silinemedi', 'error');
             }
         }
 
-        document.getElementById('navLogout').addEventListener('click', async () => {
+        // Logout
+        document.getElementById('navLogout')?.addEventListener('click', async () => {
             await firebase.auth().signOut();
             window.location.href = 'index.html';
         });
 
-        document.getElementById('mobileLogout').addEventListener('click', async () => {
+        document.getElementById('mobileLogout')?.addEventListener('click', async () => {
             await firebase.auth().signOut();
             window.location.href = 'index.html';
         });
