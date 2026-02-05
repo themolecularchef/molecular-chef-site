@@ -284,34 +284,54 @@
         }
 
         document.getElementById('addToFavoritesBtn')?.addEventListener('click', async () => {
-            const user = firebase.auth().currentUser;
-            if (!user) {
-                showToast('Favorilere eklemek için giriş yapmalısınız', 'error');
-                setTimeout(() => window.location.href = 'auth.html', 1500);
-                return;
-            }
-            
-            const recipeId = new URLSearchParams(window.location.search).get('id');
-            if (!recipeId) return;
-            
-            try {
-                const favRef = db.collection('users').doc(user.uid).collection('favorites').doc(recipeId);
-                const doc = await favRef.get();
-                
-                if (doc.exists) {
-                    await favRef.delete();
-                    updateFavoriteButton(false);
-                    showToast('Favorilerden çıkarıldı');
-                } else {
-                    await favRef.set({ addedAt: new Date().toISOString() });
-                    updateFavoriteButton(true);
-                    showToast('Favorilere eklendi!', 'success');
-                }
-            } catch (error) {
-                console.error("Favori hatası:", error);
-                showToast('İşlem yapılamadı', 'error');
-            }
-        });
+    const user = firebase.auth().currentUser;
+    if (!user) {
+        showToast('Favorilere eklemek için giriş yapmalısınız', 'error');
+        setTimeout(() => window.location.href = 'auth.html', 1500);
+        return;
+    }
+    
+    const recipeId = new URLSearchParams(window.location.search).get('id');
+    if (!recipeId) return;
+    
+    try {
+        const userRef = db.collection('users').doc(user.uid);
+        const userDoc = await userRef.get();
+        
+        if (!userDoc.exists) {
+            // Kullanıcı dokümanı yoksa oluştur
+            await userRef.set({
+                favorites: [recipeId],
+                name: user.displayName || '',
+                email: user.email
+            });
+            updateFavoriteButton(true);
+            showToast('Favorilere eklendi!', 'success');
+            return;
+        }
+        
+        const currentFavorites = userDoc.data().favorites || [];
+        
+        if (currentFavorites.includes(recipeId)) {
+            // Favorilerden çıkar
+            await userRef.update({
+                favorites: firebase.firestore.FieldValue.arrayRemove(recipeId)
+            });
+            updateFavoriteButton(false);
+            showToast('Favorilerden çıkarıldı');
+        } else {
+            // Favorilere ekle
+            await userRef.update({
+                favorites: firebase.firestore.FieldValue.arrayUnion(recipeId)
+            });
+            updateFavoriteButton(true);
+            showToast('Favorilere eklendi!', 'success');
+        }
+    } catch (error) {
+        console.error("Favori hatası:", error);
+        showToast('İşlem yapılamadı', 'error');
+    }
+});
 
         function showToast(message, type = 'default') {
             const toast = document.getElementById('toast');
