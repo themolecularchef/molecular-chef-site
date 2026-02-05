@@ -47,7 +47,6 @@ const Recipes = {
     getRecipeById(id) {
         return this.data ? this.data.find(r => r.id.toString() === id.toString()) : null;
     },
-
     async renderRecipesGrid(recipes = null) {
         const grid = document.getElementById('recipesGrid');
         const emptyState = document.getElementById('emptyState');
@@ -146,7 +145,6 @@ const Recipes = {
         
         Modal.open('quickViewModal');
     },
-
     renderIngredients(recipe, markdownHtml) {
         const ingredientsList = document.getElementById('ingredientsList');
         const servingsCount = document.getElementById('servingsCount');
