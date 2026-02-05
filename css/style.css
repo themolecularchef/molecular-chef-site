@@ -411,7 +411,6 @@ textarea {
     padding: var(--space-xl);
     max-width: 700px;
 }
-}
 
 .hero-title {
     font-family: var(--font-heading);
