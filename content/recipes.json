@@ -10,7 +10,12 @@
       "servings": 4,
       "difficulty": "Orta",
       "category": "Çorba",
-      "tags": ["azerbaycan", "çorba", "yoğurt", "kruton"],
+      "tags": [
+        "azerbaycan",
+        "çorba",
+        "yoğurt",
+        "kruton"
+      ],
       "contentFile": "content/markdown/dovga-krutonlar.md",
       "description": "Ekşi mayalı yoğurtla hazırlanan geleneksel Azerbaycan çorbası, sumaklı baharatlı krutonlarla servis edilir."
     },
@@ -24,7 +29,12 @@
       "servings": 2,
       "difficulty": "Orta",
       "category": "Et Yemekleri",
-      "tags": ["iskender", "kebap", "pilav", "türk mutfağı"],
+      "tags": [
+        "iskender",
+        "kebap",
+        "pilav",
+        "türk mutfağı"
+      ],
       "contentFile": "content/markdown/iskender-kebap.md",
       "description": "Evde yapılabilen nefis İskender kebap, tereyağlı salça sosu ve tane tane pilavıyla."
     },
@@ -38,7 +48,12 @@
       "servings": 4,
       "difficulty": "Kolay",
       "category": "Meze",
-      "tags": ["patates", "fırın", "meze", "nar ekşisi"],
+      "tags": [
+        "patates",
+        "fırın",
+        "meze",
+        "nar ekşisi"
+      ],
       "contentFile": "content/markdown/elma-dilim-patates.md",
       "description": "Dışı çıtır içi yumuşak fırın patates, nar ekşili mayonezli sosla buluşuyor."
     },
@@ -52,7 +67,12 @@
       "servings": 2,
       "difficulty": "Orta",
       "category": "Tavuk Yemekleri",
-      "tags": ["tavuk", "haşlama", "fırın", "turşu"],
+      "tags": [
+        "tavuk",
+        "haşlama",
+        "fırın",
+        "turşu"
+      ],
       "contentFile": "content/markdown/tavuk-but-lahana.md",
       "description": "Lokum gibi yumuşak tavuk but, lahana turşusu ve taze nane ile."
     },
@@ -66,7 +86,12 @@
       "servings": 2,
       "difficulty": "Kolay",
       "category": "Makarna",
-      "tags": ["sucuk", "spagetti", "makarna", "sarımsak"],
+      "tags": [
+        "sucuk",
+        "spagetti",
+        "makarna",
+        "sarımsak"
+      ],
       "contentFile": "content/markdown/sucuk-spagetti.md",
       "description": "Kızarmış sucuk dilimleri ve sarımsaklı salça soslu nefis spagetti."
     },
@@ -80,7 +105,12 @@
       "servings": 2,
       "difficulty": "Orta",
       "category": "Et Yemekleri",
-      "tags": ["dürüm", "lavaş", "et", "közbiber"],
+      "tags": [
+        "dürüm",
+        "lavaş",
+        "et",
+        "közbiber"
+      ],
       "contentFile": "content/markdown/lavas-durum.md",
       "description": "Tel tel yumuşak et, gevrek lavaş ve közlenmiş biberin mükemmel uyumu."
     },
@@ -94,7 +124,13 @@
       "servings": 2,
       "difficulty": "Kolay",
       "category": "Makarna",
-      "tags": ["makarna", "penne", "sigara böreği", "salça", "hızlı yemek"],
+      "tags": [
+        "makarna",
+        "penne",
+        "sigara böreği",
+        "salça",
+        "hızlı yemek"
+      ],
       "contentFile": "content/markdown/penne-sigara-boregi.md",
       "description": "Bol salçalı, krema ile yumuşatılmış penne makarna, yanında çıtır sigara böreği ve çanak peyniriyle."
     },
@@ -108,7 +144,13 @@
       "servings": 4,
       "difficulty": "Orta",
       "category": "Et Yemekleri",
-      "tags": ["dana", "kavurma", "defne", "yavaş pişirme", "mühürleme"],
+      "tags": [
+        "dana",
+        "kavurma",
+        "defne",
+        "yavaş pişirme",
+        "mühürleme"
+      ],
       "contentFile": "content/markdown/defne-aromali-dana-kavurma.md",
       "description": "Defne aromasıyla marine edilmiş, önce mühürlenip sonra kısık ateşte lokum gibi pişen dana kavurma."
     },
@@ -122,7 +164,12 @@
       "servings": 2,
       "difficulty": "Orta",
       "category": "Tavuk Yemekleri",
-      "tags": ["tavuk kanat", "közbiber", "fırın", "sarımsak"],
+      "tags": [
+        "tavuk kanat",
+        "közbiber",
+        "fırın",
+        "sarımsak"
+      ],
       "contentFile": "content/markdown/firin-kanat-kozlenmis-biber.md",
       "description": "Çıtır derili fırın kanat, elektrikli ocakta közlenmiş biber ve kavrulmuş sarımsakla."
     },
@@ -136,7 +183,12 @@
       "servings": 3,
       "difficulty": "Orta",
       "category": "Tavuk Yemekleri",
-      "tags": ["tavuk but", "fırın", "yoğurt marine", "çiğ sarımsak"],
+      "tags": [
+        "tavuk but",
+        "fırın",
+        "yoğurt marine",
+        "çiğ sarımsak"
+      ],
       "contentFile": "content/markdown/firinda-baharatli-tavuk-but.md",
       "description": "Yoğurt ve baharatlarla marine edilmiş, gevrek derili fırın tavuk but, çiğ garnitürlerle."
     },
@@ -150,7 +202,12 @@
       "servings": 2,
       "difficulty": "Kolay",
       "category": "Tavuk Yemekleri",
-      "tags": ["tavuk göğüs", "mantar", "salça", "kruton"],
+      "tags": [
+        "tavuk göğüs",
+        "mantar",
+        "salça",
+        "kruton"
+      ],
       "contentFile": "content/markdown/firinda-salcali-tavuk-mantar.md",
       "description": "Salçalı soslu fırın tavuk göğüs, tereyağlı mantar, kruton ve çikolata toplarıyla süslenmiş."
     },
@@ -164,7 +221,13 @@
       "servings": 3,
       "difficulty": "Orta",
       "category": "Et Yemekleri",
-      "tags": ["antrikot", "kabuklu pişirme", "soğan", "sarımsak", "uzun pişirme"],
+      "tags": [
+        "antrikot",
+        "kabuklu pişirme",
+        "soğan",
+        "sarımsak",
+        "uzun pişirme"
+      ],
       "contentFile": "content/markdown/kabuklarinda-firinlanmis-antrikot.md",
       "description": "Kabuklarında pişirilmiş antrikot, soğan ve sarımsak püresiyle, şerit biber ve taze üzümle."
     },
@@ -178,7 +241,12 @@
       "servings": 6,
       "difficulty": "Orta",
       "category": "Et Yemekleri",
-      "tags": ["bonfile", "kavurma", "patates püresi", "lokum kıvamı"],
+      "tags": [
+        "bonfile",
+        "kavurma",
+        "patates püresi",
+        "lokum kıvamı"
+      ],
       "contentFile": "content/markdown/kisik-ateste-lokum-bonfile.md",
       "description": "Kısık ateşte lokum gibi yumuşayan bonfile kavurma, kremamsı tereyağlı patates püresi üzerinde."
     },
@@ -192,7 +260,13 @@
       "servings": 10,
       "difficulty": "Orta",
       "category": "Tatlı",
-      "tags": ["tiramisu", "muz", "çikolata", "italyan", "soğuk tatlı"],
+      "tags": [
+        "tiramisu",
+        "muz",
+        "çikolata",
+        "italyan",
+        "soğuk tatlı"
+      ],
       "contentFile": "content/markdown/muzlu-tiramisu-cikolata.md",
       "description": "Kedidili bisküvi, mascarpone krema, taze muz ve çikolata toplarıyla zenginleştirilmiş nefis tiramisu."
     },
@@ -206,7 +280,15 @@
       "servings": 2,
       "difficulty": "Orta",
       "category": "Tavuk Yemekleri",
-      "tags": ["tavuk", "kanat", "fırın", "yoğurt", "marine", "dip sos", "baharatlı"],
+      "tags": [
+        "tavuk",
+        "kanat",
+        "fırın",
+        "yoğurt",
+        "marine",
+        "dip sos",
+        "baharatlı"
+      ],
       "contentFile": "content/markdown/baharatli-firin-kanat-yogurtlu-dip.md",
       "description": "Yoğurt ve baharatlarla marine edilmiş, fırında gevrek kıvamlı kanatlar, ferahlatıcı yoğurtlu dip sosla servis edilir."
     },
@@ -220,7 +302,15 @@
       "servings": 2,
       "difficulty": "Kolay",
       "category": "Makarna",
-      "tags": ["makarna", "fusilli", "domates", "kapya biberi", "sarımsak", "italyan", "vejeteryan"],
+      "tags": [
+        "makarna",
+        "fusilli",
+        "domates",
+        "kapya biberi",
+        "sarımsak",
+        "italyan",
+        "vejeteryan"
+      ],
       "contentFile": "content/markdown/domates-kapya-biberli-fusilli-cig-sarimsak.md",
       "description": "Taze domates ve kırmızı kapya biberiyle hazırlanan, üzerine çiğ sarımsak dilimleriyle süslenmiş burgu makarna."
     },
@@ -234,7 +324,14 @@
       "servings": 3,
       "difficulty": "Orta",
       "category": "Et Yemekleri",
-      "tags": ["bonfile", "kavurma", "ekmek arası", "sokak lezzeti", "biber", "marine"],
+      "tags": [
+        "bonfile",
+        "kavurma",
+        "ekmek arası",
+        "sokak lezzeti",
+        "biber",
+        "marine"
+      ],
       "contentFile": "content/markdown/marineli-bonfile-kavurma-baharatli-soganli-ekmek-arasi.md",
       "description": "Sebzeli marineyle tatlandırılmış, yavaş pişirilmiş bonfile kavurma, ramazan pidesi arası sunum ve baharatlı çiğ soğan ile."
     },
@@ -248,9 +345,18 @@
       "servings": 4,
       "difficulty": "Orta",
       "category": "Tavuk Yemekleri",
-      "tags": ["tavuk", "but", "incik", "patates", "fırın", "marine", "baharat", "elma dilim"],
+      "tags": [
+        "tavuk",
+        "but",
+        "incik",
+        "patates",
+        "fırın",
+        "marine",
+        "baharat",
+        "elma dilim"
+      ],
       "contentFile": "content/markdown/baharat-bombasi-firin-tavuk-but-sade-elma-dilim-patates.md",
       "description": "Yoğun baharat karışımıyla marine edilmiş, çıtır derili fırın tavuk butları ve sade baharatlı elma dilim patates."
     }
-  ]   
+  ]
 }
