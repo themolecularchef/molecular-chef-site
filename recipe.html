@@ -52,7 +52,7 @@
             </div>
 
             <div class="nav-actions">
-                <button class="theme-toggle" id="themeToggle" aria-label="Karanlık moda geç">
+                <button class="theme-toggle" id="themeToggle" aria-label="Tema değiştir">
                     <span class="theme-toggle-light">☀️</span>
                     <span class="theme-toggle-dark">🌙</span>
                 </button>
@@ -189,9 +189,10 @@
         <div class="container">
             <div class="footer-content">
                 <div class="footer-brand">
-                    <span class="footer-logo"> <img src="assets/images/Logo.png"
-                            style="height: 24px; width: auto; vertical-align: middle; margin-right: 8px;"> Lezzet
-                        Yolculuğu </span>
+                    <span class="footer-logo">
+                        <img src="assets/images/Logo.png" style="height: 24px; width: auto; vertical-align: middle; margin-right: 8px;">
+                        Lezzet Yolculuğu
+                    </span>
                     <p class="footer-tagline">Evde profesyonel lezzetler</p>
                 </div>
                 <div class="footer-links">
@@ -228,12 +229,10 @@
                 if (navUser) navUser.classList.remove('hidden');
                 if (navUserName) navUserName.textContent = user.displayName || user.email;
                 if (navLists) navLists.classList.remove('hidden');
-
                 if (mobileAuth) mobileAuth.classList.add('hidden');
                 if (mobileUser) mobileUser.classList.remove('hidden');
                 if (mobileUserName) mobileUserName.textContent = user.displayName || user.email;
                 if (mobileLists) mobileLists.classList.remove('hidden');
-
                 checkFavoriteStatus();
             } else {
                 if (navAuth) navAuth.classList.remove('hidden');
@@ -260,11 +259,9 @@
         async function checkFavoriteStatus() {
             const recipeId = new URLSearchParams(window.location.search).get('id');
             if (!recipeId) return;
-
             try {
                 const user = firebase.auth().currentUser;
                 if (!user) return;
-
                 const doc = await db.collection('users').doc(user.uid).get();
                 if (doc.exists) {
                     const favorites = doc.data().favorites || [];
@@ -280,10 +277,8 @@
         function updateFavoriteButton(isFavorited) {
             const btn = document.getElementById('addToFavoritesBtn');
             if (!btn) return;
-
             const icon = btn.querySelector('.action-btn-icon');
             const text = btn.querySelector('.action-btn-text');
-
             if (isFavorited) {
                 btn.classList.add('active');
                 if (icon) icon.textContent = '❤️';
@@ -302,16 +297,12 @@
                 setTimeout(() => window.location.href = 'auth.html', 1500);
                 return;
             }
-
             const recipeId = new URLSearchParams(window.location.search).get('id');
             if (!recipeId) return;
-
             try {
                 const userRef = db.collection('users').doc(user.uid);
                 const userDoc = await userRef.get();
-
                 if (!userDoc.exists) {
-                    // Kullanıcı dokümanı yoksa oluştur
                     await userRef.set({
                         favorites: [recipeId],
                         name: user.displayName || '',
@@ -321,18 +312,14 @@
                     showToast('Favorilere eklendi!', 'success');
                     return;
                 }
-
                 const currentFavorites = userDoc.data().favorites || [];
-
                 if (currentFavorites.includes(recipeId)) {
-                    // Favorilerden çıkar
                     await userRef.update({
                         favorites: firebase.firestore.FieldValue.arrayRemove(recipeId)
                     });
                     updateFavoriteButton(false);
                     showToast('Favorilerden çıkarıldı');
                 } else {
-                    // Favorilere ekle
                     await userRef.update({
                         favorites: firebase.firestore.FieldValue.arrayUnion(recipeId)
                     });
@@ -351,169 +338,132 @@
             toast.className = 'toast active ' + type;
             setTimeout(() => toast.classList.remove('active'), 3000);
         }
-        // PORSİYON YÖNETİMİ
-let currentServings = 4;
-let baseServings = 4;
-let ingredientsList = [];
 
-// Tarif detayını yükleme fonksiyonunu güncelle
-async function loadRecipeDetail() {
-    const recipeId = new URLSearchParams(window.location.search).get('id');
-    if (!recipeId) return;
-    
-    if (!window.Recipes || !window.Recipes.data) await window.Recipes.loadRecipes();
-    
-    const recipe = window.Recipes.data.find(r => r.id.toString() === recipeId.toString());
-    if (!recipe) {
-        showToast('Tarif bulunamadı', 'error');
-        return;
-    }
-    
-    // HTML güncelle...
-    document.getElementById('recipeHeroImage').src = recipe.image;
-    document.getElementById('recipeCategory').textContent = recipe.category;
-    document.getElementById('recipeTitle').textContent = recipe.title;
-    document.getElementById('recipePrepTime').textContent = recipe.prepTime;
-    document.getElementById('recipeCookTime').textContent = recipe.cookTime;
-    document.getElementById('recipeServings').textContent = recipe.servings + ' kişilik';
-    document.getElementById('recipeDifficulty').textContent = recipe.difficulty;
-    
-    baseServings = recipe.servings || 4;
-    currentServings = baseServings;
-    document.getElementById('servingsCount').textContent = currentServings;
-    
-    // Markdown içeriği yükle ve malzemeleri parse et
-    const contentHtml = await window.Recipes.loadRecipeContent(recipe.contentFile);
-    document.getElementById('instructionsContent').innerHTML = contentHtml;
-    
-    // Malzemeleri HTML'den çıkar ve sidebar'a ekle
-    parseIngredients(contentHtml);
-}
+        // Porsiyon ve Malzeme Yönetimi
+        let currentServings = 4;
+        let baseServings = 4;
+        let ingredientsList = [];
 
-// Malzemeleri parse et ve listele
-function parseIngredients(htmlContent) {
-    const tempDiv = document.createElement('div');
-    tempDiv.innerHTML = htmlContent;
-    
-    // Markdown'taki listeleri bul
-    const lists = tempDiv.querySelectorAll('ul li, ol li');
-    ingredientsList = [];
-    
-    lists.forEach(li => {
-        const text = li.textContent.trim();
-        if (text && (text.includes('su bardağı') || text.includes('yemek kaşığı') || text.includes('tatlı kaşığı') || text.includes('kg') || text.includes('gr') || text.includes('adet'))) {
-            ingredientsList.push(text);
+        async function loadRecipeDetail() {
+            const recipeId = new URLSearchParams(window.location.search).get('id');
+            if (!recipeId) return;
+            if (!window.Recipes || !window.Recipes.data) await window.Recipes.loadRecipes();
+            const recipe = window.Recipes.data.find(r => r.id.toString() === recipeId.toString());
+            if (!recipe) {
+                showToast('Tarif bulunamadı', 'error');
+                return;
+            }
+            document.getElementById('recipeHeroImage').src = recipe.image;
+            document.getElementById('recipeCategory').textContent = recipe.category;
+            document.getElementById('recipeTitle').textContent = recipe.title;
+            document.getElementById('recipePrepTime').textContent = recipe.prepTime;
+            document.getElementById('recipeCookTime').textContent = recipe.cookTime;
+            document.getElementById('recipeServings').textContent = recipe.servings + ' kişilik';
+            document.getElementById('recipeDifficulty').textContent = recipe.difficulty;
+            baseServings = recipe.servings || 4;
+            currentServings = baseServings;
+            document.getElementById('servingsCount').textContent = currentServings;
+            const contentHtml = await window.Recipes.loadRecipeContent(recipe.contentFile);
+            document.getElementById('instructionsContent').innerHTML = contentHtml;
+            parseIngredients(contentHtml);
         }
-    });
-    
-    renderIngredients();
-}
 
-// Malzemeleri render et
-function renderIngredients() {
-    const container = document.getElementById('ingredientsList');
-    if (!container || ingredientsList.length === 0) return;
-    
-    const ratio = currentServings / baseServings;
-    
-    container.innerHTML = ingredientsList.map((ing, index) => {
-        // Miktarları hesapla (basit regex)
-        let displayText = ing;
-        if (ratio !== 1) {
-            displayText = ing.replace(/(\d+\.?\d*)/g, (match) => {
-                const num = parseFloat(match);
-                return (num * ratio).toFixed(1).replace(/\.0$/, '');
+        function parseIngredients(htmlContent) {
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = htmlContent;
+            const lists = tempDiv.querySelectorAll('ul li, ol li');
+            ingredientsList = [];
+            lists.forEach(li => {
+                const text = li.textContent.trim();
+                if (text && (text.includes('su bardağı') || text.includes('yemek kaşığı') || text.includes('tatlı kaşığı') || text.includes('kg') || text.includes('gr') || text.includes('adet'))) {
+                    ingredientsList.push(text);
+                }
             });
+            renderIngredients();
         }
-        
-        return `
-            <div class="ingredient-item">
-                <div class="ingredient-checkbox" onclick="toggleIngredient(this)"></div>
-                <span class="ingredient-text">${displayText}</span>
-            </div>
-        `;
-    }).join('');
-}
 
-// Malzeme tik işaretleme
-function toggleIngredient(checkbox) {
-    checkbox.classList.toggle('checked');
-    checkbox.nextElementSibling.classList.toggle('checked');
-}
+        function renderIngredients() {
+            const container = document.getElementById('ingredientsList');
+            if (!container || ingredientsList.length === 0) return;
+            const ratio = currentServings / baseServings;
+            container.innerHTML = ingredientsList.map((ing) => {
+                let displayText = ing;
+                if (ratio !== 1) {
+                    displayText = ing.replace(/(\d+\.?\d*)/g, (match) => {
+                        const num = parseFloat(match);
+                        return (num * ratio).toFixed(1).replace(/\.0$/, '');
+                    });
+                }
+                return `
+                    <div class="ingredient-item">
+                        <div class="ingredient-checkbox" onclick="toggleIngredient(this)"></div>
+                        <span class="ingredient-text">${displayText}</span>
+                    </div>
+                `;
+            }).join('');
+        }
 
-// Porsiyon butonları
-document.getElementById('increaseServings')?.addEventListener('click', () => {
-    currentServings++;
-    document.getElementById('servingsCount').textContent = currentServings;
-    renderIngredients();
-});
+        function toggleIngredient(checkbox) {
+            checkbox.classList.toggle('checked');
+            checkbox.nextElementSibling.classList.toggle('checked');
+        }
 
-document.getElementById('decreaseServings')?.addEventListener('click', () => {
-    if (currentServings > 1) {
-        currentServings--;
-        document.getElementById('servingsCount').textContent = currentServings;
-        renderIngredients();
-    }
-});
-
-// PAYLAŞMA FONKSİYONU
-document.getElementById('shareBtn')?.addEventListener('click', () => {
-    const modal = document.getElementById('shareModal');
-    modal.classList.add('active');
-    document.body.style.overflow = 'hidden';
-});
-
-document.getElementById('shareNative')?.addEventListener('click', async () => {
-    try {
-        await navigator.share({
-            title: document.getElementById('recipeTitle').textContent,
-            url: window.location.href
+        document.getElementById('increaseServings')?.addEventListener('click', () => {
+            currentServings++;
+            document.getElementById('servingsCount').textContent = currentServings;
+            renderIngredients();
         });
-    } catch (err) {
-        console.log('Paylaşım iptal edildi');
-    }
-    document.getElementById('shareModal').classList.remove('active');
-});
 
-document.getElementById('shareWhatsApp')?.addEventListener('click', () => {
-    const url = encodeURIComponent(window.location.href);
-    const text = encodeURIComponent(document.getElementById('recipeTitle').textContent);
-    window.open(`https://wa.me/?text=${text}%20${url}`, '_blank');
-    document.getElementById('shareModal').classList.remove('active');
-});
+        document.getElementById('decreaseServings')?.addEventListener('click', () => {
+            if (currentServings > 1) {
+                currentServings--;
+                document.getElementById('servingsCount').textContent = currentServings;
+                renderIngredients();
+            }
+        });
 
-document.getElementById('shareCopy')?.addEventListener('click', () => {
-    navigator.clipboard.writeText(window.location.href);
-    showToast('Link kopyalandı!', 'success');
-    document.getElementById('shareModal').classList.remove('active');
-});
+        // Paylaşım Fonksiyonları
+        document.getElementById('shareBtn')?.addEventListener('click', () => {
+            const modal = document.getElementById('shareModal');
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        });
 
-// Modal kapatma
-document.querySelector('#shareModal .modal-backdrop')?.addEventListener('click', () => {
-    document.getElementById('shareModal').classList.remove('active');
-    document.body.style.overflow = '';
-});
+        document.getElementById('shareNative')?.addEventListener('click', async () => {
+            try {
+                await navigator.share({
+                    title: document.getElementById('recipeTitle').textContent,
+                    url: window.location.href
+                });
+            } catch (err) {
+                console.log('Paylaşım iptal edildi');
+            }
+            document.getElementById('shareModal').classList.remove('active');
+        });
 
-// YAZDIRMA
-document.getElementById('printBtn')?.addEventListener('click', () => {
-    window.print();
-});
+        document.getElementById('shareWhatsApp')?.addEventListener('click', () => {
+            const url = encodeURIComponent(window.location.href);
+            const text = encodeURIComponent(document.getElementById('recipeTitle').textContent);
+            window.open(`https://wa.me/?text=${text}%20${url}`, '_blank');
+            document.getElementById('shareModal').classList.remove('active');
+        });
 
-// Toast fonksiyonu (eğer yoksa)
-function showToast(message, type = 'default') {
-    const toast = document.getElementById('toast');
-    const msg = document.getElementById('toastMessage');
-    if (toast && msg) {
-        msg.textContent = message;
-        toast.className = 'toast active ' + type;
-        setTimeout(() => toast.classList.remove('active'), 3000);
-    }
-}
+        document.getElementById('shareCopy')?.addEventListener('click', () => {
+            navigator.clipboard.writeText(window.location.href);
+            showToast('Link kopyalandı!', 'success');
+            document.getElementById('shareModal').classList.remove('active');
+        });
 
-// Sayfa yüklendiğinde
-document.addEventListener('DOMContentLoaded', loadRecipeDetail);
+        document.querySelector('#shareModal .modal-backdrop')?.addEventListener('click', () => {
+            document.getElementById('shareModal').classList.remove('active');
+            document.body.style.overflow = '';
+        });
+
+        document.getElementById('printBtn')?.addEventListener('click', () => {
+            window.print();
+        });
+
+        document.addEventListener('DOMContentLoaded', loadRecipeDetail);
     </script>
-    
 </body>
-
 </html>
