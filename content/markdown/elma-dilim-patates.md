@@ -1,4 +1,3 @@
-[elma-dilim-patates.md](https://github.com/user-attachments/files/24979365/elma-dilim-patates.md)
 # Fırında Elma Dilim Patates & Nar Ekşili Mayonezli Sos
 
 ## Malzemeler (4 kişilik)
