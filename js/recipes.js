@@ -177,6 +177,51 @@ const Recipes = {
 
 document.addEventListener('DOMContentLoaded', () => {
     Recipes.init();
+    renderIngredients(recipe, html) {
+        const list = document.getElementById('ingredientsList');
+        const count = document.getElementById('servingsCount');
+        if (count) count.textContent = recipe.servings || 4;
+        
+        let items = recipe.ingredients;
+        if (!items && html) {
+            const temp = document.createElement('div');
+            temp.innerHTML = html;
+            const h2 = temp.querySelector('h2');
+            if (h2 && h2.textContent.includes('Malzemeler')) {
+                const ul = h2.nextElementSibling;
+                if (ul) items = Array.from(ul.querySelectorAll('li')).map(li => li.textContent);
+            }
+        }
+        
+        if (items && list) {
+            this.originalIngredients = items;
+            list.innerHTML = items.map(text => `
+                <div class="ingredient-item">
+                    <div class="ingredient-checkbox" onclick="this.classList.toggle('checked'); this.nextElementSibling.classList.toggle('checked')"></div>
+                    <span class="ingredient-text">${text}</span>
+                </div>
+            `).join('');
+        }
+    },
+
+    bindButtons() {
+        document.getElementById('increaseServings')?.addEventListener('click', () => {
+            this.servingsMultiplier = Math.min(this.servingsMultiplier + 0.5, 3);
+            this.updateServings();
+        });
+        document.getElementById('decreaseServings')?.addEventListener('click', () => {
+            this.servingsMultiplier = Math.max(this.servingsMultiplier - 0.5, 0.5);
+            this.updateServings();
+        });
+    },
+
+    updateServings() {
+        document.getElementById('servingsCount').textContent = Math.round(this.originalServings * this.servingsMultiplier * 10) / 10 + ' kişilik';
+        document.querySelectorAll('.ingredient-text').forEach((el, i) => {
+            const orig = this.originalIngredients[i];
+            if (orig) el.textContent = orig.replace(/(\d+)/g, n => Math.round(parseInt(n) * this.servingsMultiplier * 10) / 10);
+        });
+    },
 });
 
 window.Recipes = Recipes;
