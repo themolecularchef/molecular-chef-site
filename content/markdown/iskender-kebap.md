@@ -1,4 +1,3 @@
-[iskender-kebap.md](https://github.com/user-attachments/files/24979339/iskender-kebap.md)
 # Evde İskender Kebap & Tane Pilav
 
 ## Malzemeler (2 kişilik)
