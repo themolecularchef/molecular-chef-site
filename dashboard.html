@@ -1,22 +1,27 @@
 <!DOCTYPE html>
 <html lang="tr">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Kişisel tarif listenizi yönetin. Favorilerinizi kaydedin, özel listeler oluşturun.">
+    <meta name="description"
+        content="Kişisel tarif listenizi yönetin. Favorilerinizi kaydedin, özel listeler oluşturun.">
     <title>Listelerim | Lezzet Yolculuğu</title>
-    
+
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-    
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap"
+        rel="stylesheet">
+
     <!-- CSS -->
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/components.css">
-    
+
     <!-- Favicon -->
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍳</text></svg>">
+    <link rel="icon" type="image/svg+xml"
+        href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍳</text></svg>">
 
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
@@ -32,11 +37,12 @@
             messagingSenderId: "23609596807",
             appId: "1:23609596807:web:18db592c11caeaade29122"
         };
-        
+
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
     </script>
 </head>
+
 <body>
     <!-- Navigation -->
     <nav class="nav" id="nav">
@@ -45,12 +51,12 @@
                 <span class="nav-logo-icon">🍳</span>
                 <span class="nav-logo-text">Lezzet Yolculuğu</span>
             </a>
-            
+
             <div class="nav-links">
                 <a href="index.html" class="nav-link">Tarifler</a>
                 <a href="dashboard.html" class="nav-link active">Listelerim</a>
             </div>
-            
+
             <div class="nav-actions">
                 <button class="theme-toggle" id="themeToggle" aria-label="Karanlık moda geç">
                     <span class="theme-toggle-light">☀️</span>
@@ -61,7 +67,7 @@
                     <button class="nav-logout" id="navLogout" title="Çıkış yap">→</button>
                 </div>
             </div>
-            
+
             <button class="nav-mobile-toggle" id="navMobileToggle" aria-label="Menüyü aç">
                 <span></span>
                 <span></span>
@@ -82,15 +88,18 @@
         <div class="container">
             <!-- Dashboard Header -->
             <div class="dashboard-header" style="margin-bottom: var(--space-2xl);">
-                <h1 class="dashboard-title" style="font-family: var(--font-heading); font-size: clamp(1.75rem, 4vw, 2.5rem); font-weight: 600; margin-bottom: var(--space-sm);">
+                <h1 class="dashboard-title"
+                    style="font-family: var(--font-heading); font-size: clamp(1.75rem, 4vw, 2.5rem); font-weight: 600; margin-bottom: var(--space-sm);">
                     Merhaba, <span id="userName">Misafir</span> 👋
                 </h1>
-                <p class="dashboard-subtitle" style="font-size: 1rem; color: var(--color-text-secondary);">Favori tariflerinizi ve listelerinizi görüntüleyin</p>
+                <p class="dashboard-subtitle" style="font-size: 1rem; color: var(--color-text-secondary);">Favori
+                    tariflerinizi ve listelerinizi görüntüleyin</p>
             </div>
-            
+
             <!-- Create List Button -->
             <div style="margin-bottom: var(--space-xl);">
-                <button id="createListBtn" class="btn btn-primary" style="display: flex; align-items: center; gap: var(--space-sm);">
+                <button id="createListBtn" class="btn btn-primary"
+                    style="display: flex; align-items: center; gap: var(--space-sm);">
                     <span>+</span> Yeni Liste Oluştur
                 </button>
             </div>
@@ -107,7 +116,8 @@
                         <form id="createListForm">
                             <div class="form-group">
                                 <label class="form-label" for="listName">Liste Adı</label>
-                                <input type="text" class="form-input" id="listName" placeholder="Örn: Hafta Sonu Menüsü" required>
+                                <input type="text" class="form-input" id="listName" placeholder="Örn: Hafta Sonu Menüsü"
+                                    required>
                             </div>
                             <button type="submit" class="btn btn-primary btn-full">Oluştur</button>
                         </form>
@@ -125,13 +135,17 @@
                         <p class="modal-subtitle" id="listDetailCount">0 tarif</p>
                     </div>
                     <div class="modal-body">
-                        <div id="listRecipesGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: var(--space-lg);">
+                        <div id="listRecipesGrid"
+                            style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: var(--space-lg);">
                             <!-- Tarifler buraya yüklenecek -->
                         </div>
                         <div id="emptyListDetail" style="text-align: center; padding: var(--space-3xl); display: none;">
                             <div style="font-size: 4rem; margin-bottom: var(--space-lg); opacity: 0.5;">📋</div>
-                            <h4 style="font-family: var(--font-heading); font-size: 1.25rem; margin-bottom: var(--space-sm);">Liste boş</h4>
-                            <p style="color: var(--color-text-secondary); margin-bottom: var(--space-lg);">Bu listeye henüz tarif eklenmemiş.</p>
+                            <h4
+                                style="font-family: var(--font-heading); font-size: 1.25rem; margin-bottom: var(--space-sm);">
+                                Liste boş</h4>
+                            <p style="color: var(--color-text-secondary); margin-bottom: var(--space-lg);">Bu listeye
+                                henüz tarif eklenmemiş.</p>
                             <a href="index.html" class="btn btn-primary btn-sm">Tariflere Göz At</a>
                         </div>
                     </div>
@@ -140,39 +154,49 @@
 
             <!-- Lists Section -->
             <div class="lists-section">
-                <div class="lists-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-xl);">
-                    <h2 class="section-title" style="font-family: var(--font-heading); font-size: 1.5rem; font-weight: 600;">Listelerim</h2>
+                <div class="lists-header"
+                    style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-xl);">
+                    <h2 class="section-title"
+                        style="font-family: var(--font-heading); font-size: 1.5rem; font-weight: 600;">Listelerim</h2>
                 </div>
 
                 <!-- Lists Grid -->
-                <div class="lists-grid" id="listsGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: var(--space-lg);">
+                <div class="lists-grid" id="listsGrid"
+                    style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: var(--space-lg);">
                     <!-- Lists loaded dynamically -->
                 </div>
-                
+
                 <!-- Empty State -->
                 <div id="emptyLists" style="text-align: center; padding: var(--space-3xl); display: none;">
                     <div style="font-size: 4rem; margin-bottom: var(--space-lg); opacity: 0.5;">📋</div>
-                    <h4 style="font-family: var(--font-heading); font-size: 1.5rem; margin-bottom: var(--space-sm);">Henüz listeniz yok</h4>
-                    <p style="color: var(--color-text-secondary); margin-bottom: var(--space-lg);">İlk listenizi oluşturmak için "Yeni Liste" butonuna tıklayın.</p>
+                    <h4 style="font-family: var(--font-heading); font-size: 1.5rem; margin-bottom: var(--space-sm);">
+                        Henüz listeniz yok</h4>
+                    <p style="color: var(--color-text-secondary); margin-bottom: var(--space-lg);">İlk listenizi
+                        oluşturmak için "Yeni Liste" butonuna tıklayın.</p>
                 </div>
             </div>
-            
+
             <!-- Favorites Section -->
             <div class="lists-section" style="margin-top: var(--space-3xl);">
-                <div class="lists-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-xl);">
-                    <h2 class="section-title" style="font-family: var(--font-heading); font-size: 1.5rem; font-weight: 600;">Favorilerim</h2>
+                <div class="lists-header"
+                    style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-xl);">
+                    <h2 class="section-title"
+                        style="font-family: var(--font-heading); font-size: 1.5rem; font-weight: 600;">Favorilerim</h2>
                 </div>
 
                 <!-- Favorites Grid -->
-                <div class="lists-grid" id="favoritesGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: var(--space-lg);">
+                <div class="lists-grid" id="favoritesGrid"
+                    style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: var(--space-lg);">
                     <!-- Favorites loaded dynamically -->
                 </div>
-                
+
                 <!-- Empty State -->
                 <div id="emptyFavorites" style="text-align: center; padding: var(--space-3xl); display: none;">
                     <div style="font-size: 4rem; margin-bottom: var(--space-lg); opacity: 0.5;">❤️</div>
-                    <h4 style="font-family: var(--font-heading); font-size: 1.5rem; margin-bottom: var(--space-sm);">Henüz favori yok</h4>
-                    <p style="color: var(--color-text-secondary); margin-bottom: var(--space-lg);">Beğendiğiniz tarifleri favorilere ekleyin.</p>
+                    <h4 style="font-family: var(--font-heading); font-size: 1.5rem; margin-bottom: var(--space-sm);">
+                        Henüz favori yok</h4>
+                    <p style="color: var(--color-text-secondary); margin-bottom: var(--space-lg);">Beğendiğiniz
+                        tarifleri favorilere ekleyin.</p>
                     <a href="index.html" class="btn btn-primary btn-sm">Tariflere Göz At</a>
                 </div>
             </div>
@@ -207,10 +231,10 @@
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script src="js/recipes.js"></script>
     <script src="js/app.js"></script>
-    
+
     <script>
         // Modal fonksiyonları
-       
+
         // Toast fonksiyonu
         function showToast(message, type = 'default') {
             const toast = document.getElementById('toast');
@@ -231,14 +255,14 @@
                 window.location.href = 'index.html';
                 return;
             }
-            
+
             // Kullanıcı bilgilerini göster
             document.getElementById('userName').textContent = user.displayName || user.email;
             document.getElementById('navUserName').textContent = user.displayName || user.email;
-            
+
             // Önce tarifleri yükle
             await loadAllRecipes();
-            
+
             // Sonra listeleri ve favorileri yükle
             await loadLists();
             await loadFavorites();
@@ -260,29 +284,29 @@
         async function loadLists() {
             const user = firebase.auth().currentUser;
             if (!user) return;
-            
+
             try {
                 const doc = await db.collection('users').doc(user.uid).get();
                 const lists = doc.exists ? (doc.data().lists || []) : [];
-                
+
                 const grid = document.getElementById('listsGrid');
                 const emptyState = document.getElementById('emptyLists');
-                
+
                 if (lists.length === 0) {
                     grid.innerHTML = '';
                     emptyState.style.display = 'block';
                     return;
                 }
-                
+
                 emptyState.style.display = 'none';
-                
+
                 // Listeleri render et
                 grid.innerHTML = lists.map(list => {
                     const recipeCount = list.recipes ? list.recipes.length : 0;
-                    const recipeText = recipeCount === 0 ? 'Henüz tarif yok' : 
-                                      recipeCount === 1 ? '1 tarif' : 
-                                      `${recipeCount} tarif`;
-                    
+                    const recipeText = recipeCount === 0 ? 'Henüz tarif yok' :
+                        recipeCount === 1 ? '1 tarif' :
+                            `${recipeCount} tarif`;
+
                     // İlk tarifin görselini al (varsa)
                     let coverImage = '';
                     if (list.recipes && list.recipes.length > 0 && allRecipes.length > 0) {
@@ -291,7 +315,7 @@
                             coverImage = `<img src="${firstRecipe.image}" alt="${list.name}" style="width: 100%; height: 100%; object-fit: cover;">`;
                         }
                     }
-                    
+
                     return `
                         <div class="list-card" style="background: var(--color-surface); border-radius: var(--radius-xl); overflow: hidden; box-shadow: var(--shadow-sm); cursor: pointer; transition: transform 0.2s;" 
                              onmouseover="this.style.transform='translateY(-4px)'" 
@@ -311,7 +335,7 @@
                         </div>
                     `;
                 }).join('');
-                
+
             } catch (error) {
                 console.error("Listeler yüklenemedi:", error);
             }
@@ -321,40 +345,40 @@
         async function openListDetail(listId) {
             const user = firebase.auth().currentUser;
             if (!user) return;
-            
+
             try {
                 const doc = await db.collection('users').doc(user.uid).get();
                 if (!doc.exists) return;
-                
+
                 const lists = doc.data().lists || [];
                 const list = lists.find(l => l.id === listId);
-                
+
                 if (!list) return;
-                
+
                 // Modal başlığını güncelle
                 document.getElementById('listDetailTitle').textContent = list.name;
-                
+
                 const recipeCount = list.recipes ? list.recipes.length : 0;
-                document.getElementById('listDetailCount').textContent = 
-                    recipeCount === 0 ? 'Henüz tarif yok' : 
-                    recipeCount === 1 ? '1 tarif' : 
-                    `${recipeCount} tarif`;
-                
+                document.getElementById('listDetailCount').textContent =
+                    recipeCount === 0 ? 'Henüz tarif yok' :
+                        recipeCount === 1 ? '1 tarif' :
+                            `${recipeCount} tarif`;
+
                 const grid = document.getElementById('listRecipesGrid');
                 const emptyState = document.getElementById('emptyListDetail');
-                
+
                 if (recipeCount === 0) {
                     grid.style.display = 'none';
                     emptyState.style.display = 'block';
                 } else {
                     grid.style.display = 'grid';
                     emptyState.style.display = 'none';
-                    
+
                     // Tarifleri render et
                     grid.innerHTML = list.recipes.map(recipeId => {
                         const recipe = allRecipes.find(r => r.id.toString() === recipeId.toString());
                         if (!recipe) return '';
-                        
+
                         return `
                             <div class="recipe-card" style="background: var(--color-surface); border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-sm);">
                                 <div style="position: relative; aspect-ratio: 4/3; overflow: hidden;">
@@ -377,9 +401,9 @@
                         `;
                     }).join('');
                 }
-                
+
                 Modal.open('listDetailModal');
-                
+
             } catch (error) {
                 console.error("Liste detayı yüklenemedi:", error);
             }
@@ -389,19 +413,19 @@
         async function removeFromList(listId, recipeId) {
             const user = firebase.auth().currentUser;
             if (!user) return;
-            
+
             try {
                 const userRef = db.collection('users').doc(user.uid);
                 const doc = await userRef.get();
-                
+
                 if (doc.exists) {
                     const lists = doc.data().lists || [];
                     const listIndex = lists.findIndex(l => l.id === listId);
-                    
+
                     if (listIndex !== -1) {
                         lists[listIndex].recipes = lists[listIndex].recipes.filter(id => id !== recipeId);
                         await userRef.update({ lists: lists });
-                        
+
                         showToast('Listeden çıkarıldı');
                         openListDetail(listId); // Modalı yenile
                         loadLists(); // Listeleri yenile
@@ -420,27 +444,27 @@
 
         document.getElementById('createListForm')?.addEventListener('submit', async (e) => {
             e.preventDefault();
-            
+
             const user = firebase.auth().currentUser;
             if (!user) {
                 showToast('Giriş yapmalısınız', 'error');
                 return;
             }
-            
+
             const listName = document.getElementById('listName').value.trim();
             if (!listName) return;
-            
+
             try {
                 const userRef = db.collection('users').doc(user.uid);
                 const doc = await userRef.get();
-                
+
                 const newList = {
                     id: Date.now().toString(),
                     name: listName,
                     recipes: [],
                     createdAt: new Date().toISOString()
                 };
-                
+
                 if (doc.exists) {
                     const currentLists = doc.data().lists || [];
                     await userRef.update({
@@ -451,12 +475,12 @@
                         lists: [newList]
                     });
                 }
-                
+
                 showToast('Liste oluşturuldu!', 'success');
                 Modal.close('createListModal');
                 document.getElementById('createListForm').reset();
                 await loadLists();
-                
+
             } catch (error) {
                 console.error("Liste oluşturulamadı:", error);
                 showToast('Liste oluşturulamadı', 'error');
@@ -466,19 +490,19 @@
         // Liste sil
         async function deleteList(listId) {
             if (!confirm('Bu listeyi silmek istediğinize emin misiniz?')) return;
-            
+
             const user = firebase.auth().currentUser;
             if (!user) return;
-            
+
             try {
                 const userRef = db.collection('users').doc(user.uid);
                 const doc = await userRef.get();
-                
+
                 if (doc.exists) {
                     const currentLists = doc.data().lists || [];
                     const updatedLists = currentLists.filter(l => l.id !== listId);
                     await userRef.update({ lists: updatedLists });
-                    
+
                     showToast('Liste silindi');
                     await loadLists();
                 }
@@ -493,42 +517,42 @@
         async function loadFavorites() {
             const user = firebase.auth().currentUser;
             if (!user) return;
-            
+
             try {
                 console.log("Favoriler yükleniyor..."); // Kontrol 1
                 const doc = await db.collection('users').doc(user.uid).get();
-                
+
                 if (!doc.exists) {
                     console.log("Kullanıcı verisi yok.");
                     return;
                 }
-                
+
                 // Veritabanındaki favori ID'leri
                 const favorites = doc.data().favorites || [];
                 console.log("Bulunan Favori ID'leri:", favorites); // Kontrol 2
-                
+
                 const grid = document.getElementById('favoritesGrid');
-                
+
                 if (favorites.length === 0) {
                     grid.innerHTML = '<p class="empty-state">Henüz favori tarifiniz yok.</p>';
                     return;
                 }
-                
+
                 // Tüm tarifleri getir
                 const recipes = await Recipes.loadRecipes();
-                
+
                 // KRİTİK DÜZELTME: Hem Metin (String) hem Sayı (Number) olarak kontrol et
                 const favRecipes = recipes.filter(r => {
-                    return favorites.includes(r.id) || 
-                           favorites.includes(String(r.id)) || 
-                           favorites.includes(Number(r.id));
+                    return favorites.includes(r.id) ||
+                        favorites.includes(String(r.id)) ||
+                        favorites.includes(Number(r.id));
                 });
-                
+
                 console.log("Eşleşen Tarifler:", favRecipes); // Kontrol 3
-                
+
                 if (favRecipes.length === 0) {
-                     grid.innerHTML = '<p class="empty-state">Favoriler var ama tarif dosyasıyla eşleşmedi. ID sorunu olabilir.</p>';
-                     return;
+                    grid.innerHTML = '<p class="empty-state">Favoriler var ama tarif dosyasıyla eşleşmedi. ID sorunu olabilir.</p>';
+                    return;
                 }
 
                 grid.innerHTML = favRecipes.map(recipe => {
@@ -547,40 +571,41 @@
                         </div>
                     `;
                 }).join('');
-                
+
             } catch (error) {
                 console.error("Favoriler yüklenemedi:", error);
                 document.getElementById('favoritesGrid').innerHTML = '<p style="color:red">Bir hata oluştu: ' + error.message + '</p>';
             }
         }
-        
+
         // Favoriden çıkar
         async function removeFavorite(recipeId) {
             const user = firebase.auth().currentUser;
             if (!user) return;
-            
+
             try {
                 await db.collection('users').doc(user.uid).update({
                     favorites: firebase.firestore.FieldValue.arrayRemove(recipeId)
                 });
-                
+
                 showToast('Favorilerden çıkarıldı');
                 loadFavorites();
             } catch (error) {
                 console.error("Favori silinemedi:", error);
             }
         }
-        
+
         // Çıkış yap
         document.getElementById('navLogout').addEventListener('click', async () => {
             await firebase.auth().signOut();
             window.location.href = 'index.html';
         });
-        
+
         document.getElementById('mobileLogout').addEventListener('click', async () => {
             await firebase.auth().signOut();
             window.location.href = 'index.html';
         });
     </script>
 </body>
+
 </html>

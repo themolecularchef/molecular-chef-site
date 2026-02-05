@@ -1,37 +1,43 @@
 <!DOCTYPE html>
 <html lang="tr">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Lezzet Yolculuğu'na giriş yapın veya hesap oluşturun. Favori tariflerinizi kaydedin, kişisel listeler oluşturun.">
+    <meta name="description"
+        content="Lezzet Yolculuğu'na giriş yapın veya hesap oluşturun. Favori tariflerinizi kaydedin, kişisel listeler oluşturun.">
     <title>Giriş | Lezzet Yolculuğu</title>
-    
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-    
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap"
+        rel="stylesheet">
+
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/components.css">
-    
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍳</text></svg>">
+
+    <link rel="icon" type="image/svg+xml"
+        href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍳</text></svg>">
 
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
     <script>
-         const firebaseConfig = {
-    apiKey: "AIzaSyCfWLSG4d7bamB-_3rDCeZFnM5Paq4GBO4",
-    authDomain: "the-molecular-chef-17eb2.firebaseapp.com",
-    projectId: "the-molecular-chef-17eb2",
-    storageBucket: "the-molecular-chef-17eb2.firebasestorage.app",
-    messagingSenderId: "23609596807",
-    appId: "1:23609596807:web:18db592c11caeaade29122"
-};
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
+        const firebaseConfig = {
+            apiKey: "AIzaSyCfWLSG4d7bamB-_3rDCeZFnM5Paq4GBO4",
+            authDomain: "the-molecular-chef-17eb2.firebaseapp.com",
+            projectId: "the-molecular-chef-17eb2",
+            storageBucket: "the-molecular-chef-17eb2.firebasestorage.app",
+            messagingSenderId: "23609596807",
+            appId: "1:23609596807:web:18db592c11caeaade29122"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
     </script>
 </head>
+
 <body class="auth-page">
     <nav class="nav nav-transparent" id="nav">
         <div class="nav-container">
@@ -52,7 +58,7 @@ const db = firebase.firestore();
                 <h1 class="auth-title" id="authTitle">Giriş Yap</h1>
                 <p class="auth-subtitle" id="authSubtitle">Hesabınıza giriş yaparak tariflerinizi kaydedin</p>
             </div>
-            
+
             <form class="auth-form" id="authForm">
                 <div class="form-group" id="nameGroup" style="display: none;">
                     <label class="form-label" for="name">İsim</label>
@@ -60,22 +66,25 @@ const db = firebase.firestore();
                 </div>
                 <div class="form-group">
                     <label class="form-label" for="email">E-posta</label>
-                    <input type="email" class="form-input" id="email" name="email" placeholder="ornek@email.com" required>
+                    <input type="email" class="form-input" id="email" name="email" placeholder="ornek@email.com"
+                        required>
                 </div>
                 <div class="form-group">
                     <label class="form-label" for="password">Şifre</label>
-                    <input type="password" class="form-input" id="password" name="password" placeholder="••••••••" required>
+                    <input type="password" class="form-input" id="password" name="password" placeholder="••••••••"
+                        required>
                 </div>
                 <div class="form-group" id="confirmPasswordGroup" style="display: none;">
                     <label class="form-label" for="confirmPassword">Şifre Tekrar</label>
-                    <input type="password" class="form-input" id="confirmPassword" name="confirmPassword" placeholder="••••••••">
+                    <input type="password" class="form-input" id="confirmPassword" name="confirmPassword"
+                        placeholder="••••••••">
                 </div>
                 <button type="submit" class="btn btn-primary btn-full" id="authSubmit">Giriş Yap</button>
             </form>
-            
+
             <div class="auth-divider"><span>veya</span></div>
             <a href="index.html" onclick="skipAuth(event)" class="btn btn-ghost btn-full">Üye Olmadan Devam Et</a>
-            
+
             <div class="auth-toggle">
                 <p id="authToggleText">Hesabınız yok mu?</p>
                 <button class="auth-toggle-btn" id="authToggleBtn">Kayıt Ol</button>
@@ -88,7 +97,7 @@ const db = firebase.firestore();
     </div>
 
     <script src="js/app.js"></script>
-    
+
     <script>
         // Theme
         const ThemeManager = {
@@ -166,7 +175,7 @@ const db = firebase.firestore();
             } else {
                 const name = document.getElementById('name').value.trim();
                 const confirmPass = document.getElementById('confirmPassword').value;
-                
+
                 if (!name) return showToast('İsim girin', 'error');
                 if (password !== confirmPass) return showToast('Şifreler eşleşmiyor', 'error');
                 if (password.length < 6) return showToast('Şifre en az 6 karakter', 'error');
@@ -197,4 +206,5 @@ const db = firebase.firestore();
         }
     </script>
 </body>
+
 </html>

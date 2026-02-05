@@ -1,47 +1,54 @@
 <!DOCTYPE html>
 <html lang="tr">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Lezzetli yemek tarifleri, adım adım anlatımlar ve püf noktaları. Evde profesyonel sonuçlar için tariflerimizi keşfedin.">
+    <meta name="description"
+        content="Lezzetli yemek tarifleri, adım adım anlatımlar ve püf noktaları. Evde profesyonel sonuçlar için tariflerimizi keşfedin.">
     <title>Lezzet Yolculuğu | Yemek Tarifleri</title>
-    
+
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-    
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap"
+        rel="stylesheet">
+
     <!-- CSS -->
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/components.css">
-    
+
     <!-- Favicon -->
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍳</text></svg>">
+    <link rel="icon" type="image/svg+xml"
+        href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍳</text></svg>">
 
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
-<script>
-  // Yeni Proje Bilgileriniz
-  const firebaseConfig = {
-    apiKey: "AIzaSyCfWLSG4d7bamB-_3rDCeZFnM5Paq4GBO4",
-    authDomain: "the-molecular-chef-17eb2.firebaseapp.com",
-    projectId: "the-molecular-chef-17eb2",
-    storageBucket: "the-molecular-chef-17eb2.firebasestorage.app",
-    messagingSenderId: "23609596807",
-    appId: "1:23609596807:web:18db592c11caeaade29122"
-  };
+    <script>
+        // Yeni Proje Bilgileriniz
+        const firebaseConfig = {
+            apiKey: "AIzaSyCfWLSG4d7bamB-_3rDCeZFnM5Paq4GBO4",
+            authDomain: "the-molecular-chef-17eb2.firebaseapp.com",
+            projectId: "the-molecular-chef-17eb2",
+            storageBucket: "the-molecular-chef-17eb2.firebasestorage.app",
+            messagingSenderId: "23609596807",
+            appId: "1:23609596807:web:18db592c11caeaade29122"
+        };
 
-  // Firebase'i Başlat
-  firebase.initializeApp(firebaseConfig);
-  const db = firebase.firestore();
-</script>
+        // Firebase'i Başlat
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+    </script>
 </head>
+
 <body>
     <!-- GİRİŞ EKRANI (İlk Başlangıç) -->
-    <div id="authScreen" style="position: fixed; inset: 0; z-index: 9999; background: linear-gradient(135deg, var(--color-bg) 0%, var(--color-bg-secondary) 100%); min-height: 100vh; display: none; flex-direction: column;">
+    <div id="authScreen"
+        style="position: fixed; inset: 0; z-index: 9999; background: linear-gradient(135deg, var(--color-bg) 0%, var(--color-bg-secondary) 100%); min-height: 100vh; display: none; flex-direction: column;">
         <!-- Navigation -->
         <nav class="nav nav-transparent">
             <div class="nav-container">
@@ -58,49 +65,68 @@
 
         <!-- Auth Container -->
         <main style="flex: 1; display: flex; align-items: center; justify-content: center; padding: 2rem;">
-            <div style="width: 100%; max-width: 420px; background: var(--color-surface); border-radius: 16px; padding: 2.5rem; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);">
+            <div
+                style="width: 100%; max-width: 420px; background: var(--color-surface); border-radius: 16px; padding: 2.5rem; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);">
                 <div style="text-align: center; margin-bottom: 2rem;">
-                    <h1 id="authTitle" style="font-family: var(--font-heading); font-size: 1.75rem; font-weight: 600; margin-bottom: 0.5rem;">Giriş Yap</h1>
-                    <p id="authSubtitle" style="font-size: 0.9375rem; color: var(--color-text-secondary);">Hesabınıza giriş yaparak tariflerinizi kaydedin</p>
+                    <h1 id="authTitle"
+                        style="font-family: var(--font-heading); font-size: 1.75rem; font-weight: 600; margin-bottom: 0.5rem;">
+                        Giriş Yap</h1>
+                    <p id="authSubtitle" style="font-size: 0.9375rem; color: var(--color-text-secondary);">Hesabınıza
+                        giriş yaparak tariflerinizi kaydedin</p>
                 </div>
-                
+
                 <form id="authForm" style="margin-bottom: 1.5rem;">
                     <div id="nameGroup" style="display: none; margin-bottom: 1.5rem;">
-                        <label style="display: block; font-size: 0.875rem; font-weight: 500; margin-bottom: 0.5rem;">İsim</label>
-                        <input type="text" id="name" placeholder="İsminizi girin" style="width: 100%; padding: 0.75rem; border: 1px solid var(--color-border); border-radius: 8px; background: var(--color-bg);">
+                        <label
+                            style="display: block; font-size: 0.875rem; font-weight: 500; margin-bottom: 0.5rem;">İsim</label>
+                        <input type="text" id="name" placeholder="İsminizi girin"
+                            style="width: 100%; padding: 0.75rem; border: 1px solid var(--color-border); border-radius: 8px; background: var(--color-bg);">
                     </div>
-                    
+
                     <div style="margin-bottom: 1.5rem;">
-                        <label style="display: block; font-size: 0.875rem; font-weight: 500; margin-bottom: 0.5rem;">E-posta</label>
-                        <input type="email" id="email" placeholder="ornek@email.com" required style="width: 100%; padding: 0.75rem; border: 1px solid var(--color-border); border-radius: 8px; background: var(--color-bg);">
+                        <label
+                            style="display: block; font-size: 0.875rem; font-weight: 500; margin-bottom: 0.5rem;">E-posta</label>
+                        <input type="email" id="email" placeholder="ornek@email.com" required
+                            style="width: 100%; padding: 0.75rem; border: 1px solid var(--color-border); border-radius: 8px; background: var(--color-bg);">
                     </div>
-                    
+
                     <div style="margin-bottom: 1.5rem;">
-                        <label style="display: block; font-size: 0.875rem; font-weight: 500; margin-bottom: 0.5rem;">Şifre</label>
-                        <input type="password" id="password" placeholder="••••••••" required style="width: 100%; padding: 0.75rem; border: 1px solid var(--color-border); border-radius: 8px; background: var(--color-bg);">
+                        <label
+                            style="display: block; font-size: 0.875rem; font-weight: 500; margin-bottom: 0.5rem;">Şifre</label>
+                        <input type="password" id="password" placeholder="••••••••" required
+                            style="width: 100%; padding: 0.75rem; border: 1px solid var(--color-border); border-radius: 8px; background: var(--color-bg);">
                     </div>
-                    
+
                     <div id="confirmPasswordGroup" style="display: none; margin-bottom: 1.5rem;">
-                        <label style="display: block; font-size: 0.875rem; font-weight: 500; margin-bottom: 0.5rem;">Şifre Tekrar</label>
-                        <input type="password" id="confirmPassword" placeholder="••••••••" style="width: 100%; padding: 0.75rem; border: 1px solid var(--color-border); border-radius: 8px; background: var(--color-bg);">
+                        <label
+                            style="display: block; font-size: 0.875rem; font-weight: 500; margin-bottom: 0.5rem;">Şifre
+                            Tekrar</label>
+                        <input type="password" id="confirmPassword" placeholder="••••••••"
+                            style="width: 100%; padding: 0.75rem; border: 1px solid var(--color-border); border-radius: 8px; background: var(--color-bg);">
                     </div>
-                    
-                    <button type="submit" id="authSubmit" style="width: 100%; padding: 0.75rem; background: var(--color-accent); color: white; border: none; border-radius: 8px; font-weight: 500; cursor: pointer; font-size: 1rem;">Giriş Yap</button>
+
+                    <button type="submit" id="authSubmit"
+                        style="width: 100%; padding: 0.75rem; background: var(--color-accent); color: white; border: none; border-radius: 8px; font-weight: 500; cursor: pointer; font-size: 1rem;">Giriş
+                        Yap</button>
                 </form>
-                
-                <div style="display: flex; align-items: center; gap: 1rem; margin: 1.5rem 0; color: var(--color-text-muted); font-size: 0.875rem;">
+
+                <div
+                    style="display: flex; align-items: center; gap: 1rem; margin: 1.5rem 0; color: var(--color-text-muted); font-size: 0.875rem;">
                     <span style="flex: 1; height: 1px; background: var(--color-border);"></span>
                     <span>veya</span>
                     <span style="flex: 1; height: 1px; background: var(--color-border);"></span>
                 </div>
-                
-                <button id="skipAuthBtn" style="width: 100%; padding: 0.75rem; background: transparent; border: 1px solid var(--color-border); border-radius: 8px; font-weight: 500; cursor: pointer; color: var(--color-text-secondary); margin-bottom: 1.5rem;">
+
+                <button id="skipAuthBtn"
+                    style="width: 100%; padding: 0.75rem; background: transparent; border: 1px solid var(--color-border); border-radius: 8px; font-weight: 500; cursor: pointer; color: var(--color-text-secondary); margin-bottom: 1.5rem;">
                     Üye Olmadan Devam Et
                 </button>
-                
+
                 <div style="text-align: center; font-size: 0.9375rem; color: var(--color-text-secondary);">
                     <span id="authToggleText">Hesabınız yok mu?</span>
-                    <button id="authToggleBtn" style="background: none; border: none; color: var(--color-accent); font-weight: 500; cursor: pointer; margin-left: 0.25rem;">Kayıt Ol</button>
+                    <button id="authToggleBtn"
+                        style="background: none; border: none; color: var(--color-accent); font-weight: 500; cursor: pointer; margin-left: 0.25rem;">Kayıt
+                        Ol</button>
                 </div>
             </div>
         </main>
@@ -115,12 +141,12 @@
                     <span class="nav-logo-icon">🍳</span>
                     <span class="nav-logo-text">Lezzet Yolculuğu</span>
                 </a>
-                
+
                 <div class="nav-links">
                     <a href="index.html" class="nav-link active">Tarifler</a>
                     <a href="dashboard.html" class="nav-link nav-link-lists hidden" id="navLists">Listelerim</a>
                 </div>
-                
+
                 <div class="nav-actions">
                     <button class="theme-toggle" id="themeToggle" aria-label="Karanlık moda geç">
                         <span class="theme-toggle-light">☀️</span>
@@ -132,7 +158,7 @@
                         <button class="nav-logout" id="navLogout" title="Çıkış yap">→</button>
                     </div>
                 </div>
-                
+
                 <button class="nav-mobile-toggle" id="navMobileToggle" aria-label="Menüyü aç">
                     <span></span>
                     <span></span>
@@ -209,7 +235,9 @@
                 <button class="modal-close" onclick="closeAddToListModal()" aria-label="Kapat">×</button>
                 <div class="modal-header">
                     <h3 class="modal-title">Nereye kaydedeyim?</h3>
-                    <p class="modal-subtitle" id="addToListRecipeName" style="font-size: 0.875rem; color: var(--color-text-secondary); margin-top: var(--space-xs);"></p>
+                    <p class="modal-subtitle" id="addToListRecipeName"
+                        style="font-size: 0.875rem; color: var(--color-text-secondary); margin-top: var(--space-xs);">
+                    </p>
                 </div>
                 <div class="modal-body">
                     <div id="addToListOptions" style="display: flex; flex-direction: column; gap: var(--space-md);">
@@ -273,12 +301,12 @@
                 authScreen.style.display = 'none';
                 mainWebsite.style.display = 'block';
                 document.body.style.overflow = 'auto';
-                
+
                 if (navAuth) navAuth.classList.add('hidden');
                 if (navUser) navUser.classList.remove('hidden');
                 if (navUserName) navUserName.textContent = user.displayName || user.email;
                 if (navLists) navLists.classList.remove('hidden');
-                
+
                 if (mobileAuth) mobileAuth.classList.add('hidden');
                 if (mobileUser) mobileUser.classList.remove('hidden');
                 if (mobileUserName) mobileUserName.textContent = user.displayName || user.email;
@@ -294,7 +322,7 @@
                     mainWebsite.style.display = 'none';
                     document.body.style.overflow = 'hidden';
                 }
-                
+
                 if (navAuth) navAuth.classList.remove('hidden');
                 if (navUser) navUser.classList.add('hidden');
                 if (navLists) navLists.classList.add('hidden');
@@ -309,7 +337,7 @@
             const skipBtn = document.getElementById('skipAuthBtn');
             const toggleBtn = document.getElementById('authToggleBtn');
             const form = document.getElementById('authForm');
-            
+
             if (skipBtn) {
                 skipBtn.addEventListener('click', () => {
                     localStorage.setItem('skipAuth', 'true');
@@ -318,7 +346,7 @@
                     document.body.style.overflow = 'auto';
                 });
             }
-            
+
             let isLoginMode = true;
             if (toggleBtn) {
                 toggleBtn.addEventListener('click', () => {
@@ -332,13 +360,13 @@
                     toggleBtn.textContent = isLoginMode ? 'Kayıt Ol' : 'Giriş Yap';
                 });
             }
-            
+
             if (form) {
                 form.addEventListener('submit', async (e) => {
                     e.preventDefault();
                     const email = document.getElementById('email').value;
                     const password = document.getElementById('password').value;
-                    
+
                     if (isLoginMode) {
                         try {
                             await firebase.auth().signInWithEmailAndPassword(email, password);
@@ -351,26 +379,26 @@
                     } else {
                         const name = document.getElementById('name').value;
                         const confirmPass = document.getElementById('confirmPassword').value;
-                        
+
                         if (!name.trim()) {
                             alert('Lütfen isminizi girin');
                             return;
                         }
-                        
+
                         if (password !== confirmPass) {
                             alert('Şifreler eşleşmiyor');
                             return;
                         }
-                        
+
                         if (password.length < 6) {
                             alert('Şifre en az 6 karakter olmalı');
                             return;
                         }
-                        
+
                         try {
                             const result = await firebase.auth().createUserWithEmailAndPassword(email, password);
                             await result.user.updateProfile({ displayName: name });
-                            
+
                             await db.collection('users').doc(result.user.uid).set({
                                 name: name,
                                 email: email,
@@ -387,10 +415,10 @@
                     }
                 });
             }
-            
+
             const navLogout = document.getElementById('navLogout');
             const mobileLogout = document.getElementById('mobileLogout');
-            
+
             if (navLogout) {
                 navLogout.addEventListener('click', async () => {
                     await firebase.auth().signOut();
@@ -398,7 +426,7 @@
                     location.reload();
                 });
             }
-            
+
             if (mobileLogout) {
                 mobileLogout.addEventListener('click', async () => {
                     await firebase.auth().signOut();
@@ -430,21 +458,21 @@
 
             currentRecipeForList = recipeId;
             document.getElementById('addToListRecipeName').textContent = recipeTitle;
-            
+
             const modal = document.getElementById('addToListModal');
             const optionsContainer = document.getElementById('addToListOptions');
-            
+
             // Kullanıcının listelerini çek
             try {
                 const userRef = db.collection('users').doc(user.uid);
                 const doc = await userRef.get();
-                
+
                 let html = '';
-                
+
                 // Favoriler seçeneği (her zaman var)
                 const favorites = doc.exists ? (doc.data().favorites || []) : [];
                 const isInFavorites = favorites.includes(recipeId);
-                
+
                 html += `
                     <button onclick="addToFavorites('${recipeId}')" 
                             class="btn ${isInFavorites ? 'btn-secondary' : 'btn-primary'} btn-full" 
@@ -456,15 +484,15 @@
                         </div>
                     </button>
                 `;
-                
+
                 // Kullanıcının diğer listeleri
                 if (doc.exists) {
                     const lists = doc.data().lists || [];
-                    
+
                     if (lists.length > 0) {
                         html += `<div style="border-top: 1px solid var(--color-border); padding-top: var(--space-md); margin-top: var(--space-sm);">
                             <p style="font-size: 0.875rem; color: var(--color-text-secondary); margin-bottom: var(--space-md);">Listelerim:</p>`;
-                        
+
                         for (const list of lists) {
                             const isInList = list.recipes && list.recipes.includes(recipeId);
                             html += `
@@ -480,11 +508,11 @@
                                 </button>
                             `;
                         }
-                        
+
                         html += `</div>`;
                     }
                 }
-                
+
                 // Yeni liste oluştur butonu
                 html += `
                     <button onclick="window.location.href='dashboard.html'" 
@@ -493,11 +521,11 @@
                         <span>+</span> Yeni Liste Oluştur
                     </button>
                 `;
-                
+
                 optionsContainer.innerHTML = html;
                 modal.classList.add('active');
                 document.body.style.overflow = 'hidden';
-                
+
             } catch (error) {
                 console.error("Listeler yüklenemedi:", error);
                 Toast.show('Listeler yüklenemedi', 'error');
@@ -516,17 +544,17 @@
         async function addToFavorites(recipeId) {
             const user = firebase.auth().currentUser;
             if (!user) return;
-            
+
             try {
                 const userRef = db.collection('users').doc(user.uid);
                 const doc = await userRef.get();
-                
+
                 if (!doc.exists) {
                     await userRef.set({ favorites: [recipeId], lists: [] });
                     Toast.show('Favorilere eklendi!', 'success');
                 } else {
                     const favorites = doc.data().favorites || [];
-                    
+
                     if (favorites.includes(recipeId)) {
                         // Favorilerden çıkar
                         await userRef.update({
@@ -541,14 +569,14 @@
                         Toast.show('Favorilere eklendi!', 'success');
                     }
                 }
-                
+
                 // Modalı yenile
                 const recipe = window.Recipes ? window.Recipes.getRecipeById(recipeId) : null;
                 openAddToListModal(recipeId, recipe ? recipe.title : '');
-                
+
                 // Kalp butonunu güncelle
                 updateFavoriteButtonUI(recipeId);
-                
+
             } catch (error) {
                 console.error("Favori hatası:", error);
                 Toast.show('İşlem yapılamadı', 'error');
@@ -559,19 +587,19 @@
         async function addToCustomList(listId, recipeId) {
             const user = firebase.auth().currentUser;
             if (!user) return;
-            
+
             try {
                 const userRef = db.collection('users').doc(user.uid);
                 const doc = await userRef.get();
-                
+
                 if (doc.exists) {
                     const lists = doc.data().lists || [];
                     const listIndex = lists.findIndex(l => l.id === listId);
-                    
+
                     if (listIndex !== -1) {
                         const list = lists[listIndex];
                         const listRecipes = list.recipes || [];
-                        
+
                         if (listRecipes.includes(recipeId)) {
                             // Listeden çıkar
                             lists[listIndex].recipes = listRecipes.filter(id => id !== recipeId);
@@ -583,7 +611,7 @@
                             await userRef.update({ lists: lists });
                             Toast.show('Listeye eklendi!', 'success');
                         }
-                        
+
                         // Modalı yenile
                         const recipe = window.Recipes ? window.Recipes.getRecipeById(recipeId) : null;
                         openAddToListModal(recipeId, recipe ? recipe.title : '');
@@ -605,7 +633,7 @@
                         if (doc.exists) {
                             const favorites = doc.data().favorites || [];
                             const isFavorited = favorites.includes(recipeId);
-                            
+
                             if (isFavorited) {
                                 btn.classList.add('active');
                                 btn.dataset.favorited = "true";
@@ -627,4 +655,5 @@
         document.getElementById('addToListModal')?.querySelector('.modal-backdrop')?.addEventListener('click', closeAddToListModal);
     </script>
 </body>
+
 </html>

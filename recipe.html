@@ -1,38 +1,43 @@
 <!DOCTYPE html>
 <html lang="tr">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Detaylı yemek tarifi. Malzemeler, adım adım hazırlık ve püf noktaları.">
     <title>Tarif | Lezzet Yolculuğu</title>
-    
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-    
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap"
+        rel="stylesheet">
+
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/components.css">
     <link rel="stylesheet" href="css/print.css" media="print">
-    
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍳</text></svg>">
+
+    <link rel="icon" type="image/svg+xml"
+        href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍳</text></svg>">
 
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
     <script>
-           const firebaseConfig = {
-       apiKey: "AIzaSyCfWLSG4d7bamB-_3rDCeZFnM5Paq4GBO4",
-       authDomain: "the-molecular-chef-17eb2.firebaseapp.com",
-       projectId: "the-molecular-chef-17eb2",
-       storageBucket: "the-molecular-chef-17eb2.firebasestorage.app",
-       messagingSenderId: "23609596807",
-       appId: "1:23609596807:web:18db592c11caeaade29122"
-    };
+        const firebaseConfig = {
+            apiKey: "AIzaSyCfWLSG4d7bamB-_3rDCeZFnM5Paq4GBO4",
+            authDomain: "the-molecular-chef-17eb2.firebaseapp.com",
+            projectId: "the-molecular-chef-17eb2",
+            storageBucket: "the-molecular-chef-17eb2.firebasestorage.app",
+            messagingSenderId: "23609596807",
+            appId: "1:23609596807:web:18db592c11caeaade29122"
+        };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
     </script>
 </head>
+
 <body>
     <nav class="nav" id="nav">
         <div class="nav-container">
@@ -40,12 +45,12 @@
                 <span class="nav-logo-icon">🍳</span>
                 <span class="nav-logo-text">Lezzet Yolculuğu</span>
             </a>
-            
+
             <div class="nav-links">
                 <a href="index.html" class="nav-link">Tarifler</a>
                 <a href="dashboard.html" class="nav-link nav-link-lists hidden" id="navLists">Listelerim</a>
             </div>
-            
+
             <div class="nav-actions">
                 <button class="theme-toggle" id="themeToggle" aria-label="Karanlık moda geç">
                     <span class="theme-toggle-light">☀️</span>
@@ -57,7 +62,7 @@
                     <button class="nav-logout" id="navLogout" title="Çıkış yap">→</button>
                 </div>
             </div>
-            
+
             <button class="nav-mobile-toggle" id="navMobileToggle" aria-label="Menüyü aç">
                 <span></span><span></span><span></span>
             </button>
@@ -221,12 +226,12 @@
                 if (navUser) navUser.classList.remove('hidden');
                 if (navUserName) navUserName.textContent = user.displayName || user.email;
                 if (navLists) navLists.classList.remove('hidden');
-                
+
                 if (mobileAuth) mobileAuth.classList.add('hidden');
                 if (mobileUser) mobileUser.classList.remove('hidden');
                 if (mobileUserName) mobileUserName.textContent = user.displayName || user.email;
                 if (mobileLists) mobileLists.classList.remove('hidden');
-                
+
                 checkFavoriteStatus();
             } else {
                 if (navAuth) navAuth.classList.remove('hidden');
@@ -243,7 +248,7 @@
             localStorage.removeItem('skipAuth');
             window.location.href = 'index.html';
         });
-        
+
         document.getElementById('mobileLogout')?.addEventListener('click', async () => {
             await firebase.auth().signOut();
             localStorage.removeItem('skipAuth');
@@ -251,32 +256,32 @@
         });
 
         async function checkFavoriteStatus() {
-    const recipeId = new URLSearchParams(window.location.search).get('id');
-    if (!recipeId) return;
-    
-    try {
-        const user = firebase.auth().currentUser;
-        if (!user) return;
-        
-        const doc = await db.collection('users').doc(user.uid).get();
-        if (doc.exists) {
-            const favorites = doc.data().favorites || [];
-            updateFavoriteButton(favorites.includes(recipeId));
-        } else {
-            updateFavoriteButton(false);
+            const recipeId = new URLSearchParams(window.location.search).get('id');
+            if (!recipeId) return;
+
+            try {
+                const user = firebase.auth().currentUser;
+                if (!user) return;
+
+                const doc = await db.collection('users').doc(user.uid).get();
+                if (doc.exists) {
+                    const favorites = doc.data().favorites || [];
+                    updateFavoriteButton(favorites.includes(recipeId));
+                } else {
+                    updateFavoriteButton(false);
+                }
+            } catch (e) {
+                console.error("Favori kontrol hatası:", e);
+            }
         }
-    } catch (e) {
-        console.error("Favori kontrol hatası:", e);
-    }
-}
 
         function updateFavoriteButton(isFavorited) {
             const btn = document.getElementById('addToFavoritesBtn');
             if (!btn) return;
-            
+
             const icon = btn.querySelector('.action-btn-icon');
             const text = btn.querySelector('.action-btn-text');
-            
+
             if (isFavorited) {
                 btn.classList.add('active');
                 if (icon) icon.textContent = '❤️';
@@ -289,54 +294,54 @@
         }
 
         document.getElementById('addToFavoritesBtn')?.addEventListener('click', async () => {
-    const user = firebase.auth().currentUser;
-    if (!user) {
-        showToast('Favorilere eklemek için giriş yapmalısınız', 'error');
-        setTimeout(() => window.location.href = 'auth.html', 1500);
-        return;
-    }
-    
-    const recipeId = new URLSearchParams(window.location.search).get('id');
-    if (!recipeId) return;
-    
-    try {
-        const userRef = db.collection('users').doc(user.uid);
-        const userDoc = await userRef.get();
-        
-        if (!userDoc.exists) {
-            // Kullanıcı dokümanı yoksa oluştur
-            await userRef.set({
-                favorites: [recipeId],
-                name: user.displayName || '',
-                email: user.email
-            });
-            updateFavoriteButton(true);
-            showToast('Favorilere eklendi!', 'success');
-            return;
-        }
-        
-        const currentFavorites = userDoc.data().favorites || [];
-        
-        if (currentFavorites.includes(recipeId)) {
-            // Favorilerden çıkar
-            await userRef.update({
-                favorites: firebase.firestore.FieldValue.arrayRemove(recipeId)
-            });
-            updateFavoriteButton(false);
-            showToast('Favorilerden çıkarıldı');
-        } else {
-            // Favorilere ekle
-            await userRef.update({
-                favorites: firebase.firestore.FieldValue.arrayUnion(recipeId)
-            });
-            updateFavoriteButton(true);
-            showToast('Favorilere eklendi!', 'success');
-        }
-    } catch (error) {
-        console.error("Favori hatası:", error);
-        showToast('İşlem yapılamadı', 'error');
-    }
-});
+            const user = firebase.auth().currentUser;
+            if (!user) {
+                showToast('Favorilere eklemek için giriş yapmalısınız', 'error');
+                setTimeout(() => window.location.href = 'auth.html', 1500);
+                return;
+            }
+
+            const recipeId = new URLSearchParams(window.location.search).get('id');
+            if (!recipeId) return;
+
+            try {
+                const userRef = db.collection('users').doc(user.uid);
+                const userDoc = await userRef.get();
+
+                if (!userDoc.exists) {
+                    // Kullanıcı dokümanı yoksa oluştur
+                    await userRef.set({
+                        favorites: [recipeId],
+                        name: user.displayName || '',
+                        email: user.email
+                    });
+                    updateFavoriteButton(true);
+                    showToast('Favorilere eklendi!', 'success');
+                    return;
+                }
+
+                const currentFavorites = userDoc.data().favorites || [];
+
+                if (currentFavorites.includes(recipeId)) {
+                    // Favorilerden çıkar
+                    await userRef.update({
+                        favorites: firebase.firestore.FieldValue.arrayRemove(recipeId)
+                    });
+                    updateFavoriteButton(false);
+                    showToast('Favorilerden çıkarıldı');
+                } else {
+                    // Favorilere ekle
+                    await userRef.update({
+                        favorites: firebase.firestore.FieldValue.arrayUnion(recipeId)
+                    });
+                    updateFavoriteButton(true);
+                    showToast('Favorilere eklendi!', 'success');
+                }
+            } catch (error) {
+                console.error("Favori hatası:", error);
+                showToast('İşlem yapılamadı', 'error');
+            }
+        });
 
         function showToast(message, type = 'default') {
             const toast = document.getElementById('toast');
@@ -346,4 +351,5 @@
         }
     </script>
 </body>
+
 </html>
