@@ -77,44 +77,20 @@ const Recipes = {
     },
 
     async renderRecipesGrid(recipes = null) {
-    const grid = document.getElementById('recipesGrid');
-    const emptyState = document.getElementById('emptyState');
-    
-    if (!grid) return;
-    
-    const recipesToRender = recipes || this.data;
-    
-    if (!recipesToRender || recipesToRender.length === 0) {
-        grid.innerHTML = '';
-        if (emptyState) emptyState.classList.remove('hidden');
-        return;
-    }
-    
-    if (emptyState) emptyState.classList.add('hidden');
-    
-    // SKELETON GÖSTER (yükleme başlangıcı)
-    if (window.SkeletonLoader) {
-        SkeletonLoader.showGridSkeleton('recipesGrid', 6);
-    }
-    
-    // Gerçek içeriği hazırla (kısa gecikme ile kullanıcı animasyonu görsün)
-    setTimeout(() => {
-        const html = recipesToRender.map(recipe => `
-            <article class="recipe-card" data-id="${recipe.id}">
-                <!-- ... mevcut kart HTML'i ... -->
-            </article>
-        `).join('');
+        const grid = document.getElementById('recipesGrid');
+        const emptyState = document.getElementById('emptyState');
         
-        // Skeleton'u kaldır ve gerçek içeriği göster
-        if (window.SkeletonLoader) {
-            SkeletonLoader.hideSkeleton('recipesGrid', html);
-        } else {
-            grid.innerHTML = html;
+        if (!grid) return;
+        
+        const recipesToRender = recipes || this.data;
+        
+        if (!recipesToRender || recipesToRender.length === 0) {
+            grid.innerHTML = '';
+            if (emptyState) emptyState.classList.remove('hidden');
+            return;
         }
         
-        this.bindCardEvents();
-    }, 500); // 500ms bekle (animasyon gözüksün)
-}
+        if (emptyState) emptyState.classList.add('hidden');
         
         grid.innerHTML = recipesToRender.map(recipe => `
             <article class="recipe-card" data-id="${recipe.id}">
