@@ -173,10 +173,8 @@
         let currentRecipeForList = null;
         let isLoginMode = true;
 
-        // Auth State Management
+                // Auth State Management
         firebase.auth().onAuthStateChanged((user) => {
-            const authScreen = document.getElementById('authScreen');
-            const mainWebsite = document.getElementById('mainWebsite');
             const navAuth = document.getElementById('navAuth');
             const navUser = document.getElementById('navUser');
             const navUserName = document.getElementById('navUserName');
@@ -187,42 +185,34 @@
             const mobileLists = document.getElementById('mobileLists');
 
             if (user) {
-                authScreen.style.display = 'none';
-                mainWebsite.style.display = 'block';
-                document.body.style.overflow = 'auto';
-
+                // Giriş yapmış
                 if (navAuth) navAuth.classList.add('hidden');
-                if (navUser) navUser.classList.remove('hidden');
-                if (navUserName) navUserName.textContent = user.displayName || user.email;
+                if (navUser) {
+                    navUser.classList.remove('hidden');
+                    navUserName.textContent = user.displayName || user.email;
+                }
                 if (navLists) navLists.classList.remove('hidden');
-
+                
                 if (mobileAuth) mobileAuth.classList.add('hidden');
-                if (mobileUser) mobileUser.classList.remove('hidden');
-                if (mobileUserName) mobileUserName.textContent = user.displayName || user.email;
+                if (mobileUser) {
+                    mobileUser.classList.remove('hidden');
+                    mobileUserName.textContent = user.displayName || user.email;
+                }
                 if (mobileLists) mobileLists.classList.remove('hidden');
                 
                 updateFavoriteButtons();
             } else {
-                const hasSkipped = localStorage.getItem('skipAuth');
-                if (hasSkipped) {
-                    authScreen.style.display = 'none';
-                    mainWebsite.style.display = 'block';
-                    document.body.style.overflow = 'auto';
-                } else {
-                    authScreen.style.display = 'flex';
-                    mainWebsite.style.display = 'none';
-                    document.body.style.overflow = 'hidden';
-                }
-
+                // Giriş yapmamış - ana sayfa göster
                 if (navAuth) navAuth.classList.remove('hidden');
                 if (navUser) navUser.classList.add('hidden');
                 if (navLists) navLists.classList.add('hidden');
+                
                 if (mobileAuth) mobileAuth.classList.remove('hidden');
                 if (mobileUser) mobileUser.classList.add('hidden');
                 if (mobileLists) mobileLists.classList.add('hidden');
             }
         });
-
+        
         // Auth Screen Logic
         document.addEventListener('DOMContentLoaded', () => {
             // Skip Auth
