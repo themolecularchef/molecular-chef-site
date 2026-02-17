@@ -53,7 +53,7 @@
                         <span class="theme-toggle-light">☀️</span>
                         <span class="theme-toggle-dark">🌙</span>
                     </button>
-                    <a href="#" onclick="showAuthScreen(); return false;" class="nav-auth" id="navAuth">Giriş</a>
+                    <a href="auth.html" class="nav-auth" id="navAuth">Giriş</a>
                     <div class="nav-user hidden" id="navUser">
                         <span class="nav-user-name" id="navUserName"></span>
                         <button class="nav-logout" id="navLogout" title="Çıkış yap">→</button>
@@ -71,7 +71,7 @@
         <div class="mobile-menu" id="mobileMenu">
             <a href="index.html" class="mobile-link active">Tarifler</a>
             <a href="dashboard.html" class="mobile-link mobile-link-lists hidden" id="mobileLists">Listelerim</a>
-            <a href="#" onclick="showAuthScreen(); return false;" class="mobile-link" id="mobileAuth">Giriş</a>
+            <a href="au<a href="auth.html" class="mobile-link" id="mobileAuth">Giriş</a>th.html" class="nav-auth" id="navAuth">Giriş</a>
             <div class="mobile-user hidden" id="mobileUser">
                 <span class="mobile-user-name" id="mobileUserName"></span>
                 <button class="mobile-logout" id="mobileLogout">Çıkış Yap</button>
@@ -156,7 +156,7 @@
                     </div>
                     <div class="footer-links">
                         <a href="index.html">Tarifler</a>
-                        <a href="#" onclick="showAuthScreen(); return false;">Giriş</a>
+                        <a href="auth.html">Giriş</a>
                     </div>
                 </div>
                 <div class="footer-bottom">
@@ -215,111 +215,14 @@
         
         // Auth Screen Logic
         document.addEventListener('DOMContentLoaded', () => {
-            // Skip Auth
-            document.getElementById('skipAuthBtn')?.addEventListener('click', () => {
-                localStorage.setItem('skipAuth', 'true');
-                document.getElementById('authScreen').style.display = 'none';
-                document.getElementById('mainWebsite').style.display = 'block';
-                document.body.style.overflow = 'auto';
-            });
-
-            // Toggle Login/Register
-            document.getElementById('authToggleBtn')?.addEventListener('click', toggleAuthMode);
-
-            // Auth Form Submit
-            document.getElementById('authForm')?.addEventListener('submit', handleAuthSubmit);
-
-            // Logout Buttons
-            document.getElementById('navLogout')?.addEventListener('click', handleLogout);
-            document.getElementById('mobileLogout')?.addEventListener('click', handleLogout);
-
-            // Theme Toggle for Auth Screen
-            document.getElementById('themeToggleAuth')?.addEventListener('click', () => {
-                ThemeManager.toggle();
-            });
 
             // Hero Slider
             initHeroSlider();
         });
 
-        function toggleAuthMode() {
-            isLoginMode = !isLoginMode;
-            document.getElementById('authTitle').textContent = isLoginMode ? 'Giriş Yap' : 'Kayıt Ol';
-            document.getElementById('authSubtitle').textContent = isLoginMode ? 'Hesabınıza giriş yaparak tariflerinizi kaydedin' : 'Yeni bir hesap oluşturun';
-            document.getElementById('authSubmit').textContent = isLoginMode ? 'Giriş Yap' : 'Kayıt Ol';
-            document.getElementById('nameGroup').style.display = isLoginMode ? 'none' : 'block';
-            document.getElementById('confirmPasswordGroup').style.display = isLoginMode ? 'none' : 'block';
-            document.getElementById('authToggleText').textContent = isLoginMode ? 'Hesabınız yok mu?' : 'Zaten hesabınız var mı?';
-            document.getElementById('authToggleBtn').textContent = isLoginMode ? 'Kayıt Ol' : 'Giriş Yap';
-        }
 
-        async function handleAuthSubmit(e) {
-            e.preventDefault();
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-
-            if (isLoginMode) {
-                try {
-                    await firebase.auth().signInWithEmailAndPassword(email, password);
-                    Toast.show('Giriş başarılı!', 'success');
-                } catch (error) {
-                    let msg = 'Giriş yapılamadı';
-                    if (error.code === 'auth/user-not-found') msg = 'Kullanıcı bulunamadı';
-                    if (error.code === 'auth/wrong-password') msg = 'Şifre hatalı';
-                    Toast.show(msg, 'error');
-                }
-            } else {
-                const name = document.getElementById('name').value;
-                const confirmPass = document.getElementById('confirmPassword').value;
-
-                if (!name.trim()) {
-                    Toast.show('Lütfen isminizi girin', 'error');
-                    return;
-                }
-                if (password !== confirmPass) {
-                    Toast.show('Şifreler eşleşmiyor', 'error');
-                    return;
-                }
-                if (password.length < 6) {
-                    Toast.show('Şifre en az 6 karakter olmalı', 'error');
-                    return;
-                }
-
-                try {
-                    const result = await firebase.auth().createUserWithEmailAndPassword(email, password);
-                    await result.user.updateProfile({ displayName: name });
-                    await db.collection('users').doc(result.user.uid).set({
-                        name: name,
-                        email: email,
-                        createdAt: new Date().toISOString(),
-                        favorites: [],
-                        lists: []
-                    });
-                    Toast.show('Kayıt başarılı!', 'success');
-                } catch (error) {
-                    let msg = 'Kayıt yapılamadı';
-                    if (error.code === 'auth/email-already-in-use') msg = 'Bu e-posta zaten kayıtlı';
-                    if (error.code === 'auth/weak-password') msg = 'Şifre çok zayıf';
-                    Toast.show(msg, 'error');
-                }
-            }
-        }
-
-        async function handleLogout() {
-            await firebase.auth().signOut();
-            localStorage.removeItem('skipAuth');
-            window.location.reload();
-        }
-
-        function showAuthScreen() {
-            localStorage.removeItem('skipAuth');
-            const authScreen = document.getElementById('authScreen');
-            const mainWebsite = document.getElementById('mainWebsite');
-            if (authScreen && mainWebsite) {
-                authScreen.style.display = 'flex';
-                mainWebsite.style.display = 'none';
-                document.body.style.overflow = 'hidden';
-            }
+                function showAuthScreen() {
+            window.location.href = 'auth.html';
         }
 
         function initHeroSlider() {
